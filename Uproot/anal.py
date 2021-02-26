@@ -55,10 +55,14 @@ MT_e = np.sqrt(2*Leading_Electron_pt * MET_sel_met*(1-np.cos(MET_sel_T2vec.delta
 #plt.xlim(0,200)
 #plt.show()
 
+histo = {}
+histo['MT'] = MT_e.sum() 
 
 
 outname = sample_name + ".npy"
 
-np.save(outname,MT_e.sum())
+print(histo.keys())
+
+np.save(outname,histo)
 
 print("End processing.... Bye Bye!")

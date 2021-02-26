@@ -3,7 +3,12 @@ import numpy as np
 Wdec = 'Wdec.npy'
 
 Wdec_Ntuple = np.load(Wdec,allow_pickle=True)
-MT_arr = Wdec_Ntuple
+Ntuples = Wdec_Ntuple[()]
+
+
+
+MT_arr = Ntuples['MT']
+
 
 import matplotlib.pyplot as plt
 
