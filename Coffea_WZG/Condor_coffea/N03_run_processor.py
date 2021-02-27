@@ -137,81 +137,7 @@ class JW_Processor(processor.ProcessorABC):
 				"Events",
 				hist.Cat("dataset","Dataset"),
 				hist.Bin("ele2phi","Subleading Electron $\phi$ [GeV]", 20, -3.15, 3.15),
-			),
-
-			"pho_EE_pt": hist.Hist(
-				"Events",
-				hist.Cat("dataset","Dataset"),
-				hist.Bin("pho_EE_pt","Photon EE $P_{T}$ [GeV]", 300, 0, 600),
-			),
-			"pho_EE_eta": hist.Hist(
-				"Events",
-				hist.Cat("dataset","Dataset"),
-				hist.Bin("pho_EE_eta","Photon EE $\eta$ ", 50, -5, 5),
-			),
-			"pho_EE_phi": hist.Hist(
-				"Events",
-				hist.Cat("dataset","Dataset"),
-				hist.Bin("pho_EE_phi","Photon EE $\phi$ ", 50, -3.15, 3.15),
-			),
-			"pho_EE_hoe": hist.Hist(
-				"Events",
-				hist.Cat("dataset","Dataset"),
-				hist.Bin("pho_EE_hoe","Photon EE HoverE", 100, 0, 0.6),
-			),
-
-			"pho_EE_sieie": hist.Hist(
-				"Events",
-				hist.Cat("dataset","Dataset"),
-				hist.Bin("pho_EE_sieie","Photon EE sieie", 100, 0, 0.03),
-			),
-			"pho_EE_Iso_all": hist.Hist(
-				"Events",
-				hist.Cat("dataset","Dataset"),
-				hist.Bin("pho_EE_Iso_all","Photon EE pfReoIso03_all", 100, 0, 0.3),
-			),
-			"pho_EE_Iso_chg": hist.Hist(
-				"Events",
-				hist.Cat("dataset","Dataset"),
-				hist.Bin("pho_EE_Iso_chg","Photon EE pfReoIso03_charge", 200, 0, 1),
-			),
-			"pho_EB_pt": hist.Hist(
-				"Events",
-				hist.Cat("dataset","Dataset"),
-				hist.Bin("pho_EB_pt","Photon EB $P_{T}$ [GeV]", 300, 0, 600),
-			),
-			"pho_EB_eta": hist.Hist(
-				"Events",
-				hist.Cat("dataset","Dataset"),
-				hist.Bin("pho_EB_eta","Photon EB $\eta$ ", 50, -5, 5),
-			),
-			"pho_EB_phi": hist.Hist(
-				"Events",
-				hist.Cat("dataset","Dataset"),
-				hist.Bin("pho_EB_phi","Photon EB $\phi$ ", 50, -3.15, 3.15),
-			),
-			"pho_EB_hoe": hist.Hist(
-				"Events",
-				hist.Cat("dataset","Dataset"),
-				hist.Bin("pho_EB_hoe","Photon EB HoverE", 100, 0, 0.6),
-			),
-
-			"pho_EB_sieie": hist.Hist(
-				"Events",
-				hist.Cat("dataset","Dataset"),
-				hist.Bin("pho_EB_sieie","Photon EB sieie", 100, 0, 0.012),
-			),
-			"pho_EB_Iso_all": hist.Hist(
-				"Events",
-				hist.Cat("dataset","Dataset"),
-				hist.Bin("pho_EB_Iso_all","Photon EB pfReoIso03_all", 100, 0, 0.15),
-			),
-			"pho_EB_Iso_chg": hist.Hist(
-				"Events",
-				hist.Cat("dataset","Dataset"),
-				hist.Bin("pho_EB_Iso_chg","Photon EB pfReoIso03_charge", 100, 0, 0.03),
 			)
-
 			})
 		
 	# -- Accumulator: accumulate histograms
@@ -293,26 +219,18 @@ class JW_Processor(processor.ProcessorABC):
 		print("#### cut1: ",len(cut1))
 		# Particle Identification
 		Electron = events.Electron
-		Photon = events.Photon
 
-		def Particle_selection(ele,pho):
-			# Electron selection
-			EleSelmask = (ele.pt > 25) & (np.abs(ele.eta) < 2.5) & (ele.cutBased > 2)
-			
-			# Photon selection
-			PhoSelmask = (pho.pt > 25) & (pho.cutBased > 2)
-			return EleSelmask,PhoSelmask
+		def Electron_selection(ele):
+			return(ele.pt > 25) & (np.abs(ele.eta) < 2.5) & (ele.cutBased > 2)
 		
 
-		# Event Selection
-		Electron_mask, Photon_mask  = Particle_selection(Electron,Photon)
+		# Electron channel
+		Electron_mask = Electron_selection(Electron)
 		Ele_channel_mask = ak.num(Electron[Electron_mask]) > 1
-		Pho_channel_mask = ak.num(Photon[Photon_mask]) > 0
-
-		Ele_channel_events = events[Ele_channel_mask & Pho_channel_mask]
+		Ele_channel_events = events[Ele_channel_mask]
 
 
-		##-----------  Cut flow2: Electron channel with one photon
+		##-----------  Cut flow2: Electron channel
 		cut2 = np.ones(len(Ele_channel_events)) * 2
 		print("#### cut2: ",len(cut2))
 		
@@ -324,7 +242,7 @@ class JW_Processor(processor.ProcessorABC):
 			#pu = get_pu_weight(events.Pileup.nTrueInt)
 	
 			get_ele_reco_sf = self._corrections['get_ele_reco_sf'][self._year]
-			get_ele_loose_id_sf = self._corrections['get_ele_loose_id_sf'][self._year]
+			get_ele_medium_id_sf = self._corrections['get_ele_medium_id_sf'][self._year]
 
 
 			get_ele_trig_leg1_SF		= self._corrections['get_ele_trig_leg1_SF'][self._year]
@@ -347,47 +265,11 @@ class JW_Processor(processor.ProcessorABC):
 			nPV = Ele_channel_events.PV.npvsGood
 
 
-		# Particle array
+		# Electron array
 		Ele = Ele_channel_events.Electron
-		Pho = Ele_channel_events.Photon
-		
-		Electron_mask,Photon_mask = Particle_selection(Ele,Pho)	
+		Electron_mask = Electron_selection(Ele)	
 		Ele_sel = Ele[Electron_mask]	
-		Pho_sel = Pho[Photon_mask]	
-		
-		# Helper function: High PT argmax
-		def make_leading_pair(target,base):
 
-			return target[ak.argmax(base.pt,axis=1,keepdims=True)]
-
-		leading_pho = make_leading_pair(Pho_sel,Pho_sel)
-		
-
-		# Photon 
-		isEE_mask = leading_pho.isScEtaEE
-		isEB_mask = leading_pho.isScEtaEB
-		
-		# Photon EE
-		Pho_EE = leading_pho[isEE_mask]
-		Pho_EE_PT		 = flat_dim(Pho_EE.pt)
-		Pho_EE_Eta		= flat_dim(Pho_EE.eta)
-		Pho_EE_Phi		= flat_dim(Pho_EE.phi)
-		Pho_EE_sieie	  = flat_dim(Pho_EE.sieie)
-		Pho_EE_hoe		= flat_dim(Pho_EE.hoe)
-		Pho_EE_Iso_all	= flat_dim(Pho_EE.pfRelIso03_all)
-		Pho_EE_Iso_charge = flat_dim(Pho_EE.pfRelIso03_chg)
-
-		# Photon EB
-		Pho_EB = leading_pho[isEB_mask]
-		Pho_EB_PT		 = flat_dim(Pho_EB.pt)
-		Pho_EB_Eta		= flat_dim(Pho_EB.eta)
-		Pho_EB_Phi		= flat_dim(Pho_EB.phi)
-		Pho_EB_sieie	  = flat_dim(Pho_EB.sieie)
-		Pho_EB_hoe		= flat_dim(Pho_EB.hoe)
-		Pho_EB_Iso_all	= flat_dim(Pho_EB.pfRelIso03_all)
-		Pho_EB_Iso_charge = flat_dim(Pho_EB.pfRelIso03_chg)
-		
-		
 
 
 		# Electron pair
@@ -405,6 +287,10 @@ class JW_Processor(processor.ProcessorABC):
 		#selection.add('ossf',os_event_mask)
 
 
+		# Helper function: High PT argmax
+		def make_leading_pair(target,base):
+
+			return target[ak.argmax(base.pt,axis=1,keepdims=True)]
 
 
 		# -- Only Leading pair --
@@ -429,7 +315,7 @@ class JW_Processor(processor.ProcessorABC):
 			
 
 		if not isData:
-			ele_loose_id_sf = get_ele_loose_id_sf(ak.flatten(leading_ele.deltaEtaSC + leading_ele.eta),ak.flatten(leading_ele.pt))* get_ele_loose_id_sf(ak.flatten(subleading_ele.deltaEtaSC + subleading_ele.eta),ak.flatten(subleading_ele.pt))
+			ele_mediun_id_sf = get_ele_medium_id_sf(ak.flatten(leading_ele.deltaEtaSC + leading_ele.eta),ak.flatten(leading_ele.pt))* get_ele_medium_id_sf(ak.flatten(subleading_ele.deltaEtaSC + subleading_ele.eta),ak.flatten(subleading_ele.pt))
 			#print("Ele ID SC---->",ele_loose_id_sf)
 			
 			ele_reco_sf = get_ele_reco_sf(ak.flatten(leading_ele.deltaEtaSC + leading_ele.eta),ak.flatten(leading_ele.pt))* get_ele_reco_sf(ak.flatten(subleading_ele.deltaEtaSC + subleading_ele.eta),ak.flatten(subleading_ele.pt))
@@ -507,15 +393,10 @@ class JW_Processor(processor.ProcessorABC):
 			mask2 = subarr !=0
 			return ak.to_numpy(subarr[mask2])
 
-
 		cuts = ak.flatten(Zmass_mask_os)
-		cuts_pho_EE = ak.flatten(isEE_mask)
-		cuts_pho_EB = ak.flatten(isEB_mask)
-
-
 		if not isData:
 			weights.add('pileup',pu)		
-			weights.add('ele_id',ele_loose_id_sf)		
+			weights.add('ele_id',ele_medium_id_sf)		
 			weights.add('ele_reco',ele_reco_sf)		
 			weights.add('ele_trigger',ele_trig_weight)		
 
@@ -544,8 +425,6 @@ class JW_Processor(processor.ProcessorABC):
 		)
 
 		# Physics varibles passing Zwindow
-
-			# -- Electron -- #
 		out["mass"].fill(
 			dataset=dataset,
 			mass=Mee,
@@ -581,80 +460,6 @@ class JW_Processor(processor.ProcessorABC):
 			ele2phi=ele2Phi,
 			weight = skim_weight(weights.weight() * cuts)
 		)
-
-			# -- Photon -- #
-		out["pho_EE_pt"].fill(
-			dataset=dataset,
-			pho_EE_pt=Pho_EE_PT,
-			weight = skim_weight(weights.weight() * cuts_pho_EE)
-		)
-		out["pho_EE_eta"].fill(
-			dataset=dataset,
-			pho_EE_eta=Pho_EE_Eta,
-			weight = skim_weight(weights.weight() * cuts_pho_EE)
-		)
-		out["pho_EE_phi"].fill(
-			dataset=dataset,
-			pho_EE_phi=Pho_EE_Phi,
-			weight = skim_weight(weights.weight() * cuts_pho_EE)
-		)
-		out["pho_EE_hoe"].fill(
-			dataset=dataset,
-			pho_EE_hoe=Pho_EE_hoe,
-			weight = skim_weight(weights.weight() * cuts_pho_EE)
-		)
-		out["pho_EE_sieie"].fill(
-			dataset=dataset,
-			pho_EE_sieie=Pho_EE_sieie,
-			weight = skim_weight(weights.weight() * cuts_pho_EE)
-		)
-		out["pho_EE_Iso_all"].fill(
-			dataset=dataset,
-			pho_EE_Iso_all=Pho_EE_Iso_all,
-			weight = skim_weight(weights.weight() * cuts_pho_EE)
-		)
-		out["pho_EE_Iso_chg"].fill(
-			dataset=dataset,
-			pho_EE_Iso_chg=Pho_EE_Iso_charge,
-			weight = skim_weight(weights.weight() * cuts_pho_EE)
-		)
-		out["pho_EB_pt"].fill(
-			dataset=dataset,
-			pho_EB_pt=Pho_EB_PT,
-			weight = skim_weight(weights.weight() * cuts_pho_EB)
-		)
-		out["pho_EB_eta"].fill(
-			dataset=dataset,
-			pho_EB_eta=Pho_EB_Eta,
-			weight = skim_weight(weights.weight() * cuts_pho_EB)
-		)
-		out["pho_EB_phi"].fill(
-			dataset=dataset,
-			pho_EB_phi=Pho_EB_Phi,
-			weight = skim_weight(weights.weight() * cuts_pho_EB)
-		)
-		out["pho_EB_hoe"].fill(
-			dataset=dataset,
-			pho_EB_hoe=Pho_EB_hoe,
-			weight = skim_weight(weights.weight() * cuts_pho_EB)
-		)
-		out["pho_EB_sieie"].fill(
-			dataset=dataset,
-			pho_EB_sieie=Pho_EB_sieie,
-			weight = skim_weight(weights.weight() * cuts_pho_EB)
-		)
-		out["pho_EB_Iso_all"].fill(
-			dataset=dataset,
-			pho_EB_Iso_all=Pho_EB_Iso_all,
-			weight = skim_weight(weights.weight() * cuts_pho_EB)
-		)
-		out["pho_EB_Iso_chg"].fill(
-			dataset=dataset,
-			pho_EB_Iso_chg=Pho_EB_Iso_charge,
-			weight = skim_weight(weights.weight() * cuts_pho_EB)
-		)
-
-
 		return out
 
 	# -- Finally! return accumulator

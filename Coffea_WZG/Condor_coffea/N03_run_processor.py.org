@@ -242,7 +242,7 @@ class JW_Processor(processor.ProcessorABC):
 			#pu = get_pu_weight(events.Pileup.nTrueInt)
 	
 			get_ele_reco_sf = self._corrections['get_ele_reco_sf'][self._year]
-			get_ele_loose_id_sf = self._corrections['get_ele_loose_id_sf'][self._year]
+			get_ele_medium_id_sf = self._corrections['get_ele_medium_id_sf'][self._year]
 
 
 			get_ele_trig_leg1_SF		= self._corrections['get_ele_trig_leg1_SF'][self._year]
@@ -315,7 +315,7 @@ class JW_Processor(processor.ProcessorABC):
 			
 
 		if not isData:
-			ele_loose_id_sf = get_ele_loose_id_sf(ak.flatten(leading_ele.deltaEtaSC + leading_ele.eta),ak.flatten(leading_ele.pt))* get_ele_loose_id_sf(ak.flatten(subleading_ele.deltaEtaSC + subleading_ele.eta),ak.flatten(subleading_ele.pt))
+			ele_mediun_id_sf = get_ele_medium_id_sf(ak.flatten(leading_ele.deltaEtaSC + leading_ele.eta),ak.flatten(leading_ele.pt))* get_ele_medium_id_sf(ak.flatten(subleading_ele.deltaEtaSC + subleading_ele.eta),ak.flatten(subleading_ele.pt))
 			#print("Ele ID SC---->",ele_loose_id_sf)
 			
 			ele_reco_sf = get_ele_reco_sf(ak.flatten(leading_ele.deltaEtaSC + leading_ele.eta),ak.flatten(leading_ele.pt))* get_ele_reco_sf(ak.flatten(subleading_ele.deltaEtaSC + subleading_ele.eta),ak.flatten(subleading_ele.pt))
@@ -396,7 +396,7 @@ class JW_Processor(processor.ProcessorABC):
 		cuts = ak.flatten(Zmass_mask_os)
 		if not isData:
 			weights.add('pileup',pu)		
-			weights.add('ele_id',ele_loose_id_sf)		
+			weights.add('ele_id',ele_medium_id_sf)		
 			weights.add('ele_reco',ele_reco_sf)		
 			weights.add('ele_trigger',ele_trig_weight)		
 
