@@ -20,10 +20,10 @@ def counter(f_list):
 			empty+=1
 			trash_files.append(f)
 
-	return sum,empty,trash_files
+	return cnt,sum,empty,trash_files
 
 
-sum,empty,trash_files = counter(file_list)
+cnt,sum,empty,trash_files = counter(file_list)
 
 ## 3. Show results
 print("##"*22)
