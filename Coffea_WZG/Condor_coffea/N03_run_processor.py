@@ -318,7 +318,7 @@ class JW_Processor(processor.ProcessorABC):
 		MET = events.MET
 
 
-
+		# ID variables
 		def Particle_selection(ele,pho,jet):
 			# Electron selection
 			EleSelmask = (ele.pt > 25) & (np.abs(ele.eta) < 2.5) & (ele.cutBased > 2)
@@ -331,7 +331,7 @@ class JW_Processor(processor.ProcessorABC):
 			
 			return EleSelmask,PhoSelmask,bJet_selmask
 
-		# Event Selection
+		# Event Selection   --> 3 Electrons 1 or more photon  0 bjet
 		Electron_mask, Photon_mask, bjet_selmask  = Particle_selection(Electron,Photon,Jet)
 		Ele_channel_mask = ak.num(Electron[Electron_mask])  == 3 
 		Pho_channel_mask = ak.num(Photon[Photon_mask]) > 0
@@ -379,7 +379,7 @@ class JW_Processor(processor.ProcessorABC):
 		Electron = Electron[Electron_mask]	
 		Photon   = Photon[Photon_mask]
 
-		# OSSF
+		# OSSF index maker
 		@numba.njit
 		def find_3lep(events_leptons,builder):
 		    
@@ -402,10 +402,10 @@ class JW_Processor(processor.ProcessorABC):
 		    return builder
 
 		eee_triplet_idx = find_3lep(Electron,ak.ArrayBuilder()).snapshot()
+		
+		# OSSF cut
 		ossf_mask = ak.num(eee_triplet_idx) == 2
 		eee_triplet_idx = eee_triplet_idx[ossf_mask]
-
-
 		Electron= Electron[ossf_mask]
 		Photon= Photon[ossf_mask]
 		Jet= Jet[ossf_mask]
@@ -461,6 +461,7 @@ class JW_Processor(processor.ProcessorABC):
 		                   "p4":TLorentz_vector(Triple_electron[0]+Triple_electron[1])})
 
 
+		# Ele pair selector --> Close to Z mass
 		bestZ_idx = ak.singletons(ak.argmin(abs(Triple_eee.p4.mass - 91.1876), axis=1))
 		Triple_eee = Triple_eee[bestZ_idx]
 		
@@ -469,9 +470,9 @@ class JW_Processor(processor.ProcessorABC):
 		# dR cut
 		def make_DR(ele1,ele2,pho,jet):
 		      
-		    dR_e1pho  = ele1.delta_r(pho)
-		    dR_e2pho  = ele2.delta_r(pho)
-		    dR_phojet = jet[:,0].delta_r(pho)
+		    dR_e1pho  = ele1.delta_r(pho) # dR pho,ele1
+		    dR_e2pho  = ele2.delta_r(pho) # dR pho,ele2
+		    dR_phojet = jet[:,0].delta_r(pho) # dR pho,jet
 		    dR_mask   = (dR_e1pho > 0.4) & (dR_e2pho > 0.4) & (dR_phojet > 0.4)
 		    
 		    return dR_mask,dR_e1pho,dR_e2pho,dR_phojet
@@ -517,7 +518,7 @@ class JW_Processor(processor.ProcessorABC):
 
 		# -- Scale Factor for each electron
 
-
+		# Trigger weight helper function
 		def Trigger_Weight(eta1,pt1,eta2,pt2):
 			per_ev_MC =\
 			get_ele_trig_leg1_mc_Eff(eta1,pt1) * get_ele_trig_leg2_mc_Eff(eta2,pt2) +\
@@ -552,8 +553,8 @@ class JW_Processor(processor.ProcessorABC):
 
 		
 
-		# for masking
-
+		
+		# Event selection --  M(ee)  M(eea)
 		diele = Triple_eee.p4
 		zmass_window_mask = ak.firsts((diele.mass) > 60 | (diele.mass < 120))
 		eeg_vec = diele + Photon[:,0]
@@ -570,6 +571,10 @@ class JW_Processor(processor.ProcessorABC):
 
 		##-----------  Cut flow5: Event Selection
 		cut5 = np.ones(ak.sum(ak.num(Photon_sel) > 0)) * 5
+
+
+
+		## -------------------- Prepare making hist --------------#
 
 
 		# Photon EE
@@ -631,6 +636,8 @@ class JW_Processor(processor.ProcessorABC):
 		
 		print("cut0: {0}, cut1: {1}, cut2: {2}, cut3: {3}, cut4: {4}, cut5: {5},Mee: {6}".format(len(Initial_events),len(cut1),len(cut2),len(cut3),len(cut4),len(cut5),len(Mee)))
 
+
+		# Weight and SF here
 		if not isData:
 			weights.add('pileup',pu)		
 			weights.add('ele_id',ele_medium_id_sf)		
@@ -639,6 +646,9 @@ class JW_Processor(processor.ProcessorABC):
 			weights.add('ele_trigger',ele_trig_weight)		
 			print("#### Weight: ",weights.weight())
 
+
+
+		# ---------------------------- Fill hist --------------------------------------#
 
 		# Initial events
 		out["sumw"][dataset] += len(Initial_events)
