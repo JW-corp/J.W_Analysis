@@ -65,28 +65,31 @@ MET_sel	        =  MET[Evt_mask]
 print("Selected Events: ",len(Electron))
 
 
-## W --MT calculation     <Use Ak0 donwn-grade ...  ak1 with vector method is on developing..>
-# ! -------Warning ------>  ak.zip modify the an array type ak0-based jagged-array to ak1-based High level-array
-# You should condiser this when you try the ak0-based method eg. uproot method
+## W --MT calculation   < Trick is used .. not stable.. ak1 with vector method is on developing..>
+			# --------------- Warning --------------#
+#	ak.zip modify the an array type ak0-based jagged-array to ak1-based High level-array
+#	In principle, you cannot use the ak0-based method including uproot_method
+#	But, there is trick: You can use one-dimensional array with uproot_method
+#
+#	If you realy want to use multi-dimensional array with uproot_method
+#	Please use the ak.to_awkward0 method like below:
+#
+#	def Make_T2Vector(pt,phi):
+#		pt  = ak.to_awkward0(pt)
+#		phi = ak.to_awkward0(phi)
+#		return TVector2Array.from_polar(pt,phi)
+#
+#	Beware ths fact that ak0 array is shown as 1-dimensional array even if is is actually 2-dimentional array
+#	ak0arr.shape -> (N,)
 
-def Make_T2Vector(pt,phi):
-	pt  = ak.to_awkward0(pt)
-	phi = ak.to_awkward0(phi)
-	return TVector2Array.from_polar(pt,phi)
 
 
-Electron_T2vec = Make_T2Vector(Electron_sel.PT,Electron_sel.Phi)
-MET_T2vec	   = Make_T2Vector(MET_sel.MET,MET_sel.Phi)
+MET_T2vec				   = TVector2Array.from_polar(MET_sel.MET,MET_sel.Phi) 
 
 Leading_Electron		   = Electron_sel[ak.argmax(Electron_sel.PT,axis=1,keepdims=True)]
-Leading_Electron_T2Vec	   = Make_T2Vector(Leading_Electron.PT,Leading_Electron.Phi)
+Leading_Electron_T2Vec	   = TVector2Array.from_polar(Leading_Electron.PT,Leading_Electron.Phi)
 
-# !--------- Warning ---------! 
-#  ak0-based jagged array has shape of (N,) but ak1-based high level array has shape of (N,N)
-#  Do not match this dimension with ak.flatten() or array.sum() 
-#  This difference is from the different version
-#  Therefore, please use the ak.to_awkward0 method to match the difference dimensions from difference ak version
-MT_e = np.sqrt(2*ak.to_awkward0(Leading_Electron.PT) *ak.to_awkward0(MET_sel.MET)*(1-np.cos(MET_T2vec.delta_phi(Leading_Electron_T2Vec))))
+MT_e = np.sqrt(2*Leading_Electron.PT *MET_sel.MET * (1-np.cos(abs(MET_T2vec.delta_phi(Leading_Electron_T2Vec)))))
 
 
 
@@ -106,4 +109,3 @@ print(histo.keys())
 np.save(outname,histo)
 
 print("End processing.... Bye Bye!")
-
