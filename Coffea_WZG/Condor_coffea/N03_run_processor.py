@@ -14,6 +14,8 @@ import numba
 # ---> Class JW Processor
 class JW_Processor(processor.ProcessorABC):
 
+
+
 	# -- Initializer
 	def __init__(self,year,sample_name,xsec,puweight_arr,corrections):
 
@@ -54,7 +56,7 @@ class JW_Processor(processor.ProcessorABC):
 					'Photon200'
 				],
 				'2018': [
-					'Ele32_WPTight_Gsf',   # Recomended
+					'Ele32_WPTight_Gsf',	# Recomended
 				]
 			}
 		
@@ -219,6 +221,11 @@ class JW_Processor(processor.ProcessorABC):
 				"Events",
 				hist.Cat("dataset","Dataset"),
 				hist.Bin("pho_EB_Iso_chg","Photon EB pfReoIso03_charge", 100, 0, 0.03),
+			),
+			"dR_aj": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("dR_aj","$\delta R_{\gammaj}$", 100, 0, 4),
 			)
 
 			})
@@ -239,6 +246,11 @@ class JW_Processor(processor.ProcessorABC):
 
 		isData = 'genWeight' not in events.fields
 		
+		#Stop processing if there is no event remain
+		if len(events) == 0:
+			return out
+
+
 
 		selection = processor.PackedSelection()
 
@@ -280,6 +292,7 @@ class JW_Processor(processor.ProcessorABC):
 			return ele,pho,jet
 		
 
+		##----------- Cut flow1: Passing Triggers
 
 		# double lepton trigger
 		is_double_ele_trigger=True
@@ -302,46 +315,55 @@ class JW_Processor(processor.ProcessorABC):
 				if path not in events.HLT.fields: continue
 				single_ele_triggers_arr = single_ele_triggers_arr | events.HLT[path]
 
-		# Sort particle order by PT
+		# Sort particle order by PT  # RunD --> has problem
 		events.Electron,events.Photon,events.Jet = sort_by_pt(events.Electron,events.Photon,events.Jet)
 		
 		Initial_events = events
 		#events = events[single_ele_triggers_arr | double_ele_triggers_arr]
 		events = events[double_ele_triggers_arr]
 		
-		##----------- Cut flow1: Passing Triggers
 		cut1 = np.ones(len(events))
 		# Particle Identification
 		Electron = events.Electron
 		Photon = events.Photon
-		Jet = events.Jet
 		MET = events.MET
 
+		
 
-		# ID variables
-		def Particle_selection(ele,pho,jet):
+		##-----------  Cut flow2: Events contain 3 electron and 1 photon are selected  ( Basic cut applied )
+		# ID variables and basic cut
+		def Particle_selection(ele,pho):
 			# Electron selection
-			EleSelmask = (ele.pt > 25) & (np.abs(ele.eta) < 2.5) & (ele.cutBased > 2)
+			#EleSelmask = ((ele.pt > 25) & (np.abs(ele.eta + ele.deltaEtaSC) < 1.4442) & (ele.cutBased > 2) & (abs(ele.dxy) < 0.05) & (abs(ele.dz) < 0.1)) | \
 			
+
+			EleSelmask = EleSelmask = ((ele.pt > 10) & (np.abs(ele.eta + ele.deltaEtaSC) < 1.4442) & (ele.cutBased > 2) & (abs(ele.dxy) < 0.05) & (abs(ele.dz) < 0.1)) | \
+				((ele.pt > 10) & (np.abs(ele.eta + ele.deltaEtaSC) > 1.5660) & (np.abs(ele.eta + ele.deltaEtaSC) < 2.5) & (ele.cutBased > 2) & (abs(ele.dxy) < 0.1) & (abs(ele.dz) < 0.2))
+
+			# -SEN-
+			#EleSelmask = ((ele.pt > 25) & (np.abs(ele.eta + ele.deltaEtaSC) < 1.479) & (ele.cutBased > 2) & (abs(ele.dxy) < 0.05) & (abs(ele.dz) < 0.1)) | \
+			#				 ((ele.pt > 25) & (np.abs(ele.eta + ele.deltaEtaSC) > 1.479) & (np.abs(ele.eta + ele.deltaEtaSC) < 2.5) & (ele.cutBased > 2) & (abs(ele.dxy) < 0.1) & (abs(ele.dz) < 0.2))
+			
+
+
+
 			# Photon selection
-			PhoSelmask = (pho.pt > 25) & (pho.cutBased > 1)
+			isgap_mask = (abs(pho.eta) < 1.442)  |  ((abs(pho.eta) > 1.566) & (abs(pho.eta) < 2.5))
+			Pixel_seed_mask	= ~pho.pixelSeed
+			PhoSelmask = (pho.pt > 20) & (pho.cutBased > 1) & isgap_mask &  Pixel_seed_mask
+				 
+			return EleSelmask,PhoSelmask
 
-			# Jet selection for dR cut
-			bJet_selmask = (jet.btagCMVA > -0.5844)
-			
-			return EleSelmask,PhoSelmask,bJet_selmask
 
-		# Event Selection   --> 3 Electrons 1 or more photon  0 bjet
-		Electron_mask, Photon_mask, bjet_selmask  = Particle_selection(Electron,Photon,Jet)
+		# Event Selection	--> 3 Electrons 1 or more photon  
+		Electron_mask, Photon_mask	= Particle_selection(Electron,Photon)
 		Ele_channel_mask = ak.num(Electron[Electron_mask])  == 3 
 		Pho_channel_mask = ak.num(Photon[Photon_mask]) > 0
-		bJet_veto_mask = ak.num(Jet[bjet_selmask]) == 0
 
-		Ele_channel_events = events[Ele_channel_mask & Pho_channel_mask &  bJet_veto_mask]
+		Ele_channel_events = events[Ele_channel_mask & Pho_channel_mask]
 		
 		
 
-		##-----------  Cut flow2: Electron channel with one photon ( ID cut )
 		cut2 = np.ones(len(Ele_channel_events)) * 2
 		
 		# --- Get scale factors
@@ -370,36 +392,39 @@ class JW_Processor(processor.ProcessorABC):
 
 		# Particle array
 		Electron = Ele_channel_events.Electron
-		Photon   = Ele_channel_events.Photon
-		Jet      = Ele_channel_events.Jet
+		Photon	= Ele_channel_events.Photon
+		Jet		= Ele_channel_events.Jet
 		nPV		 = Ele_channel_events.PV.npvsGood
 		MET		 = Ele_channel_events.MET
 
-		Electron_mask,Photon_mask,_ = Particle_selection(Electron,Photon,Jet)	
+		Electron_mask,Photon_mask = Particle_selection(Electron,Photon)	
 		Electron = Electron[Electron_mask]	
-		Photon   = Photon[Photon_mask]
+		Photon	= Photon[Photon_mask]
 
+
+
+		
+		##-----------  Cut flow3: Electron Selection --> OSSF 
 		# OSSF index maker
 		@numba.njit
 		def find_3lep(events_leptons,builder):
-		    
-		    for leptons in events_leptons:
-		        builder.begin_list()    
-		        nlep = len(leptons)
-		        
-		        for i0 in range(nlep):
-		            for i1 in range(i0+1,nlep):
-		                if leptons[i0].charge + leptons[i1].charge != 0: continue;
-		                
-		                for i2 in range(nlep):
-		                    if len({i0,i1,i2}) < 3: continue;
-		                    builder.begin_tuple(3)
-		                    builder.index(0).integer(i0)
-		                    builder.index(1).integer(i1)
-		                    builder.index(2).integer(i2)
-		                    builder.end_tuple()
-		        builder.end_list()
-		    return builder
+			for leptons in events_leptons:
+
+				builder.begin_list()	 
+				nlep = len(leptons)
+				for i0 in range(nlep):
+					for i1 in range(i0+1,nlep):
+						if leptons[i0].charge + leptons[i1].charge != 0: continue;
+							 
+						for i2 in range(nlep):
+							if len({i0,i1,i2}) < 3: continue;
+							builder.begin_tuple(3)
+							builder.index(0).integer(i0)
+							builder.index(1).integer(i1)
+							builder.index(2).integer(i2)
+							builder.end_tuple()
+				builder.end_list()
+			return builder
 
 		eee_triplet_idx = find_3lep(Electron,ak.ArrayBuilder()).snapshot()
 		
@@ -420,7 +445,6 @@ class JW_Processor(processor.ProcessorABC):
 		Triple_electron = [Electron[eee_triplet_idx[idx]] for idx in "012"]
 
 
-		##-----------  Cut flow3: OSSF
 		cut3 = np.ones(ak.sum(ak.num(Electron) > 0)) * 3
 
 
@@ -428,25 +452,25 @@ class JW_Processor(processor.ProcessorABC):
 		ak.behavior.update(vector.behavior)
 		
 		def TLorentz_vector(vec):
-		    vec = ak.zip(
-		    {
-		            "x":vec.x,
-		            "y":vec.y,
-		            "z":vec.z,
-		            "t":vec.t
-		    },
-		    with_name = "LorentzVector"
-		    )
-		    return vec
+			 vec = ak.zip(
+			 {
+						"x":vec.x,
+						"y":vec.y,
+						"z":vec.z,
+						"t":vec.t
+			 },
+			 with_name = "LorentzVector"
+			 )
+			 return vec
 
 		def TLorentz_vector_cylinder(vec):
 
 			vec = ak.zip(
 			{
-			    "pt": vec.pt,
-			    "eta": vec.eta,
-			    "phi": vec.phi,
-			    "mass": vec.mass,
+				 "pt": vec.pt,
+				 "eta": vec.eta,
+				 "phi": vec.phi,
+				 "mass": vec.mass,
 			},
 			with_name="PtEtaPhiMLorentzVector",
 			)
@@ -456,49 +480,51 @@ class JW_Processor(processor.ProcessorABC):
 
 		
 		Triple_eee = ak.zip({"lep1":Triple_electron[0],
-		                     "lep2":Triple_electron[1],
-		                   "lep3":Triple_electron[2],
-		                   "p4":TLorentz_vector(Triple_electron[0]+Triple_electron[1])})
+									"lep2":Triple_electron[1],
+								 "lep3":Triple_electron[2],
+								 "p4":TLorentz_vector(Triple_electron[0]+Triple_electron[1])})
 
 
 		# Ele pair selector --> Close to Z mass
 		bestZ_idx = ak.singletons(ak.argmin(abs(Triple_eee.p4.mass - 91.1876), axis=1))
 		Triple_eee = Triple_eee[bestZ_idx]
 		
-		leading_ele, subleading_ele = ak.flatten(TLorentz_vector_cylinder(Triple_eee.lep1)),ak.flatten(TLorentz_vector_cylinder(Triple_eee.lep2))
+		leading_ele, subleading_ele, Third_ele = ak.flatten(TLorentz_vector_cylinder(Triple_eee.lep1)),ak.flatten(TLorentz_vector_cylinder(Triple_eee.lep2)),ak.flatten(TLorentz_vector_cylinder(Triple_eee.lep3))
+		
+		##-----------  Cut flow4: Photon "cleaning"  -- Basis of array-dimension
+		def make_DR(ele1,ele2,ele3,pho,jet):
+					
+			dR_e1pho  = ele1.delta_r(pho) # dR pho,ele1
+			dR_e2pho  = ele2.delta_r(pho) # dR pho,ele2
+			dR_e3pho  = ele3.delta_r(pho) # dR pho,ele3
+			dR_phojet = jet[:,0].delta_r(pho) # dR pho,jet # #--> Need check
+			
+			#dR_mask	= (dR_e1pho > 0.4) & (dR_e2pho > 0.4)&  (dR_e3pho > 0.4) & (dR_phojet > 0.4) #--> Need check
+			dR_mask	= (dR_e1pho > 0.4) & (dR_e2pho > 0.4)&  (dR_e3pho > 0.4) 
+			 
+			#return dR_mask,dR_e1pho,dR_e2pho,dR_e3pho,dR_phojet #--> Need check
+			return dR_mask,dR_e1pho,dR_e2pho,dR_e3pho,dR_phojet
 
-		# dR cut
-		def make_DR(ele1,ele2,pho,jet):
-		      
-		    dR_e1pho  = ele1.delta_r(pho) # dR pho,ele1
-		    dR_e2pho  = ele2.delta_r(pho) # dR pho,ele2
-		    dR_phojet = jet[:,0].delta_r(pho) # dR pho,jet
-		    dR_mask   = (dR_e1pho > 0.4) & (dR_e2pho > 0.4) & (dR_phojet > 0.4)
-		    
-		    return dR_mask,dR_e1pho,dR_e2pho,dR_phojet
-
-		dR_mask,dR_e1pho,dR_e2pho,dR_phojet = make_DR(leading_ele,subleading_ele,Photon,Jet)
+		#dR_mask,dR_e1pho,dR_e2pho,dR_e3pho,dR_phojet = make_DR(leading_ele,subleading_ele,Third_ele,Photon,Jet) #--> Need check
+		dR_mask,dR_e1pho,dR_e2pho,dR_e3pho,dR_phojet  = make_DR(leading_ele,subleading_ele,Third_ele,Photon,Jet)
 		Photon = Photon[dR_mask]
 		
 		
 		Ele_channel_with_dR = Ele_channel_events[ak.num(Photon) > 0]
 		Triple_eee = Triple_eee[ak.num(Photon) > 0]
-		Jet      = Jet[ak.num(Photon) > 0]
+		Jet		= Jet[ak.num(Photon) > 0]
 		nPV = nPV[ak.num(Photon) > 0]
 		if not isData: pu = pu[ak.num(Photon) > 0]
 		MET = MET[ak.num(Photon) > 0]
+		Photon	= Photon[ak.num(Photon) > 0] # Beware the order! Photon must be located last!
 
-		Photon   = Photon[ak.num(Photon) > 0] # Beware the order! Photon must be located last!
-
-
+		dR_phojet = flat_dim(Jet[:,0].delta_r(Photon))
 		
-
 
 		#Stop processing if there is no event remain
 		if len(Photon) == 0:
 			return out
 
-		##-----------  Cut flow4: Photon dR
 		cut4 = np.ones(ak.sum(ak.num(Photon) > 0)) * 4
 
 
@@ -507,14 +533,10 @@ class JW_Processor(processor.ProcessorABC):
 		
 		def make_leading_pair(target,base):
 			return target[ak.argmax(base.pt,axis=1,keepdims=True)]
-
+			
 		leading_pho		= make_leading_pair(Photon,Photon)
 		
 
-
-		# Photon  EE and EB
-		isEE_mask = leading_pho.isScEtaEE
-		isEB_mask = leading_pho.isScEtaEB
 
 		# -- Scale Factor for each electron
 
@@ -552,25 +574,41 @@ class JW_Processor(processor.ProcessorABC):
 			ele_trig_weight = Trigger_Weight(eta1,pt1,eta2,pt2)
 
 		
-
 		
-		# Event selection --  M(ee)  M(eea)
-		diele = Triple_eee.p4
+		##-----------  Cut flow5 and 6: Event Selection
+
+		# bjet veto
+		bJet_selmask = (Jet.btagCMVA > -0.5844)
+		bJet_veto	 = ak.num(Jet[bJet_selmask])==0
+		cut5 = np.ones(ak.sum(ak.num(leading_pho[bJet_veto] > 0 ))) * 5
+
+		# Z mass window
+		diele			  = Triple_eee.p4
 		zmass_window_mask = ak.firsts((diele.mass) > 60 | (diele.mass < 120))
-		eeg_vec = diele + Photon[:,0]
-		Meeg_mask = ak.firsts(eeg_vec.mass > 120)
-		Event_sel_mask = zmass_window_mask & Meeg_mask
 
-		Triple_eee_sel = Triple_eee[Event_sel_mask]
-		Photon_sel     = Photon[Event_sel_mask]
-		Jet_sel        = Jet[Event_sel_mask]
-		MET_sel		   = MET[Event_sel_mask]
+		# M(eea) cuts 
+		eeg_vec			  = diele + leading_pho
+		Meeg_mask		  = ak.firsts(eeg_vec.mass > 120)
+		
+		# Mask
+		Event_sel_mask	 = bJet_veto & zmass_window_mask & Meeg_mask
 
-		Pho_EE = leading_pho[Event_sel_mask & isEE_mask]
-		Pho_EB = leading_pho[Event_sel_mask & isEB_mask]
-
-		##-----------  Cut flow5: Event Selection
-		cut5 = np.ones(ak.sum(ak.num(Photon_sel) > 0)) * 5
+		Triple_eee_sel	 = Triple_eee[Event_sel_mask]
+		
+		leading_pho_sel	  = leading_pho[Event_sel_mask]
+		# Photon  EE and EB
+		isEE_mask = leading_pho.isScEtaEE
+		isEB_mask = leading_pho.isScEtaEB
+		Pho_EE = leading_pho[isEE_mask & Event_sel_mask]
+		Pho_EB = leading_pho[isEB_mask & Event_sel_mask]
+		
+		MET_sel			  = MET[Event_sel_mask]
+		
+		cut6 = np.ones(ak.sum(ak.num(leading_pho_sel) > 0)) * 6
+		
+		#Stop processing if there is no event remain
+		if len(leading_pho_sel) == 0:
+			return out
 
 
 
@@ -580,7 +618,7 @@ class JW_Processor(processor.ProcessorABC):
 		# Photon EE
 		if len(Pho_EE.pt) != 0:
 			Pho_EE_PT		 = flat_dim(Pho_EE.pt)
-			Pho_EE_Eta	   	= flat_dim(Pho_EE.eta)
+			Pho_EE_Eta			= flat_dim(Pho_EE.eta)
 			Pho_EE_Phi		= flat_dim(Pho_EE.phi)
 			Pho_EE_sieie	  = flat_dim(Pho_EE.sieie)
 			Pho_EE_hoe		= flat_dim(Pho_EE.hoe)
@@ -629,12 +667,13 @@ class JW_Processor(processor.ProcessorABC):
 			mask2 = subarr !=0
 			return ak.to_numpy(subarr[mask2])
 
-
 		cuts = Event_sel_mask
 		cuts_pho_EE = flat_dim(isEE_mask)
 		cuts_pho_EB = flat_dim(isEB_mask)
 		
-		print("cut0: {0}, cut1: {1}, cut2: {2}, cut3: {3}, cut4: {4}, cut5: {5},Mee: {6}".format(len(Initial_events),len(cut1),len(cut2),len(cut3),len(cut4),len(cut5),len(Mee)))
+
+		print("cut0: {0}, cut1: {1}, cut2: {2}, cut3: {3}, cut4: {4}, cut5: {5} cut6: {6}".format(len(Initial_events),len(cut1),len(cut2),len(cut3),len(cut4),len(cut5),len(cut6)))
+		print("isEEmask: {0}, isEBmask: {1}, Eventsetamsk: {2}".format(len(isEE_mask),len(isEB_mask),len(cuts)))
 
 
 		# Weight and SF here
@@ -655,7 +694,7 @@ class JW_Processor(processor.ProcessorABC):
 
 
 		# Cut flow loop
-		for cut in [cut0,cut1,cut2,cut3,cut4,cut5]:
+		for cut in [cut0,cut1,cut2,cut3,cut4,cut5,cut6]:
 			out["cutflow"].fill(
 				dataset = dataset,
 				cutflow=cut
@@ -726,12 +765,18 @@ class JW_Processor(processor.ProcessorABC):
 
 			# -- Photon -- #
 
+		# -- For chech dR(aj1)
+		out["dR_aj"].fill(
+				dataset=dataset,
+				dR_aj = dR_phojet,
+		)
+
 		if len(Pho_EE.pt) != 0:
 
+			
 
 
-
-
+			
 			out["pho_EE_pt"].fill(
 				dataset=dataset,
 				pho_EE_pt=Pho_EE_PT,
@@ -871,8 +916,8 @@ if __name__ == '__main__':
 	## Read PU weight file
 
 
-	isdata=False
-
+	isdata=True
+	
 	if not isdata:
 		pu_path_dict = {
 		"DY":"mcPileupDist_DYToEE_M-50_NNPDF31_TuneCP5_13TeV-powheg-pythia8.npy",
@@ -881,9 +926,10 @@ if __name__ == '__main__':
 		"WW":"mcPileupDist_WW_TuneCP5_DoubleScattering_13TeV-pythia8.npy",
 		"WZ":"mcPileupDist_WZ_TuneCP5_13TeV-pythia8.npy",
 		"ZZ":"mcPileupDist_ZZ_TuneCP5_13TeV-pythia8.npy",
-		"tZq":"mcPileupDist_tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8.npy"
+		"tZq":"mcPileupDist_tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8.npy",
+		"WZG":"mcPileupDist_wza_UL18.npy"
 		}
-		pu_path = '../Corrections/Pileup/puWeight/npy_Run2018ABD/'+ pu_path_dict[sample_name]
+		pu_path = '../Corrections/Pileup/puWeight/npy_Run2018AB/'+ pu_path_dict[sample_name]
 
 		print("Use the PU file: ",pu_path)
 		with open(pu_path,'rb') as f:
@@ -898,7 +944,7 @@ if __name__ == '__main__':
 #	filelist=["/x6/cms/store_skim_2ElIdPt20/mc/RunIISummer19UL18NanoAODv2/DYToEE_M-50_NNPDF31_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v15_L1v1-v1/280000/59AB328B-F0E3-F544-98BB-E5E55577C649_skim_2ElIdPt20.root"]
 #
 
-
+	
 
 	print("Processing the sample: ",sample_name)
 	samples = {
@@ -916,7 +962,7 @@ if __name__ == '__main__':
 		"Events", # Tree name
 		JW_Processor_instance, # Class
 		executor=processor.futures_executor,
-		executor_args={"schema": NanoAODSchema, "workers": 16},
+		executor_args={"schema": NanoAODSchema, "workers": 20},
 	#maxchunks=4,
 	)
 	

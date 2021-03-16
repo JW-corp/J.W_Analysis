@@ -6,9 +6,10 @@ import coffea.hist as hist
 import time
 
 ## Parameter set
-lumi= 21.1 * 1000
+lumi= 53.03 * 1000
 
 GenDict={
+'WZG':55000,
 "DY":1933600,
 "WZ":4000000,
 "ZZ":2000000,
@@ -19,6 +20,7 @@ GenDict={
 
 
 xsecDict={
+"WZG":0.0196,
 "DY":2137.0,
 "WZ":27.6,
 "ZZ":12.14,
@@ -28,6 +30,12 @@ xsecDict={
 }
 
 
+
+hsum_dR_aj = hist.Hist(
+	"Events",
+	hist.Cat("dataset","Dataset"),
+	hist.Bin("dR_aj","$\delta R_{\gammaj}$", 100, 0, 4),
+)
 hsum_cutflow = hist.Hist(
 	'Events',
 	hist.Cat('dataset', 'Dataset'),
@@ -35,9 +43,9 @@ hsum_cutflow = hist.Hist(
 )
 
 hsum_charge= hist.Hist(
-	   "Events",
-	   hist.Cat("dataset","Dataset"),
-	   hist.Bin("charge","charge sum of electrons", 6, -3, 3),
+	"Events",
+	hist.Cat("dataset","Dataset"),
+	hist.Bin("charge","charge sum of electrons", 6, -3, 3),
 )
 hsum_nPV = hist.Hist(
 	"Events",
@@ -190,15 +198,12 @@ histdict = {'nPV':hsum_nPV,'nPV_nw':hsum_nPV_nw, "cutflow":hsum_cutflow,"ele1pt"
 'pho_EE_hoe':hsum_pho_EE_hoe,'pho_EE_sieie': hsum_pho_EE_sieie, 'pho_EE_Iso_all': hsum_pho_EE_Iso_all, 'pho_EE_Iso_chg':hsum_pho_EE_Iso_chg,\
 'pho_EB_pt':hsum_pho_EB_pt, 'pho_EB_eta':hsum_pho_EB_eta, 'pho_EB_phi':hsum_pho_EB_phi,\
 'pho_EB_hoe':hsum_pho_EB_hoe,'pho_EB_sieie': hsum_pho_EB_sieie, 'pho_EB_Iso_all': hsum_pho_EB_Iso_all, 'pho_EB_Iso_chg':hsum_pho_EB_Iso_chg,
-'met':hsum_met}
+'met':hsum_met,'dR_aj':hsum_dR_aj}
 
 
 
 def reduce(folder,sample_list,histname):
 	hists={}
-	sumw_DY=0
-	sumw_Egamma=0
-	
 	
 
 	sumwdict ={
@@ -208,7 +213,8 @@ def reduce(folder,sample_list,histname):
 		"TTWJets":0,
 		"TTZtoLL":0,
 		"tZq":0,
-		"Egamma":0
+		"Egamma":0,
+		"WZG":0
 	}
 
 	
@@ -224,6 +230,7 @@ def reduce(folder,sample_list,histname):
 		sumwdict['TTZtoLL'] += hists[filename]['sumw']['TTZtoLL']
 		sumwdict['tZq'] += hists[filename]['sumw']['tZq']
 		sumwdict['Egamma'] += hists[filename]['sumw']['Egamma']
+		sumwdict['WZG'] += hists[filename]['sumw']['WZG']
 
 
 		hist_ = histdict[histname]
@@ -234,12 +241,12 @@ def reduce(folder,sample_list,histname):
 
 ## --File Directories
 #file_path = "Output_dir_noWegiht"
-file_path = "Output_dir"
+file_path = "210316RunABD"
 
 
 
 ## --Sample Lists
-sample_list = ['DY' ,'WZ' ,'ZZ' ,'TTWJets','TTZtoLL','tZq' ,'Egamma']
+sample_list = ['DY' ,'WZ' ,'ZZ' ,'TTWJets','TTZtoLL','tZq' ,'Egamma','WZG']
 
 
 
@@ -249,18 +256,17 @@ sample_list = ['DY' ,'WZ' ,'ZZ' ,'TTWJets','TTZtoLL','tZq' ,'Egamma']
 		
 		# --- MET --- #
 
-#histname = "met"; xmin=0; xmax=150; ymin=1; ymax=100;
+#histname = "met"; xmin=0; xmax=200; ymin=0; ymax=10;
 
 
 		# --- Electron --- #
-
-#histname = "mass"; xmin=60; xmax=120; ymin=1; ymax=1000;
+#histname = "mass"; xmin=60; xmax=120; ymin=0; ymax=10;
 #histname = "nPV"; xmin=0; xmax=100; ymin=1; ymax=1e+3;
 #histname = "nPV_nw"; xmin=0; xmax=100; ymin=1; ymax=1e+3;
 
-#histname = "ele1pt"; xmin=0; xmax=200; ymin=1; ymax=100;
-#histname = "ele2pt"; xmin=0; xmax=200; ymin=1; ymax=2e+2;
-#histname = "ele3pt"; xmin=0; xmax=200; ymin=1; ymax=2e+2;
+#histname = "ele1pt"; xmin=0; xmax=200; ymin=0; ymax=8;
+#histname = "ele2pt"; xmin=0; xmax=200; ymin=0; ymax=15; 
+#histname = "ele3pt"; xmin=0; xmax=200; ymin=0; ymax=12;
 
 #histname = "ele1eta"; xmin=-2.5; xmax=2.5; ymin=100; ymax=5e+6;
 #histname = "ele2eta"; xmin=-2.5; xmax=2.5; ymin=100; ymax=5e+6;
@@ -268,11 +274,11 @@ sample_list = ['DY' ,'WZ' ,'ZZ' ,'TTWJets','TTZtoLL','tZq' ,'Egamma']
 #histname = "ele1phi"; xmin=-3.15; xmax=3.15; ymin=100; ymax=5e+6;
 #histname = "ele2phi"; xmin=-3.15; xmax=3.15; ymin=100; ymax=5e+6;
 
-histname = "cutflow"; xmin=0; xmax=6; ymin=1; ymax=5e+8
+histname = "cutflow"; xmin=0; xmax=6; ymin=1; ymax=5e+6
 
 		# --- Photon --- #
-
-#histname = "pho_EE_pt"; xmin=0; xmax=150; ymin=1; ymax=100;
+#histname = "dR_aj"; xmin=0; xmax=1; ymin=1; ymax=1000;
+#histname = "pho_EE_pt"; xmin=0; xmax=200; ymin=0; ymax=7;
 #histname = "pho_EE_eta"; xmin=-3; xmax=3; ymin=1; ymax=5e+6;
 #histname = "pho_EE_phi"; xmin=-3.15; xmax=3.15; ymin=1; ymax=5e+6;
 #histname = "pho_EE_hoe"; xmin=0; xmax=0.2; ymin=0.001; ymax=5e+6;
@@ -280,7 +286,7 @@ histname = "cutflow"; xmin=0; xmax=6; ymin=1; ymax=5e+8
 #histname = "pho_EE_Iso_all"; xmin=0; xmax=0.2; ymin=0.01; ymax=5e+6;
 #histname = "pho_EE_Iso_chg"; xmin=0; xmax=0.03; ymin=0.01; ymax=5e+6;
 
-#histname = "pho_EB_pt"; xmin=0; xmax=250; ymin=0.01; ymax=1e+4;
+#histname = "pho_EB_pt"; xmin=0; xmax=200; ymin=0; ymax=10;
 #histname = "pho_EB_eta"; xmin=-3; xmax=3; ymin=1; ymax=5e+6;
 #histname = "pho_EB_phi"; xmin=-3.15; xmax=3.15; ymin=1; ymax=5e+6;
 #histname = "pho_EB_hoe"; xmin=0; xmax=0.15; ymin=0.001; ymax=1e+7;
@@ -298,20 +304,34 @@ for i,j in sumwdict.items():
 
 ## --Noramlize	
 scales={
-	'DY' : lumi * xsecDict['DY'] / GenDict['DY'],
-	'WZ' : lumi * xsecDict['WZ'] / GenDict['WZ'],
-	'ZZ' : lumi * xsecDict['ZZ'] / GenDict['ZZ'],
+	'WZG'	  : lumi * xsecDict['WZG'] / GenDict['WZG'],
+	'DY'	  : lumi * xsecDict['DY'] / GenDict['DY'],
+	'WZ'	  : lumi * xsecDict['WZ'] / GenDict['WZ'],
+	'ZZ'	  : lumi * xsecDict['ZZ'] / GenDict['ZZ'],
 	'TTWJets' : lumi * xsecDict['TTWJets'] / GenDict['TTWJets'],
 	'TTZtoLL' : lumi * xsecDict['TTZtoLL'] / GenDict['TTZtoLL'],
-	'tZq' : lumi * xsecDict['tZq'] / GenDict['tZq'],
+	'tZq'	  : lumi * xsecDict['tZq'] / GenDict['tZq'],
 }
 
+h1.scale(scales,axis='dataset')
 
 
 
-#h1.scale(scales,axis='dataset')
-#h1 = h1.rebin(histname,hist.Bin("pho_EB_pt","Photon EB $P_{T}$ [GeV]", 100, 0, 600))
-#h1 = h1.rebin(histname,hist.Bin("met","met [GeV]", 50, 0, 200))
+## --Rebin
+
+
+
+
+#h1 = h1.rebin(histname,hist.Bin("ele1pt","Leading electron from Z  $P_{T}$ [GeV]",30,0,600))
+#h1 = h1.rebin(histname,hist.Bin("ele2pt","Subleading electron from Z  $P_{T}$ [GeV]",30,0,600))
+#h1 = h1.rebin(histname,hist.Bin("ele3pt","electron from W  $P_{T}$ [GeV]",30,0,600))
+#h1 = h1.rebin(histname,hist.Bin("mass","M_{ee} [GeV]",50,0,200))
+
+#h1 = h1.rebin(histname,hist.Bin("pho_EB_pt","Photon EB $P_{T}$ [GeV]", 30, 0, 600))
+#h1 = h1.rebin(histname,hist.Bin("pho_EE_pt","Photon EE $P_{T}$ [GeV]", 30, 0, 600))
+
+
+#h1 = h1.rebin(histname,hist.Bin("met","met [GeV]", 10, 0, 200))
 
 
 
@@ -364,17 +384,22 @@ error_opts = {
 data_err_opts = {
 	'linestyle': 'none',
 'marker': '.',
-'markersize': 4.,
+'markersize': 10.,
 'color': 'k',
+'elinewidth': 1,
 }
 
 
 
 # MC plotting
 
+
+
+
+
+
 import re
 notdata = re.compile('(?!Egamma)')
-
 
 
 
@@ -383,10 +408,10 @@ hist.plot1d(
 	ax=ax,
 	clear=False,
 	stack=True,
+	order=["TTWJets" ,"WZ" ,"ZZ" ,"TTZtoLL" ,"tZq" ,"WZG"],
 	fill_opts=fill_opts,
-	#error_opts = error_opts,
+	error_opts = error_opts,
 )
-
 
 
 # DATA plotting
@@ -399,6 +424,7 @@ hist.plot1d(
 	
 )
 
+#print(h1['Egamma'].values())
 
 # Ratio Plot
 hist.plotratio(
@@ -413,11 +439,9 @@ hist.plotratio(
 
 
 print("##" * 20)
-#print(h1[notdata].values())
-
-
-for i,j in h1.values().items():
-	print(i,":",j)
+#for i,j in h1.values().items():
+#	print(type(j))
+#	print(i,":",j)
 
 
 
@@ -435,11 +459,11 @@ ax.set_xlabel('')
 ax.set_yscale('log')
 
 
-#rax.set_xlabel('# of Priamary vertex')
+#rax.set_xlabel()
 #leg = ax.legend()
 
 
-lum = plt.text(1., 1., r"21.1 fb$^{-1}$ (13 TeV)",
+lum = plt.text(1., 1., r"53.03 fb$^{-1}$ (13 TeV)",
 				fontsize=16,
 				horizontalalignment='right',
 				verticalalignment='bottom',
@@ -447,8 +471,6 @@ lum = plt.text(1., 1., r"21.1 fb$^{-1}$ (13 TeV)",
 			   )
 
 
-#print(h1['DY_skimEleIdPt20'].values())
-#print(h1['Egamma_skimEleIdPt20RunABD'].values())
 
 outname = histname + "_" + file_path + ".png"
 
