@@ -15,7 +15,10 @@ GenDict={
 "ZZ":2000000,
 "TTWJets":4963867,
 "TTZtoLL":13914900,
-"tZq":12748300
+"tZq":12748300,
+"ZGToLLG" :29904768,
+"TTGJets" :4647426,
+"WGToLNuG":20371504
 }
 
 
@@ -26,9 +29,18 @@ xsecDict={
 "ZZ":12.14,
 "TTWJets":0.2149,
 "TTZtoLL":0.2432,
-"tZq":0.07358
+"tZq":0.07358,
+"ZGToLLG" : 55.48,
+"TTGJets" : 4.078,
+"WGToLNuG": 1.249
 }
 
+
+hsum_MT = hist.Hist(
+	"Events",
+	hist.Cat("dataset","Dataset"),
+	hist.Bin("MT","W MT [GeV]", 100, 0, 200)
+)
 
 
 hsum_dR_aj = hist.Hist(
@@ -198,7 +210,7 @@ histdict = {'nPV':hsum_nPV,'nPV_nw':hsum_nPV_nw, "cutflow":hsum_cutflow,"ele1pt"
 'pho_EE_hoe':hsum_pho_EE_hoe,'pho_EE_sieie': hsum_pho_EE_sieie, 'pho_EE_Iso_all': hsum_pho_EE_Iso_all, 'pho_EE_Iso_chg':hsum_pho_EE_Iso_chg,\
 'pho_EB_pt':hsum_pho_EB_pt, 'pho_EB_eta':hsum_pho_EB_eta, 'pho_EB_phi':hsum_pho_EB_phi,\
 'pho_EB_hoe':hsum_pho_EB_hoe,'pho_EB_sieie': hsum_pho_EB_sieie, 'pho_EB_Iso_all': hsum_pho_EB_Iso_all, 'pho_EB_Iso_chg':hsum_pho_EB_Iso_chg,
-'met':hsum_met,'dR_aj':hsum_dR_aj}
+'met':hsum_met,'dR_aj':hsum_dR_aj,'MT':hsum_MT}
 
 
 
@@ -214,7 +226,10 @@ def reduce(folder,sample_list,histname):
 		"TTZtoLL":0,
 		"tZq":0,
 		"Egamma":0,
-		"WZG":0
+		"WZG":0,
+		'ZGToLLG':0,	
+        'TTGJets':0,
+        'WGToLNuG':0
 	}
 
 	
@@ -231,6 +246,9 @@ def reduce(folder,sample_list,histname):
 		sumwdict['tZq'] += hists[filename]['sumw']['tZq']
 		sumwdict['Egamma'] += hists[filename]['sumw']['Egamma']
 		sumwdict['WZG'] += hists[filename]['sumw']['WZG']
+		sumwdict['ZGToLLG'] += hists[filename]['sumw']['ZGToLLG']
+		sumwdict['TTGJets'] += hists[filename]['sumw']['TTGJets']
+		sumwdict['WGToLNuG'] += hists[filename]['sumw']['WGToLNuG']
 
 
 		hist_ = histdict[histname]
@@ -241,12 +259,12 @@ def reduce(folder,sample_list,histname):
 
 ## --File Directories
 #file_path = "Output_dir_noWegiht"
-file_path = "210316RunABD"
+file_path = "210318RunABD"
 
 
 
 ## --Sample Lists
-sample_list = ['DY' ,'WZ' ,'ZZ' ,'TTWJets','TTZtoLL','tZq' ,'Egamma','WZG']
+sample_list = ['DY' ,'WZ' ,'ZZ' ,'TTWJets','TTZtoLL','tZq' ,'Egamma','WZG','ZGToLLG','TTGJets','WGToLNuG']
 
 
 
@@ -260,13 +278,14 @@ sample_list = ['DY' ,'WZ' ,'ZZ' ,'TTWJets','TTZtoLL','tZq' ,'Egamma','WZG']
 
 
 		# --- Electron --- #
-#histname = "mass"; xmin=60; xmax=120; ymin=0; ymax=10;
+#histname = "mass"; xmin=60; xmax=120; ymin=0; ymax=6;
+#histname = "MT"; xmin=0; xmax=200; ymin=0; ymax=8;
 #histname = "nPV"; xmin=0; xmax=100; ymin=1; ymax=1e+3;
 #histname = "nPV_nw"; xmin=0; xmax=100; ymin=1; ymax=1e+3;
 
-#histname = "ele1pt"; xmin=0; xmax=200; ymin=0; ymax=8;
-#histname = "ele2pt"; xmin=0; xmax=200; ymin=0; ymax=15; 
-#histname = "ele3pt"; xmin=0; xmax=200; ymin=0; ymax=12;
+#histname = "ele1pt"; xmin=0; xmax=200; ymin=0; ymax=6;
+#histname = "ele2pt"; xmin=0; xmax=200; ymin=0; ymax=12; 
+#histname = "ele3pt"; xmin=0; xmax=200; ymin=0; ymax=10;
 
 #histname = "ele1eta"; xmin=-2.5; xmax=2.5; ymin=100; ymax=5e+6;
 #histname = "ele2eta"; xmin=-2.5; xmax=2.5; ymin=100; ymax=5e+6;
@@ -274,10 +293,10 @@ sample_list = ['DY' ,'WZ' ,'ZZ' ,'TTWJets','TTZtoLL','tZq' ,'Egamma','WZG']
 #histname = "ele1phi"; xmin=-3.15; xmax=3.15; ymin=100; ymax=5e+6;
 #histname = "ele2phi"; xmin=-3.15; xmax=3.15; ymin=100; ymax=5e+6;
 
-histname = "cutflow"; xmin=0; xmax=6; ymin=1; ymax=5e+6
+#histname = "cutflow"; xmin=0; xmax=6; ymin=1; ymax=5e+6
 
 		# --- Photon --- #
-#histname = "dR_aj"; xmin=0; xmax=1; ymin=1; ymax=1000;
+histname = "dR_aj"; xmin=0; xmax=1; ymin=0.01; ymax=10;
 #histname = "pho_EE_pt"; xmin=0; xmax=200; ymin=0; ymax=7;
 #histname = "pho_EE_eta"; xmin=-3; xmax=3; ymin=1; ymax=5e+6;
 #histname = "pho_EE_phi"; xmin=-3.15; xmax=3.15; ymin=1; ymax=5e+6;
@@ -286,7 +305,7 @@ histname = "cutflow"; xmin=0; xmax=6; ymin=1; ymax=5e+6
 #histname = "pho_EE_Iso_all"; xmin=0; xmax=0.2; ymin=0.01; ymax=5e+6;
 #histname = "pho_EE_Iso_chg"; xmin=0; xmax=0.03; ymin=0.01; ymax=5e+6;
 
-#histname = "pho_EB_pt"; xmin=0; xmax=200; ymin=0; ymax=10;
+#histname = "pho_EB_pt"; xmin=0; xmax=200; ymin=0; ymax=8;
 #histname = "pho_EB_eta"; xmin=-3; xmax=3; ymin=1; ymax=5e+6;
 #histname = "pho_EB_phi"; xmin=-3.15; xmax=3.15; ymin=1; ymax=5e+6;
 #histname = "pho_EB_hoe"; xmin=0; xmax=0.15; ymin=0.001; ymax=1e+7;
@@ -311,7 +330,11 @@ scales={
 	'TTWJets' : lumi * xsecDict['TTWJets'] / GenDict['TTWJets'],
 	'TTZtoLL' : lumi * xsecDict['TTZtoLL'] / GenDict['TTZtoLL'],
 	'tZq'	  : lumi * xsecDict['tZq'] / GenDict['tZq'],
+	'ZGToLLG' : lumi * xsecDict['ZGToLLG'] / GenDict['ZGToLLG'],
+    'TTGJets' : lumi * xsecDict['TTGJets'] / GenDict['TTGJets'],
+    'WGToLNuG': lumi * xsecDict['WGToLNuG'] / GenDict['WGToLNuG'],
 }
+
 
 h1.scale(scales,axis='dataset')
 
@@ -320,7 +343,8 @@ h1.scale(scales,axis='dataset')
 ## --Rebin
 
 
-
+#h1 = h1.rebin(histname,hist.Bin("mass","Z mass",10,60,120))
+#h1 = h1.rebin(histname,hist.Bin("MT","W MT [GeV]", 20, 0, 200))
 
 #h1 = h1.rebin(histname,hist.Bin("ele1pt","Leading electron from Z  $P_{T}$ [GeV]",30,0,600))
 #h1 = h1.rebin(histname,hist.Bin("ele2pt","Subleading electron from Z  $P_{T}$ [GeV]",30,0,600))
@@ -366,7 +390,10 @@ fig.subplots_adjust(hspace=.07)
 
 
 from cycler import cycler
-colors = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c']
+#colors = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c']
+
+colors= ['r','g','b','orange','pink','navy','yellow']
+
 ax.set_prop_cycle(cycler(color=colors))
 
 
@@ -391,24 +418,19 @@ data_err_opts = {
 
 
 
+
 # MC plotting
-
-
-
-
-
-
 import re
 notdata = re.compile('(?!Egamma)')
-
-
 
 hist.plot1d(
 	h1[notdata],
 	ax=ax,
 	clear=False,
 	stack=True,
-	order=["TTWJets" ,"WZ" ,"ZZ" ,"TTZtoLL" ,"tZq" ,"WZG"],
+	order=["TTWJets" ,"tZq" ,"TTZtoLL" ,"WZ" ,"WZG" ,"ZGToLLG","ZZ"],
+	#order=["TTWJets" ,"tZq" ,"TTZtoLL" ,"WZ" ,"WZG" ,"ZZ","ZGToLLG"],
+	#order=["TTWJets" ,"WZ" ,"ZZ" ,"TTZtoLL" ,"tZq" ,"WZG"],
 	fill_opts=fill_opts,
 	error_opts = error_opts,
 )
@@ -438,13 +460,10 @@ hist.plotratio(
 )
 
 
+
 print("##" * 20)
 #for i,j in h1.values().items():
-#	print(type(j))
 #	print(i,":",j)
-
-
-
 
 
 rax.set_ylabel('Data/MC')
@@ -459,7 +478,7 @@ ax.set_xlabel('')
 ax.set_yscale('log')
 
 
-#rax.set_xlabel()
+rax.set_xlabel('Delta R(pho jet1)')
 #leg = ax.legend()
 
 

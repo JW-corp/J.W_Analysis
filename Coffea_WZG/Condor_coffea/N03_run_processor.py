@@ -96,6 +96,14 @@ class JW_Processor(processor.ProcessorABC):
 				hist.Cat("dataset","Dataset"),
 				hist.Bin("mass","$m_{e+e-}$ [GeV]", 100, 0, 200),
 			),
+
+			"MT": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("MT","W MT [GeV]", 100, 0, 200),
+			),
+
+
 			"charge": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
@@ -332,7 +340,7 @@ class JW_Processor(processor.ProcessorABC):
 
 		##-----------  Cut flow2: Events contain 3 electron and 1 photon are selected  ( Basic cut applied )
 		# ID variables and basic cut
-		def Particle_selection(ele,pho):
+		def Particle_selection(ele,pho,dataset):
 			# Electron selection
 			#EleSelmask = ((ele.pt > 25) & (np.abs(ele.eta + ele.deltaEtaSC) < 1.4442) & (ele.cutBased > 2) & (abs(ele.dxy) < 0.05) & (abs(ele.dz) < 0.1)) | \
 			
@@ -340,23 +348,38 @@ class JW_Processor(processor.ProcessorABC):
 			EleSelmask = EleSelmask = ((ele.pt > 10) & (np.abs(ele.eta + ele.deltaEtaSC) < 1.4442) & (ele.cutBased > 2) & (abs(ele.dxy) < 0.05) & (abs(ele.dz) < 0.1)) | \
 				((ele.pt > 10) & (np.abs(ele.eta + ele.deltaEtaSC) > 1.5660) & (np.abs(ele.eta + ele.deltaEtaSC) < 2.5) & (ele.cutBased > 2) & (abs(ele.dxy) < 0.1) & (abs(ele.dz) < 0.2))
 
+
+
 			# -SEN-
 			#EleSelmask = ((ele.pt > 25) & (np.abs(ele.eta + ele.deltaEtaSC) < 1.479) & (ele.cutBased > 2) & (abs(ele.dxy) < 0.05) & (abs(ele.dz) < 0.1)) | \
 			#				 ((ele.pt > 25) & (np.abs(ele.eta + ele.deltaEtaSC) > 1.479) & (np.abs(ele.eta + ele.deltaEtaSC) < 2.5) & (ele.cutBased > 2) & (abs(ele.dxy) < 0.1) & (abs(ele.dz) < 0.2))
 			
-
+			
 
 
 			# Photon selection
 			isgap_mask = (abs(pho.eta) < 1.442)  |  ((abs(pho.eta) > 1.566) & (abs(pho.eta) < 2.5))
 			Pixel_seed_mask	= ~pho.pixelSeed
-			PhoSelmask = (pho.pt > 20) & (pho.cutBased > 1) & isgap_mask &  Pixel_seed_mask
+
+			
+
+			if dataset == "WZG":
+				isPrompt = (Photon.genPartFlav == 1) | (Photon.genPartFlav == 11)
+				PhoSelmask = (pho.pt > 20) & (pho.cutBased > 1) & isgap_mask &  Pixel_seed_mask & isPrompt
+
+			elif dataset == "WZ":
+				isPrompt = (Photon.genPartFlav == 1) | (Photon.genPartFlav == 11)
+				PhoSelmask = (pho.pt > 20) & (pho.cutBased > 1) & isgap_mask &  Pixel_seed_mask & ~isPrompt
+				
+			else:
+				PhoSelmask = (pho.pt > 20) & (pho.cutBased > 1) & isgap_mask &  Pixel_seed_mask
+				
 				 
 			return EleSelmask,PhoSelmask
 
 
 		# Event Selection	--> 3 Electrons 1 or more photon  
-		Electron_mask, Photon_mask	= Particle_selection(Electron,Photon)
+		Electron_mask, Photon_mask	= Particle_selection(Electron,Photon,dataset)
 		Ele_channel_mask = ak.num(Electron[Electron_mask])  == 3 
 		Pho_channel_mask = ak.num(Photon[Photon_mask]) > 0
 
@@ -397,7 +420,7 @@ class JW_Processor(processor.ProcessorABC):
 		nPV		 = Ele_channel_events.PV.npvsGood
 		MET		 = Ele_channel_events.MET
 
-		Electron_mask,Photon_mask = Particle_selection(Electron,Photon)	
+		Electron_mask,Photon_mask = Particle_selection(Electron,Photon,dataset)	
 		Electron = Electron[Electron_mask]	
 		Photon	= Photon[Photon_mask]
 
@@ -530,6 +553,7 @@ class JW_Processor(processor.ProcessorABC):
 
 		leading_ele		= Triple_eee.lep1
 		subleading_ele  = Triple_eee.lep2
+		third_ele  = Triple_eee.lep3
 		
 		def make_leading_pair(target,base):
 			return target[ak.argmax(base.pt,axis=1,keepdims=True)]
@@ -561,9 +585,11 @@ class JW_Processor(processor.ProcessorABC):
 			## -------------< Egamma ID and Reco Scale factor > -----------------##
 			get_pho_medium_id_sf = get_pho_medium_id_sf(ak.flatten(leading_pho.eta),ak.flatten(leading_pho.pt))
 
-			ele_reco_sf = get_ele_reco_sf(ak.flatten(leading_ele.deltaEtaSC + leading_ele.eta),ak.flatten(leading_ele.pt))* get_ele_reco_sf(ak.flatten(subleading_ele.deltaEtaSC + subleading_ele.eta),ak.flatten(subleading_ele.pt))
+			ele_reco_sf = get_ele_reco_sf(ak.flatten(leading_ele.deltaEtaSC + leading_ele.eta),ak.flatten(leading_ele.pt))* get_ele_reco_sf(ak.flatten(subleading_ele.deltaEtaSC + subleading_ele.eta),ak.flatten(subleading_ele.pt))\
+							* get_ele_reco_sf(ak.flatten(third_ele.deltaEtaSC + third_ele.eta),ak.flatten(third_ele.pt))
 		
-			ele_medium_id_sf = get_ele_medium_id_sf(ak.flatten(leading_ele.deltaEtaSC + leading_ele.eta),ak.flatten(leading_ele.pt))* get_ele_medium_id_sf(ak.flatten(subleading_ele.deltaEtaSC + subleading_ele.eta),ak.flatten(subleading_ele.pt))
+			ele_medium_id_sf = get_ele_medium_id_sf(ak.flatten(leading_ele.deltaEtaSC + leading_ele.eta),ak.flatten(leading_ele.pt))* get_ele_medium_id_sf(ak.flatten(subleading_ele.deltaEtaSC + subleading_ele.eta),ak.flatten(subleading_ele.pt))\
+							* get_ele_medium_id_sf(ak.flatten(third_ele.deltaEtaSC + third_ele.eta),ak.flatten(third_ele.pt))
 				
 			
 			## -------------< Double Electron Trigger Scale factor > -----------------##
@@ -584,14 +610,24 @@ class JW_Processor(processor.ProcessorABC):
 
 		# Z mass window
 		diele			  = Triple_eee.p4
-		zmass_window_mask = ak.firsts((diele.mass) > 60 | (diele.mass < 120))
+		zmass_window_mask = ak.firsts((diele.mass) > 60 | (diele.mass < 120)) # signal region
+		#zmass_window_mask = ak.firsts(diele.mass) > 4  # control region
+		
 
 		# M(eea) cuts 
 		eeg_vec			  = diele + leading_pho
 		Meeg_mask		  = ak.firsts(eeg_vec.mass > 120)
 		
+		# Electron PT cuts
+		Elept_mask = ak.firsts((Triple_eee.lep1.pt > 25) & (Triple_eee.lep2.pt > 10) & (Triple_eee.lep3.pt > 25))
+		
+
+
 		# Mask
-		Event_sel_mask	 = bJet_veto & zmass_window_mask & Meeg_mask
+		Event_sel_mask	 = bJet_veto & zmass_window_mask & Meeg_mask & Elept_mask  # my version
+		#Event_sel_mask	 = bJet_veto & zmass_window_mask & Elept_mask # SEn version
+		#Event_sel_mask	 = zmass_window_mask & Elept_mask # SEn version
+
 
 		Triple_eee_sel	 = Triple_eee[Event_sel_mask]
 		
@@ -602,6 +638,7 @@ class JW_Processor(processor.ProcessorABC):
 		Pho_EE = leading_pho[isEE_mask & Event_sel_mask]
 		Pho_EB = leading_pho[isEB_mask & Event_sel_mask]
 		
+
 		MET_sel			  = MET[Event_sel_mask]
 		
 		cut6 = np.ones(ak.sum(ak.num(leading_pho_sel) > 0)) * 6
@@ -611,7 +648,11 @@ class JW_Processor(processor.ProcessorABC):
 			return out
 
 
+		# W MT (--> beta )
+		Ele3 = ak.flatten(Triple_eee_sel.lep3)
+		MT = np.sqrt(2*Ele3.pt * MET_sel.pt * (1-np.cos(abs(MET_sel.delta_phi(Ele3)))))
 
+		MT = np.array(MT)
 		## -------------------- Prepare making hist --------------#
 
 
@@ -654,7 +695,7 @@ class JW_Processor(processor.ProcessorABC):
 
 		# MET
 		met = ak.to_numpy(MET_sel.pt)
-
+		
 	
 		# --- Apply weight and hist  
 		weights = processor.Weights(len(cut4))
@@ -721,6 +762,14 @@ class JW_Processor(processor.ProcessorABC):
 			met=met,
 			weight = skim_weight(weights.weight() * cuts)
 		)
+
+		out['MT'].fill(
+			dataset=dataset,
+			MT=MT,
+			weight = skim_weight(weights.weight() * cuts)
+		)
+
+
 			# -- Electron -- #
 		out["mass"].fill(
 			dataset=dataset,
@@ -927,9 +976,12 @@ if __name__ == '__main__':
 		"WZ":"mcPileupDist_WZ_TuneCP5_13TeV-pythia8.npy",
 		"ZZ":"mcPileupDist_ZZ_TuneCP5_13TeV-pythia8.npy",
 		"tZq":"mcPileupDist_tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8.npy",
-		"WZG":"mcPileupDist_wza_UL18.npy"
+		"WZG":"mcPileupDist_wza_UL18.npy",
+		"ZGToLLG":"mcPileupDist_ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIISummer20UL18NanoAODv2.npy",
+		"TTGJets":"mcPileupDist_TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8.npy",
+		"WGToLNuG":"mcPileupDist_WGToLNuG_01J_5f_PtG_120_TuneCP5_13TeV-amcatnloFXFX-pythia8.npy"
 		}
-		pu_path = '../Corrections/Pileup/puWeight/npy_Run2018AB/'+ pu_path_dict[sample_name]
+		pu_path = '../Corrections/Pileup/puWeight/npy_Run2018ABD/'+ pu_path_dict[sample_name]
 
 		print("Use the PU file: ",pu_path)
 		with open(pu_path,'rb') as f:
