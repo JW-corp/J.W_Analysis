@@ -96,6 +96,11 @@ class JW_Processor(processor.ProcessorABC):
 				hist.Cat("dataset","Dataset"),
 				hist.Bin("mass","$m_{e+e-}$ [GeV]", 100, 0, 200),
 			),
+			"mass_eea": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("mass_eea","$m_{e+e-\gamma}$ [GeV]", 300, 0, 600),
+			),
 
 			"MT": hist.Hist(
 				"Events",
@@ -156,6 +161,21 @@ class JW_Processor(processor.ProcessorABC):
 				"Events",
 				hist.Cat("dataset","Dataset"),
 				hist.Bin("ele2phi","Subleading Electron $\phi$ [GeV]", 20, -3.15, 3.15),
+			),
+			"phopt": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("phopt","Leading Photon $P_{T}$ [GeV]", 300, 0, 600),
+			),
+			"phoeta": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("phoeta","Photon  $\eta$ ", 50, -5, 5),
+			),
+			"phophi": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("phophi","Photon $\phi$ ", 50, -3.15, 3.15),
 			),
 
 			"pho_EE_pt": hist.Hist(
@@ -233,8 +253,28 @@ class JW_Processor(processor.ProcessorABC):
 			"dR_aj": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("dR_aj","$\delta R_{\gammaj}$", 100, 0, 4),
-			)
+				hist.Bin("dR_aj","dR(aj1)", 100, 0, 4),
+			),
+			"dR_ae1": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("dR_ae1","dR(ae1)", 100, 0, 4),
+			),
+			"dR_ae2": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("dR_ae2","$dR(ae2)$", 100, 0, 4),
+			),
+			"dR_ae3": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("dR_ae3","$dR(ae3)$", 100, 0, 4),
+			),
+			"dPhie3": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("dPhie3","$dPhi(eW,MET)$", 100, -3.15, 3.15),
+			),
 
 			})
 		
@@ -345,7 +385,7 @@ class JW_Processor(processor.ProcessorABC):
 			#EleSelmask = ((ele.pt > 25) & (np.abs(ele.eta + ele.deltaEtaSC) < 1.4442) & (ele.cutBased > 2) & (abs(ele.dxy) < 0.05) & (abs(ele.dz) < 0.1)) | \
 			
 
-			EleSelmask = EleSelmask = ((ele.pt > 10) & (np.abs(ele.eta + ele.deltaEtaSC) < 1.4442) & (ele.cutBased > 2) & (abs(ele.dxy) < 0.05) & (abs(ele.dz) < 0.1)) | \
+			EleSelmask = ((ele.pt > 10) & (np.abs(ele.eta + ele.deltaEtaSC) < 1.4442) & (ele.cutBased > 2) & (abs(ele.dxy) < 0.05) & (abs(ele.dz) < 0.1)) | \
 				((ele.pt > 10) & (np.abs(ele.eta + ele.deltaEtaSC) > 1.5660) & (np.abs(ele.eta + ele.deltaEtaSC) < 2.5) & (ele.cutBased > 2) & (abs(ele.dxy) < 0.1) & (abs(ele.dz) < 0.2))
 
 
@@ -368,7 +408,7 @@ class JW_Processor(processor.ProcessorABC):
 				PhoSelmask = (pho.pt > 20) & (pho.cutBased > 1) & isgap_mask &  Pixel_seed_mask & isPrompt
 
 			elif dataset == "WZ":
-				isPrompt = (Photon.genPartFlav == 1) | (Photon.genPartFlav == 11)
+				isPrompt = (Photon.genPartFlav == 1) 
 				PhoSelmask = (pho.pt > 20) & (pho.cutBased > 1) & isgap_mask &  Pixel_seed_mask & ~isPrompt
 				
 			else:
@@ -419,6 +459,14 @@ class JW_Processor(processor.ProcessorABC):
 		Jet		= Ele_channel_events.Jet
 		nPV		 = Ele_channel_events.PV.npvsGood
 		MET		 = Ele_channel_events.MET
+		 
+		Muon	   = Ele_channel_events.Muon
+		
+		if not ak.sum(ak.num(Muon)) == 0:
+			Loose_mask = ( Muon.pt > 20 ) & ( Muon.looseId ) & ( abs(Muon.eta) < 2.4 ) & (Muon.pfRelIso03_all < 0.25)
+			Muon = Muon[Loose_mask]
+
+
 
 		Electron_mask,Photon_mask = Particle_selection(Electron,Photon,dataset)	
 		Electron = Electron[Electron_mask]	
@@ -459,7 +507,8 @@ class JW_Processor(processor.ProcessorABC):
 		Jet= Jet[ossf_mask]
 		MET = MET[ossf_mask]
 		if not isData: pu = pu[ossf_mask]
-
+	
+		if not ak.sum(ak.num(Muon)) == 0: Muon[ossf_mask]
 
 		# Stop processing if there is no event remain
 		if len(Electron) == 0:
@@ -539,6 +588,8 @@ class JW_Processor(processor.ProcessorABC):
 		nPV = nPV[ak.num(Photon) > 0]
 		if not isData: pu = pu[ak.num(Photon) > 0]
 		MET = MET[ak.num(Photon) > 0]
+		if not ak.sum(ak.num(Muon)) == 0: Muon[ak.num(Photon) > 0]
+
 		Photon	= Photon[ak.num(Photon) > 0] # Beware the order! Photon must be located last!
 
 		dR_phojet = flat_dim(Jet[:,0].delta_r(Photon))
@@ -608,6 +659,10 @@ class JW_Processor(processor.ProcessorABC):
 		bJet_veto	 = ak.num(Jet[bJet_selmask])==0
 		cut5 = np.ones(ak.sum(ak.num(leading_pho[bJet_veto] > 0 ))) * 5
 
+		# Loose Muon veto for surpress ZZ events
+		Loose_muon_veto_mask = (ak.sum(ak.num(Muon)) == 0)
+
+
 		# Z mass window
 		diele			  = Triple_eee.p4
 		zmass_window_mask = ak.firsts((diele.mass) > 60 | (diele.mass < 120)) # signal region
@@ -621,25 +676,25 @@ class JW_Processor(processor.ProcessorABC):
 		# Electron PT cuts
 		Elept_mask = ak.firsts((Triple_eee.lep1.pt > 25) & (Triple_eee.lep2.pt > 10) & (Triple_eee.lep3.pt > 25))
 		
-
+		# MET cuts
+		MET_mask = MET.pt > 20
 
 		# Mask
-		Event_sel_mask	 = bJet_veto & zmass_window_mask & Meeg_mask & Elept_mask  # my version
-		#Event_sel_mask	 = bJet_veto & zmass_window_mask & Elept_mask # SEn version
-		#Event_sel_mask	 = zmass_window_mask & Elept_mask # SEn version
+		Event_sel_mask	 = bJet_veto & zmass_window_mask & Meeg_mask & Elept_mask & MET_mask # SR
+		#Event_sel_mask	 = bJet_veto & zmass_window_mask & Meeg_mask & Elept_mask & MET_mask  & Loose_muon_veto_mask # SR (beta)
+		#Event_sel_mask	 = bJet_veto & zmass_window_mask & Elept_mask & MET_mask   # CL
 
 
+		# Apply cyts
 		Triple_eee_sel	 = Triple_eee[Event_sel_mask]
-		
 		leading_pho_sel	  = leading_pho[Event_sel_mask]
 		# Photon  EE and EB
 		isEE_mask = leading_pho.isScEtaEE
 		isEB_mask = leading_pho.isScEtaEB
 		Pho_EE = leading_pho[isEE_mask & Event_sel_mask]
 		Pho_EB = leading_pho[isEB_mask & Event_sel_mask]
-		
-
 		MET_sel			  = MET[Event_sel_mask]
+
 		
 		cut6 = np.ones(ak.sum(ak.num(leading_pho_sel) > 0)) * 6
 		
@@ -648,12 +703,13 @@ class JW_Processor(processor.ProcessorABC):
 			return out
 
 
-		# W MT (--> beta )
-		Ele3 = ak.flatten(Triple_eee_sel.lep3)
-		MT = np.sqrt(2*Ele3.pt * MET_sel.pt * (1-np.cos(abs(MET_sel.delta_phi(Ele3)))))
-
-		MT = np.array(MT)
 		## -------------------- Prepare making hist --------------#
+
+
+		# Photon 
+		phoPT  = flat_dim(leading_pho_sel.pt)
+		phoEta = flat_dim(leading_pho_sel.eta)
+		phoPhi = flat_dim(leading_pho_sel.phi)
 
 
 		# Photon EE
@@ -689,14 +745,39 @@ class JW_Processor(processor.ProcessorABC):
 		ele3Eta = flat_dim(Triple_eee_sel.lep3.eta)
 		ele3Phi = flat_dim(Triple_eee_sel.lep3.phi)
 
-		Mee	 = flat_dim(Triple_eee_sel.p4.mass)
 		charge  = flat_dim(Triple_eee.lep1.charge +Triple_eee.lep2.charge)
 	
 
 		# MET
 		met = ak.to_numpy(MET_sel.pt)
 		
-	
+		# M(eea) M(ee)
+		diele			  = Triple_eee_sel.p4
+		eeg_vec			  = diele + leading_pho_sel
+		Meea			  = flat_dim(eeg_vec.mass)
+		Mee				  = flat_dim(Triple_eee_sel.p4.mass)
+		
+
+		# W MT (--> beta )
+		Ele3 = ak.flatten(Triple_eee_sel.lep3)
+		MT = np.sqrt(2*Ele3.pt * MET_sel.pt * (1-np.cos(abs(MET_sel.delta_phi(Ele3)))))
+		MT = np.array(MT)
+
+
+
+		# Delta-R
+		leading_ele, subleading_ele, Third_ele = ak.flatten(TLorentz_vector_cylinder(Triple_eee_sel.lep1)),ak.flatten(TLorentz_vector_cylinder(Triple_eee_sel.lep2)),ak.flatten(TLorentz_vector_cylinder(Triple_eee_sel.lep3))
+		dR_e1pho  = leading_ele.delta_r(leading_pho_sel) # dR pho,ele1
+		dR_e2pho  = subleading_ele.delta_r(leading_pho_sel) # dR pho,ele2
+		dR_e3pho  = Third_ele.delta_r(leading_pho_sel) # dR pho,ele3
+
+		dR_e1_Pho = flat_dim(dR_e1pho)
+		dR_e2_Pho = flat_dim(dR_e2pho)
+		dR_e3_Pho = flat_dim(dR_e3pho)
+		
+		dphie3	  = Third_ele.delta_phi(MET)
+
+		
 		# --- Apply weight and hist  
 		weights = processor.Weights(len(cut4))
 
@@ -763,19 +844,26 @@ class JW_Processor(processor.ProcessorABC):
 			weight = skim_weight(weights.weight() * cuts)
 		)
 
+
+			# --mass -- #
 		out['MT'].fill(
 			dataset=dataset,
 			MT=MT,
 			weight = skim_weight(weights.weight() * cuts)
 		)
-
-
-			# -- Electron -- #
 		out["mass"].fill(
 			dataset=dataset,
 			mass=Mee,
 			weight = skim_weight(weights.weight() * cuts)
 		)
+		out["mass_eea"].fill(
+			dataset=dataset,
+			mass_eea = Meea,
+			weight = skim_weight(weights.weight() * cuts)
+		)
+
+
+			# -- Electron -- #
 		out["ele1pt"].fill(
 			dataset=dataset,
 			ele1pt=ele1PT,
@@ -814,18 +902,54 @@ class JW_Processor(processor.ProcessorABC):
 
 			# -- Photon -- #
 
-		# -- For chech dR(aj1)
+
+
 		out["dR_aj"].fill(
 				dataset=dataset,
 				dR_aj = dR_phojet,
+	#			weight = skim_weight(weights.weight() * cuts)
 		)
+		out["dR_ae1"].fill(
+				dataset=dataset,
+				dR_ae1 = dR_e1_Pho,
+				weight = skim_weight(weights.weight() * cuts)
+		)
+		out["dR_ae2"].fill(
+				dataset=dataset,
+				dR_ae2 = dR_e2_Pho,
+				weight = skim_weight(weights.weight() * cuts)
+		)
+		out["dR_ae3"].fill(
+				dataset=dataset,
+				dR_ae3 = dR_e3_Pho,
+				weight = skim_weight(weights.weight() * cuts)
+		)
+		out["dPhie3"].fill(
+				dataset=dataset,
+				dPhie3 = dphie3,
+				weight = skim_weight(weights.weight() * cuts)
+		)
+		out["phopt"].fill(
+			dataset=dataset,
+			phopt=phoPT,
+			weight = skim_weight(weights.weight() * cuts)
+		)
+		out["phoeta"].fill(
+			dataset=dataset,
+			phoeta=phoEta,
+			weight = skim_weight(weights.weight() * cuts)
+		)
+		out["phophi"].fill(
+			dataset=dataset,
+			phophi=phoPhi,
+			weight = skim_weight(weights.weight() * cuts)
+		)
+
+
+
 
 		if len(Pho_EE.pt) != 0:
 
-			
-
-
-			
 			out["pho_EE_pt"].fill(
 				dataset=dataset,
 				pho_EE_pt=Pho_EE_PT,
