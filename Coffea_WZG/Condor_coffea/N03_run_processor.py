@@ -665,7 +665,7 @@ class JW_Processor(processor.ProcessorABC):
 
 		# Z mass window
 		diele			  = Triple_eee.p4
-		zmass_window_mask = ak.firsts((diele.mass) > 60 | (diele.mass < 120)) # signal region
+		zmass_window_mask = ak.firsts((diele.mass > 60) & (diele.mass < 120)) # signal region
 		#zmass_window_mask = ak.firsts(diele.mass) > 4  # control region
 		
 
@@ -775,7 +775,7 @@ class JW_Processor(processor.ProcessorABC):
 		dR_e2_Pho = flat_dim(dR_e2pho)
 		dR_e3_Pho = flat_dim(dR_e3pho)
 		
-		dphie3	  = Third_ele.delta_phi(MET)
+		dphie3	  = ak.to_numpy(Third_ele.delta_phi(MET_sel))
 
 		
 		# --- Apply weight and hist  
@@ -1089,7 +1089,7 @@ if __name__ == '__main__':
 	## Read PU weight file
 
 
-	isdata=True
+	isdata=False
 	
 	if not isdata:
 		pu_path_dict = {

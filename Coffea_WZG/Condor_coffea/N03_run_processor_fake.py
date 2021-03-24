@@ -15,7 +15,7 @@ import numba
 class JW_Processor(processor.ProcessorABC):
 
 	# -- Initializer
-	def __init__(self,year,setname):
+	def __init__(self,year,sample_name):
 
 
 
@@ -261,7 +261,7 @@ class JW_Processor(processor.ProcessorABC):
 
 		# Initialize accumulator
 		out = self.accumulator.identity()
-		dataset = setname
+		dataset = sample_name
 		#events.metadata['dataset']
 		
 		#Stop processing if there is no event remain
@@ -322,7 +322,6 @@ class JW_Processor(processor.ProcessorABC):
 		
 		##---------------  Cut flow1: Passing Triggers ------------------------#
 		Initial_events = events
-		print("#### Initial events: ",len(Initial_events))
 		#events = events[single_ele_triggers_arr | double_ele_triggers_arr]
 		events = events[double_ele_triggers_arr]
 		
@@ -630,16 +629,24 @@ class JW_Processor(processor.ProcessorABC):
 		bJet_veto	= ak.num(Jet[bJet_selmask])==0
 		
 		# Z mass window
-		zmass_window_mask = ak.firsts((Diele.p4.mass) > 60 | (Diele.p4.mass < 120))
+		zmass_window_mask = ak.firsts( (Diele.p4.mass > 60) & (Diele.p4.mass < 120) )
 		
 		# M(eea) cuts 
 		eeg_vec		   = Diele.p4 + leading_pho
 		Meeg_mask		 = ak.firsts(eeg_vec.mass > 120)
 
+		# Electron PT cuts
+		Elept_mask = ak.firsts((Diele.lep1.pt > 25) & (Diele.lep2.pt > 10))
 
-		
+		# MET cuts
+		MET_mask = MET.pt > 20
+
+
+
+
+
 		# --------Mask -------#
-		Event_sel_mask   = bJet_veto & zmass_window_mask & Meeg_mask
+		Event_sel_mask   = bJet_veto & zmass_window_mask & Meeg_mask & Elept_mask & MET_mask
 		Ele_channel_fake_template = Ele_channel_fake_template[Event_sel_mask]
 		Jet_sel			 = Jet[Event_sel_mask]
 		Diele_sel		 = Diele[Event_sel_mask]
@@ -889,7 +896,6 @@ if __name__ == '__main__':
 	filelist = glob.glob(datadict[data_sample])
 
 	sample_name = data_sample.split('_')[0]
-	setname = metadata.split('.')[0].split('/')[1]
 	
 
 	print(sample_name)
@@ -898,7 +904,7 @@ if __name__ == '__main__':
 	}
 	
 	# Class -> Object
-	JW_Processor_instance = JW_Processor(year,setname)
+	JW_Processor_instance = JW_Processor(year,sample_name)
 	
 	
 	## -->Multi-node Executor
@@ -916,4 +922,3 @@ if __name__ == '__main__':
 	save(result,outname)
 	
 	elapsed_time = time.time() - start
-	print("Time: ",elapsed_time)
