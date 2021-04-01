@@ -6,43 +6,12 @@ import coffea.hist as hist
 import time
 
 ## Parameter set
-lumi= 53.03 * 1000
-
-GenDict={
-'WZG':55000,
-"DY":1933600,
-"WZ":4000000,
-"ZZ":2000000,
-"TTWJets":4963867,
-"TTZtoLL":13914900,
-"tZq":12748300,
-"ZGToLLG" :29904768,
-"TTGJets" :4647426,
-"WGToLNuG":20371504
-}
-
-
-xsecDict={
-"WZG":0.0196,
-"DY":2137.0,
-"WZ":27.6,
-"ZZ":12.14,
-"TTWJets":0.2149,
-"TTZtoLL":0.2432,
-"tZq":0.07358,
-"ZGToLLG" : 55.48,
-"TTGJets" : 4.078,
-"WGToLNuG": 1.249
-}
-
 
 hsum_MT = hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
 	hist.Bin("MT","W MT [GeV]", 100, 0, 200)
 )
-
-
 hsum_dR_aj = hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
@@ -51,8 +20,9 @@ hsum_dR_aj = hist.Hist(
 hsum_cutflow = hist.Hist(
 	'Events',
 	hist.Cat('dataset', 'Dataset'),
-	hist.Bin('cutflow', 'Cut index', [0, 1, 2, 3,4,5,6])
+	hist.Bin('cutflow', 'Cut index', [0, 1, 2, 3,4,5,6,7])
 )
+
 
 hsum_charge= hist.Hist(
 	"Events",
@@ -145,11 +115,6 @@ hsum_pho_EE_sieie =  hist.Hist(
     hist.Cat("dataset","Dataset"),
     hist.Bin("pho_EE_sieie","Photon EE sieie", 100, 0, 0.3),
 )
-hsum_pho_EE_Iso_all =  hist.Hist(
-    "Events",
-    hist.Cat("dataset","Dataset"),
-    hist.Bin("pho_EE_Iso_all","Photon EE pfReoIso03_all", 100, 0, 0.3),
-)
 hsum_pho_EE_Iso_chg =  hist.Hist(
     "Events",
     hist.Cat("dataset","Dataset"),
@@ -185,11 +150,6 @@ hsum_pho_EB_sieie =  hist.Hist(
     hist.Cat("dataset","Dataset"),
     hist.Bin("pho_EB_sieie","Photon EB sieie", 100, 0, 0.012),
 )
-hsum_pho_EB_Iso_all =  hist.Hist(
-    "Events",
-    hist.Cat("dataset","Dataset"),
-    hist.Bin("pho_EB_Iso_all","Photon EB pfReoIso03_all", 100, 0, 0.15),
-)
 hsum_pho_EB_Iso_chg =  hist.Hist(
     "Events",
     hist.Cat("dataset","Dataset"),
@@ -207,9 +167,9 @@ hsum_met = hist.Hist(
 histdict = {'nPV':hsum_nPV,'nPV_nw':hsum_nPV_nw, "cutflow":hsum_cutflow,"ele1pt":hsum_ele1pt,"ele2pt":hsum_ele2pt,"ele3pt":hsum_ele3pt,"mass":hsum_Mee,\
 "ele1eta":hsum_ele1eta, "ele2eta":hsum_ele2eta,"ele1phi":hsum_ele1phi, "ele2phi":hsum_ele2phi,\
 'pho_EE_pt':hsum_pho_EE_pt, 'pho_EE_eta':hsum_pho_EE_eta, 'pho_EE_phi':hsum_pho_EE_phi,\
-'pho_EE_hoe':hsum_pho_EE_hoe,'pho_EE_sieie': hsum_pho_EE_sieie, 'pho_EE_Iso_all': hsum_pho_EE_Iso_all, 'pho_EE_Iso_chg':hsum_pho_EE_Iso_chg,\
+'pho_EE_hoe':hsum_pho_EE_hoe,'pho_EE_sieie': hsum_pho_EE_sieie,  'pho_EE_Iso_chg':hsum_pho_EE_Iso_chg,\
 'pho_EB_pt':hsum_pho_EB_pt, 'pho_EB_eta':hsum_pho_EB_eta, 'pho_EB_phi':hsum_pho_EB_phi,\
-'pho_EB_hoe':hsum_pho_EB_hoe,'pho_EB_sieie': hsum_pho_EB_sieie, 'pho_EB_Iso_all': hsum_pho_EB_Iso_all, 'pho_EB_Iso_chg':hsum_pho_EB_Iso_chg,
+'pho_EB_hoe':hsum_pho_EB_hoe,'pho_EB_sieie': hsum_pho_EB_sieie, 'pho_EB_Iso_chg':hsum_pho_EB_Iso_chg,
 'met':hsum_met,'dR_aj':hsum_dR_aj,'MT':hsum_MT}
 
 
@@ -219,17 +179,8 @@ def reduce(folder,sample_list,histname):
 	
 
 	sumwdict ={
-		"DY":0,
-		"WZ":0,
-		"ZZ":0,
-		"TTWJets":0,
-		"TTZtoLL":0,
-		"tZq":0,
+		#"EgammaSen":0,
 		"Egamma":0,
-		"WZG":0,
-		'ZGToLLG':0,	
-        'TTGJets':0,
-        'WGToLNuG':0
 	}
 
 	
@@ -238,17 +189,8 @@ def reduce(folder,sample_list,histname):
 		hists[filename] = hin.copy()
 		if filename.split('_')[0] not in sample_list:
 			continue
-		sumwdict['DY'] += hists[filename]['sumw']['DY']
-		sumwdict['WZ'] += hists[filename]['sumw']['WZ']
-		sumwdict['ZZ'] += hists[filename]['sumw']['ZZ']
-		sumwdict['TTWJets'] += hists[filename]['sumw']['TTWJets']
-		sumwdict['TTZtoLL'] += hists[filename]['sumw']['TTZtoLL']
-		sumwdict['tZq'] += hists[filename]['sumw']['tZq']
+		#sumwdict['EgammaSen'] += hists[filename]['sumw']['EgammaSen']
 		sumwdict['Egamma'] += hists[filename]['sumw']['Egamma']
-		sumwdict['WZG'] += hists[filename]['sumw']['WZG']
-		sumwdict['ZGToLLG'] += hists[filename]['sumw']['ZGToLLG']
-		sumwdict['TTGJets'] += hists[filename]['sumw']['TTGJets']
-		sumwdict['WGToLNuG'] += hists[filename]['sumw']['WGToLNuG']
 
 
 		hist_ = histdict[histname]
@@ -259,12 +201,16 @@ def reduce(folder,sample_list,histname):
 
 ## --File Directories
 #file_path = "Output_dir_noWegiht"
-file_path = "210318RunABD"
+file_path = "210401_JW_Ntuple"
+#file_path = "210401_SEN_Ntuple_v2"
+
 
 
 
 ## --Sample Lists
-sample_list = ['DY' ,'WZ' ,'ZZ' ,'TTWJets','TTZtoLL','tZq' ,'Egamma','WZG','ZGToLLG','TTGJets','WGToLNuG']
+#sample_list = ['DY' ,'WZ' ,'ZZ' ,'TTWJets','TTZtoLL','tZq' ,'Egamma','WZG','ZGToLLG','TTGJets','WGToLNuG']
+sample_list = ['Egamma']
+#sample_list = ['EgammaSen']
 
 
 
@@ -278,14 +224,14 @@ sample_list = ['DY' ,'WZ' ,'ZZ' ,'TTWJets','TTZtoLL','tZq' ,'Egamma','WZG','ZGTo
 
 
 		# --- Electron --- #
-#histname = "mass"; xmin=60; xmax=120; ymin=0; ymax=6;
+#histname = "mass"; xmin=0; xmax=200; ymin=0; ymax=6;
 #histname = "MT"; xmin=0; xmax=200; ymin=0; ymax=8;
 #histname = "nPV"; xmin=0; xmax=100; ymin=1; ymax=1e+3;
 #histname = "nPV_nw"; xmin=0; xmax=100; ymin=1; ymax=1e+3;
 
 #histname = "ele1pt"; xmin=0; xmax=200; ymin=0; ymax=6;
-#histname = "ele2pt"; xmin=0; xmax=200; ymin=0; ymax=12; 
-#histname = "ele3pt"; xmin=0; xmax=200; ymin=0; ymax=10;
+#histname = "ele2pt"; xmin=0; xmax=200; ymin=0; ymax=8; 
+#histname = "ele3pt"; xmin=0; xmax=200; ymin=0; ymax=8;
 
 #histname = "ele1eta"; xmin=-2.5; xmax=2.5; ymin=100; ymax=5e+6;
 #histname = "ele2eta"; xmin=-2.5; xmax=2.5; ymin=100; ymax=5e+6;
@@ -293,11 +239,11 @@ sample_list = ['DY' ,'WZ' ,'ZZ' ,'TTWJets','TTZtoLL','tZq' ,'Egamma','WZG','ZGTo
 #histname = "ele1phi"; xmin=-3.15; xmax=3.15; ymin=100; ymax=5e+6;
 #histname = "ele2phi"; xmin=-3.15; xmax=3.15; ymin=100; ymax=5e+6;
 
-histname = "cutflow"; xmin=0; xmax=6; ymin=1; ymax=5e+6
+histname = "cutflow"; xmin=0; xmax=8; ymin=1; ymax=5e+6
 
 		# --- Photon --- #
 #histname = "dR_aj"; xmin=0; xmax=1; ymin=0.01; ymax=10;
-#histname = "pho_EE_pt"; xmin=0; xmax=200; ymin=0; ymax=7;
+#histname = "pho_EE_pt"; xmin=0; xmax=200; ymin=0; ymax=5;
 #histname = "pho_EE_eta"; xmin=-3; xmax=3; ymin=1; ymax=5e+6;
 #histname = "pho_EE_phi"; xmin=-3.15; xmax=3.15; ymin=1; ymax=5e+6;
 #histname = "pho_EE_hoe"; xmin=0; xmax=0.2; ymin=0.001; ymax=5e+6;
@@ -317,33 +263,19 @@ histname = "cutflow"; xmin=0; xmax=6; ymin=1; ymax=5e+6
 ################################################################
 ## --All-reduce 
 h1,sumwdict = reduce(file_path,sample_list,histname)
+#h2,sumwdict = reduce(file_path_SEN,sample_list,histname)
 
 for i,j in sumwdict.items():
 	print(i,": ",j)
-
-## --Noramlize	
-scales={
-	'WZG'	  : lumi * xsecDict['WZG'] / GenDict['WZG'],
-	'DY'	  : lumi * xsecDict['DY'] / GenDict['DY'],
-	'WZ'	  : lumi * xsecDict['WZ'] / GenDict['WZ'],
-	'ZZ'	  : lumi * xsecDict['ZZ'] / GenDict['ZZ'],
-	'TTWJets' : lumi * xsecDict['TTWJets'] / GenDict['TTWJets'],
-	'TTZtoLL' : lumi * xsecDict['TTZtoLL'] / GenDict['TTZtoLL'],
-	'tZq'	  : lumi * xsecDict['tZq'] / GenDict['tZq'],
-	'ZGToLLG' : lumi * xsecDict['ZGToLLG'] / GenDict['ZGToLLG'],
-    'TTGJets' : lumi * xsecDict['TTGJets'] / GenDict['TTGJets'],
-    'WGToLNuG': lumi * xsecDict['WGToLNuG'] / GenDict['WGToLNuG'],
-}
-
-
-h1.scale(scales,axis='dataset')
 
 
 
 ## --Rebin
 
-
 #h1 = h1.rebin(histname,hist.Bin("mass","Z mass",10,60,120))
+#h2 = h2.rebin(histname,hist.Bin("mass","Z mass",10,60,120))
+
+
 #h1 = h1.rebin(histname,hist.Bin("MT","W MT [GeV]", 20, 0, 200))
 
 #h1 = h1.rebin(histname,hist.Bin("ele1pt","Leading electron from Z  $P_{T}$ [GeV]",30,0,600))
@@ -356,7 +288,6 @@ h1.scale(scales,axis='dataset')
 
 
 #h1 = h1.rebin(histname,hist.Bin("met","met [GeV]", 10, 0, 200))
-
 
 
 
@@ -378,36 +309,35 @@ plt.rcParams.update({
 	'xtick.labelsize': 12,
 	'ytick.labelsize': 12
 })
+
+'''
 fig, (ax, rax) = plt.subplots(
-	nrows=2,
+    nrows=2,
+    ncols=1,
+    figsize=(7,7),
+    gridspec_kw={"height_ratios": (3, 1)},
+    sharex=True
+)
+'''
+
+fig, ax = plt.subplots(
+	nrows=1,
 	ncols=1,
 	figsize=(7,7),
-	gridspec_kw={"height_ratios": (3, 1)},
 	sharex=True
 )
 
+
+
 fig.subplots_adjust(hspace=.07)
 
-
 from cycler import cycler
-#colors = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c']
+colors = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c']
 
 colors= ['r','g','b','orange','pink','navy','yellow']
 
 ax.set_prop_cycle(cycler(color=colors))
 
-
-fill_opts = {
-	'edgecolor': (0,0,0,0.3),
-	'alpha': 0.8
-}
-error_opts = {
-	'label': 'Stat. Unc.',
-	'hatch': '///',
-	'facecolor': 'none',
-	'edgecolor': (0,0,0,.5),
-	'linewidth': 0
-}
 data_err_opts = {
 	'linestyle': 'none',
 'marker': '.',
@@ -416,58 +346,34 @@ data_err_opts = {
 'elinewidth': 1,
 }
 
+data_err_opts_2 = {
+	'linestyle': 'none',
+'marker': '*',
+'markersize': 10.,
+'color': 'r',
+'elinewidth': 1,
+'alpha':0.5
+}
 
-
-
-# MC plotting
-import re
-notdata = re.compile('(?!Egamma)')
-
-hist.plot1d(
-	h1[notdata],
-	ax=ax,
-	clear=False,
-	stack=True,
-	order=["TTWJets" ,"tZq" ,"TTZtoLL" ,"WZ" ,"WZG" ,"ZGToLLG","ZZ"],
-	#order=["TTWJets" ,"tZq" ,"TTZtoLL" ,"WZ" ,"WZG" ,"ZZ","ZGToLLG"],
-	#order=["TTWJets" ,"WZ" ,"ZZ" ,"TTZtoLL" ,"tZq" ,"WZG"],
-	fill_opts=fill_opts,
-	error_opts = error_opts,
-)
 
 
 # DATA plotting
 hist.plot1d(
 
+	#h1['EgammaSen'],
 	h1['Egamma'],
 	ax=ax,
 	clear=False,
-	error_opts=data_err_opts
-	
-)
-
-#print(h1['Egamma'].values())
-
-# Ratio Plot
-hist.plotratio(
-	num=h1['Egamma'].sum("dataset"),
-	denom=h1[notdata].sum("dataset"),
-	ax=rax,
 	error_opts=data_err_opts,
-	denom_fill_opts={},
-	guide_opts={},
-	unc='num'
+	#legend_opts={"labels": ["Jiwoong"]}
+		
 )
-
 
 
 print("##" * 20)
-#for i,j in h1.values().items():
-#	print(i,":",j)
+for i,j in h1.values().items():
+   print(i,":",j)
 
-
-rax.set_ylabel('Data/MC')
-rax.set_ylim(0,2)
 
 
 ax._get_lines.prop_cycler = ax._get_patches_for_fill.prop_cycler
@@ -475,11 +381,10 @@ ax.autoscale(axis='x', tight=True)
 ax.set_ylim(ymin,ymax)
 ax.set_xlim(xmin,xmax)
 ax.set_xlabel('')
+#ax.legend(['JiWoong','Sen'],prop={'size':20})
 ax.set_yscale('log')
 
 
-rax.set_xlabel('Delta R(pho jet1)')
-#leg = ax.legend()
 
 
 lum = plt.text(1., 1., r"53.03 fb$^{-1}$ (13 TeV)",

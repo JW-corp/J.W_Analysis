@@ -80,16 +80,6 @@ class JW_Processor(processor.ProcessorABC):
 				hist.Bin('cutflow', 'Cut index', [0, 1, 2, 3, 4,5,6,7])
 			),
 
-			"nPV": hist.Hist(
-				"Events",
-				hist.Cat("dataset","Dataset"),
-				hist.Bin("nPV","Number of Primary vertex",100, 0, 100),
-			),
-			"nPV_nw": hist.Hist(
-				"Events",
-				hist.Cat("dataset","Dataset"),
-				hist.Bin("nPV_nw","Number of Primary vertex",100, 0, 100),
-			),
 
 			"mass": hist.Hist(
 				"Events",
@@ -102,11 +92,6 @@ class JW_Processor(processor.ProcessorABC):
 				hist.Bin("mass_eea","$m_{e+e-\gamma}$ [GeV]", 300, 0, 600),
 			),
 
-			"MT": hist.Hist(
-				"Events",
-				hist.Cat("dataset","Dataset"),
-				hist.Bin("MT","W MT [GeV]", 100, 0, 200),
-			),
 
 
 			"charge": hist.Hist(
@@ -269,11 +254,6 @@ class JW_Processor(processor.ProcessorABC):
 				"Events",
 				hist.Cat("dataset","Dataset"),
 				hist.Bin("dR_ae3","$dR(ae3)$", 100, 0, 4),
-			),
-			"dPhie3": hist.Hist(
-				"Events",
-				hist.Cat("dataset","Dataset"),
-				hist.Bin("dPhie3","$dPhi(eW,MET)$", 100, -3.15, 3.15),
 			),
 
 			})
@@ -457,14 +437,9 @@ class JW_Processor(processor.ProcessorABC):
 		Electron = Ele_channel_events.Electron
 		Photon	= Ele_channel_events.Photon
 		Jet		= Ele_channel_events.Jet
-		nPV		 = Ele_channel_events.PV.npvsGood
 		MET		 = Ele_channel_events.MET
 		 
-		Muon	   = Ele_channel_events.Muon
 		
-		if not ak.sum(ak.num(Muon)) == 0:
-			Loose_mask = ( Muon.pt > 20 ) & ( Muon.looseId ) & ( abs(Muon.eta) < 2.4 ) & (Muon.pfRelIso03_all < 0.25)
-			Muon = Muon[Loose_mask]
 
 
 
@@ -508,7 +483,6 @@ class JW_Processor(processor.ProcessorABC):
 		MET = MET[ossf_mask]
 		if not isData: pu = pu[ossf_mask]
 	
-		if not ak.sum(ak.num(Muon)) == 0: Muon[ossf_mask]
 
 		# Stop processing if there is no event remain
 		if len(Electron) == 0:
@@ -585,10 +559,8 @@ class JW_Processor(processor.ProcessorABC):
 		Ele_channel_with_dR = Ele_channel_events[ak.num(Photon) > 0]
 		Triple_eee = Triple_eee[ak.num(Photon) > 0]
 		Jet		= Jet[ak.num(Photon) > 0]
-		nPV = nPV[ak.num(Photon) > 0]
 		if not isData: pu = pu[ak.num(Photon) > 0]
 		MET = MET[ak.num(Photon) > 0]
-		if not ak.sum(ak.num(Muon)) == 0: Muon[ak.num(Photon) > 0]
 
 		Photon	= Photon[ak.num(Photon) > 0] # Beware the order! Photon must be located last!
 
@@ -654,13 +626,9 @@ class JW_Processor(processor.ProcessorABC):
 		
 		##-----------  Cut flow5 and 6: Event Selection
 
-		# bjet veto
-		bJet_selmask = (Jet.btagCMVA > -0.5844)
-		bJet_veto	 = ak.num(Jet[bJet_selmask])==0
-		cut5 = np.ones(ak.sum(ak.num(leading_pho[bJet_veto] > 0 ))) * 5
+		# bjet veto  -- Not used --
+		cut5 = cut4
 
-		# Loose Muon veto for surpress ZZ events
-		Loose_muon_veto_mask = (ak.sum(ak.num(Muon)) == 0)
 
 
 		# Z mass window
@@ -677,17 +645,19 @@ class JW_Processor(processor.ProcessorABC):
 		Elept_mask = ak.firsts((Triple_eee.lep1.pt > 25) & (Triple_eee.lep2.pt > 10) & (Triple_eee.lep3.pt > 25))
 		
 		# MET cuts
-		MET_mask = MET.pt > 20
+		MET_mask = MET > 20
 
 		# Mask
 		#Event_sel_mask	 = bJet_veto & zmass_window_mask & Meeg_mask & Elept_mask & MET_mask # SR
 		#Event_sel_mask	 = bJet_veto & zmass_window_mask & Meeg_mask & Elept_mask & MET_mask  & Loose_muon_veto_mask # SR (beta)
-		Event_sel_mask	 = bJet_veto & zmass_window_mask & Elept_mask & MET_mask   # CL
+		Event_sel_mask	 = zmass_window_mask & Elept_mask & MET_mask   # CL
 
 
 		# Apply cyts
 		Triple_eee_sel	 = Triple_eee[Event_sel_mask]
 		leading_pho_sel	  = leading_pho[Event_sel_mask]
+
+
 		# Photon  EE and EB
 		isEE_mask = leading_pho.isScEtaEE
 		isEB_mask = leading_pho.isScEtaEB
@@ -719,7 +689,6 @@ class JW_Processor(processor.ProcessorABC):
 			Pho_EE_Phi		= flat_dim(Pho_EE.phi)
 			Pho_EE_sieie	  = flat_dim(Pho_EE.sieie)
 			Pho_EE_hoe		= flat_dim(Pho_EE.hoe)
-			Pho_EE_Iso_all	= flat_dim(Pho_EE.pfRelIso03_all)
 			Pho_EE_Iso_charge = flat_dim(Pho_EE.pfRelIso03_chg)
 
 		# Photon EB
@@ -729,7 +698,6 @@ class JW_Processor(processor.ProcessorABC):
 			Pho_EB_Phi		= flat_dim(Pho_EB.phi)
 			Pho_EB_sieie	  = flat_dim(Pho_EB.sieie)
 			Pho_EB_hoe		= flat_dim(Pho_EB.hoe)
-			Pho_EB_Iso_all	= flat_dim(Pho_EB.pfRelIso03_all)
 			Pho_EB_Iso_charge = flat_dim(Pho_EB.pfRelIso03_chg)
 
 		# Electrons
@@ -749,7 +717,7 @@ class JW_Processor(processor.ProcessorABC):
 	
 
 		# MET
-		met = ak.to_numpy(MET_sel.pt)
+		met = ak.to_numpy(MET_sel)
 		
 		# M(eea) M(ee)
 		diele			  = Triple_eee_sel.p4
@@ -758,10 +726,6 @@ class JW_Processor(processor.ProcessorABC):
 		Mee				  = flat_dim(Triple_eee_sel.p4.mass)
 		
 
-		# W MT (--> beta )
-		Ele3 = ak.flatten(Triple_eee_sel.lep3)
-		MT = np.sqrt(2*Ele3.pt * MET_sel.pt * (1-np.cos(abs(MET_sel.delta_phi(Ele3)))))
-		MT = np.array(MT)
 
 
 
@@ -775,7 +739,6 @@ class JW_Processor(processor.ProcessorABC):
 		dR_e2_Pho = flat_dim(dR_e2pho)
 		dR_e3_Pho = flat_dim(dR_e3pho)
 		
-		dphie3	  = ak.to_numpy(Third_ele.delta_phi(MET_sel))
 
 		
 		# --- Apply weight and hist  
@@ -795,7 +758,6 @@ class JW_Processor(processor.ProcessorABC):
 		
 
 		print("cut0: {0}, cut1: {1}, cut2: {2}, cut3: {3}, cut4: {4}, cut5: {5} cut6: {6}".format(len(Initial_events),len(cut1),len(cut2),len(cut3),len(cut4),len(cut5),len(cut6)))
-		print("isEEmask: {0}, isEBmask: {1}, Eventsetamsk: {2}".format(len(isEE_mask),len(isEB_mask),len(cuts)))
 
 
 		# Weight and SF here
@@ -823,16 +785,9 @@ class JW_Processor(processor.ProcessorABC):
 			)
 		
 		
+
+		
 		# Primary vertex
-		out['nPV'].fill(
-			dataset=dataset,
-			nPV = nPV,
-			weight = weights.weight()
-		)
-		out['nPV_nw'].fill(
-			dataset=dataset,
-			nPV_nw = nPV
-		)
 
 		# Fill hist
 
@@ -846,11 +801,6 @@ class JW_Processor(processor.ProcessorABC):
 
 
 			# --mass -- #
-		out['MT'].fill(
-			dataset=dataset,
-			MT=MT,
-			weight = skim_weight(weights.weight() * cuts)
-		)
 		out["mass"].fill(
 			dataset=dataset,
 			mass=Mee,
@@ -924,11 +874,6 @@ class JW_Processor(processor.ProcessorABC):
 				dR_ae3 = dR_e3_Pho,
 				weight = skim_weight(weights.weight() * cuts)
 		)
-		out["dPhie3"].fill(
-				dataset=dataset,
-				dPhie3 = dphie3,
-				weight = skim_weight(weights.weight() * cuts)
-		)
 		out["phopt"].fill(
 			dataset=dataset,
 			phopt=phoPT,
@@ -975,11 +920,6 @@ class JW_Processor(processor.ProcessorABC):
 				pho_EE_sieie=Pho_EE_sieie,
 				weight = skim_weight(weights.weight() *cuts *  cuts_pho_EE)
 			)
-			out["pho_EE_Iso_all"].fill(
-				dataset=dataset,
-				pho_EE_Iso_all=Pho_EE_Iso_all,
-				weight = skim_weight(weights.weight() *cuts *  cuts_pho_EE)
-			)
 			out["pho_EE_Iso_chg"].fill(
 				dataset=dataset,
 				pho_EE_Iso_chg=Pho_EE_Iso_charge,
@@ -1013,11 +953,6 @@ class JW_Processor(processor.ProcessorABC):
 				pho_EB_sieie=Pho_EB_sieie,
 				weight = skim_weight(weights.weight() *cuts *  cuts_pho_EB)
 			)
-			out["pho_EB_Iso_all"].fill(
-				dataset=dataset,
-				pho_EB_Iso_all=Pho_EB_Iso_all,
-				weight = skim_weight(weights.weight() *cuts *  cuts_pho_EB)
-			)
 			out["pho_EB_Iso_chg"].fill(
 				dataset=dataset,
 				pho_EB_Iso_chg=Pho_EB_Iso_charge,
@@ -1031,7 +966,6 @@ class JW_Processor(processor.ProcessorABC):
 	def postprocess(self,accumulator):
 
 #		scale={}
-#		for d in accumulator['nPV'].identifiers('dataset'):
 #			print('Scaling:',d.name)
 #			dset = d.name
 #			print('Xsec:',self._xsec)
