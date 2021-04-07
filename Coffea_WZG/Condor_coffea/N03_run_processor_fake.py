@@ -147,7 +147,7 @@ class JW_Processor(processor.ProcessorABC):
 			"pho_EE_sieie": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("pho_EE_sieie","Photon EE sieie", 100, 0, 0.03),
+				hist.Bin("pho_EE_sieie","Photon EE sieie", 1000, 0, 0.1),
 			),
 			"pho_EE_Iso_chg": hist.Hist(
 				"Events",
@@ -157,7 +157,7 @@ class JW_Processor(processor.ProcessorABC):
 			"pho_EE_sieie_check": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("pho_EE_sieie_check","Photon EE sieie", 100, 0, 0.03),
+				hist.Bin("pho_EE_sieie_check","Photon EE sieie", 200, 0, 0.1),
 			),
 			"pho_EE_Iso_chg_check": hist.Hist(
 				"Events",
@@ -194,7 +194,7 @@ class JW_Processor(processor.ProcessorABC):
 			"pho_EB_sieie": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("pho_EB_sieie","Photon EB sieie", 100, 0, 0.1),
+				hist.Bin("pho_EB_sieie","Photon EB sieie", 200, 0, 0.1),
 			),
 			"pho_EB_Iso_chg_check": hist.Hist(
 				"Events",
@@ -247,6 +247,88 @@ class JW_Processor(processor.ProcessorABC):
 			),			
 
 
+			# -- Sieie bins -- #
+
+			"PT_1_eta_1": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("PT_1_eta_1","20 < pt <30 & |eta| < 1", 1000, 0, 1),
+			),
+			"PT_1_eta_2": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("PT_1_eta_2","20 < pt <30 & 1 < |eta| < 1.5", 200, 0, 0.1),
+			),
+			"PT_1_eta_3": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("PT_1_eta_3","20 < pt <30 & 1.5 < |eta| < 2", 200, 0, 0.1),
+			),
+			"PT_1_eta_4": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("PT_1_eta_4","20 < pt <30 & 2 < |eta| < 2.5", 200, 0, 0.1),
+			),
+			"PT_2_eta_1": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("PT_2_eta_1","30 < pt <40 & |eta| < 1", 200, 0, 0.1),
+			),
+			"PT_2_eta_2": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("PT_2_eta_2","30 < pt <40 & 1 < |eta| < 1.5", 200, 0, 0.1),
+			),
+			"PT_2_eta_3": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("PT_2_eta_3","30 < pt <40 & 1.5 < |eta| < 2", 200, 0, 0.1),
+			),
+			"PT_2_eta_4": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("PT_2_eta_4","30 < pt <40 & 2 < |eta| < 2.5", 200, 0, 0.1),
+			),
+			"PT_3_eta_1": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("PT_3_eta_1","40 < pt <50 & |eta| < 1", 200, 0, 0.1),
+			),
+			"PT_3_eta_2": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("PT_3_eta_2","40 < pt <50 & 1 < |eta| < 1.5", 200, 0, 0.1),
+			),
+			"PT_3_eta_3": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("PT_3_eta_3","40 < pt <50 & 1.5 < |eta| < 2", 200, 0, 0.1),
+			),
+			"PT_3_eta_4": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("PT_3_eta_4","40 < pt <50 & 2 < |eta| < 2.5", 200, 0, 0.1),
+			),
+			"PT_4_eta_1": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("PT_4_eta_1","50 < pt & |eta| < 1", 200, 0, 0.1),
+			),
+			"PT_4_eta_2": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("PT_4_eta_2","50 <pt  & 1 < |eta| < 1.5", 200, 0, 0.1),
+			),
+			"PT_4_eta_3": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("PT_4_eta_3","50 < pt  & 1.5 < |eta| < 2", 200, 0, 0.1),
+			),
+			"PT_4_eta_4": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("PT_4_eta_4","50 < pt  & 2 < |eta| < 2.5", 200, 0, 0.1),
+			)
 
 
 			})
@@ -532,7 +614,6 @@ class JW_Processor(processor.ProcessorABC):
 					# |1|1|1|1|1|1|1| = |1|1|1|0|1|1|1|
 		
 					
-						
 					#if (vid_cuts2 & 0b1111111 == 0b1111111): # Cut applied
 					if (vid_cuts2 & 0b1111111 == 0b1110111): # Inverse Sieie
 					#if (vid_cuts2 & 0b1110111 == 0b1110111): # Without Sieie
@@ -663,6 +744,7 @@ class JW_Processor(processor.ProcessorABC):
 		
 
 
+
 		# -------------------- Flatten variables ---------------------------#	
 
 				# -- Ele1 --#
@@ -707,6 +789,45 @@ class JW_Processor(processor.ProcessorABC):
 		dR_jpho   = flat_dim(Jet_sel[:,0].delta_r(leading_pho_sel))
 
 		MET_PT = ak.to_numpy(MET_sel.pt)
+
+
+		# -------------------- Sieie bins---------------------------#	
+		def make_bins(pt,eta,sieie,bin_range_str):
+
+			bin_dict = {'PT_1_eta_1' : ( pt > 20 ) & ( pt < 30 ) & ( eta < 1)
+			,'PT_1_eta_2' : ( pt > 20 ) & ( pt < 30 ) & ( eta > 1) & ( eta < 1.5 )
+			,'PT_1_eta_3' : ( pt > 20 ) & ( pt < 30 ) & ( eta > 1.5) & ( eta < 2 )
+			,'PT_1_eta_4' : ( pt > 20 ) & ( pt < 30 ) & ( eta > 2) & ( eta < 2.5 )
+
+			,'PT_2_eta_1' : ( pt > 30 ) & ( pt < 40 ) & ( eta < 1) 
+			,'PT_2_eta_2' : ( pt > 30 ) & ( pt < 40 ) & ( eta > 1) & ( eta < 1.5 )
+			,'PT_2_eta_3' : ( pt > 30 ) & ( pt < 40 ) & ( eta > 1.5) & ( eta < 2 )
+			,'PT_2_eta_4' : ( pt > 30 ) & ( pt < 40 ) & ( eta > 2) & ( eta < 2.5 )
+
+			,'PT_3_eta_1' : ( pt > 40 ) & ( pt < 50 ) & ( eta < 1) 
+			,'PT_3_eta_2' : ( pt > 40 ) & ( pt < 50 ) & ( eta > 1) & ( eta < 1.5 )
+			,'PT_3_eta_3' : ( pt > 40 ) & ( pt < 50 ) & ( eta > 1.5) & ( eta < 2 )
+			,'PT_3_eta_4' : ( pt > 40 ) & ( pt < 50 ) & ( eta > 2) & ( eta < 2.5 )
+
+			,'PT_4_eta_1' :  ( pt > 50 ) & ( eta < 1) 
+			,'PT_4_eta_2' :  ( pt > 50 ) & ( eta > 1) & ( eta < 1.5 )
+			,'PT_4_eta_3' :  ( pt > 50 ) & ( eta > 1.5) & ( eta < 2 )
+			,'PT_4_eta_4' :  ( pt > 50 ) & ( eta > 2) & ( eta < 2.5 )
+			}
+	
+			binmask = bin_dict[bin_range_str]
+			
+			return ak.to_numpy(sieie[binmask])
+
+
+		bin_name_list = ['PT_1_eta_1' ,'PT_1_eta_2' ,'PT_1_eta_3' ,'PT_1_eta_4' 
+				 ,'PT_2_eta_1' ,'PT_2_eta_2' ,'PT_2_eta_3' ,'PT_2_eta_4' ,'PT_3_eta_1' ,'PT_3_eta_2' 
+				 ,'PT_3_eta_3' ,'PT_3_eta_4' ,'PT_4_eta_1' ,'PT_4_eta_2' ,'PT_4_eta_3' ,'PT_4_eta_4']
+
+		binned_sieie_hist={}
+		for name in bin_name_list:
+			binned_sieie_hist[name] = make_bins(flat_dim(leading_pho_sel.pt), flat_dim(abs(leading_pho_sel.eta)),flat_dim(leading_pho_sel.sieie), name)
+		
 
 		# -------------------- Fill hist ---------------------------#	
 
@@ -857,7 +978,76 @@ class JW_Processor(processor.ProcessorABC):
 		)		
 
 
+		test_target = binned_sieie_hist['PT_1_eta_1']
+		print("CheckAAA: ",test_target[test_target > 0.05])
+		print("CheckBBB: ",test_target[test_target > 0])
+
+		# -- Binned sieie hist -- #
+		out['PT_1_eta_1'].fill(
+			dataset	   = dataset,
+			PT_1_eta_1 = binned_sieie_hist['PT_1_eta_1']
+		)
+		out['PT_1_eta_2'].fill(
+			dataset	   = dataset,
+			PT_1_eta_2 = binned_sieie_hist['PT_1_eta_2']
+		)
+		out['PT_1_eta_3'].fill(
+			dataset	   = dataset,
+			PT_1_eta_3 = binned_sieie_hist['PT_1_eta_3']
+		)
+		out['PT_1_eta_4'].fill(
+			dataset	   = dataset,
+			PT_1_eta_4 = binned_sieie_hist['PT_1_eta_4']
+		)
 	
+		out['PT_2_eta_1'].fill(
+			dataset	   = dataset,
+			PT_2_eta_1 = binned_sieie_hist['PT_2_eta_1']
+		)
+		out['PT_2_eta_2'].fill(
+			dataset	   = dataset,
+			PT_2_eta_2 = binned_sieie_hist['PT_2_eta_2']
+		)
+		out['PT_2_eta_3'].fill(
+			dataset	   = dataset,
+			PT_2_eta_3 = binned_sieie_hist['PT_2_eta_3']
+		)
+		out['PT_2_eta_4'].fill(
+			dataset	   = dataset,
+			PT_2_eta_4 = binned_sieie_hist['PT_2_eta_4']
+		)
+		out['PT_3_eta_1'].fill(
+			dataset	   = dataset,
+			PT_3_eta_1 = binned_sieie_hist['PT_3_eta_1']
+		)
+		out['PT_3_eta_2'].fill(
+			dataset	   = dataset,
+			PT_3_eta_2 = binned_sieie_hist['PT_3_eta_2']
+		)
+		out['PT_3_eta_3'].fill(
+			dataset	   = dataset,
+			PT_3_eta_3 = binned_sieie_hist['PT_3_eta_3']
+		)
+		out['PT_3_eta_4'].fill(
+			dataset	   = dataset,
+			PT_3_eta_4 = binned_sieie_hist['PT_3_eta_4']
+		)
+		out['PT_4_eta_1'].fill(
+			dataset	   = dataset,
+			PT_4_eta_1 = binned_sieie_hist['PT_4_eta_1']
+		)
+		out['PT_4_eta_2'].fill(
+			dataset	   = dataset,
+			PT_4_eta_2 = binned_sieie_hist['PT_4_eta_2']
+		)
+		out['PT_4_eta_3'].fill(
+			dataset	   = dataset,
+			PT_4_eta_3 = binned_sieie_hist['PT_4_eta_3']
+		)
+		out['PT_4_eta_4'].fill(
+			dataset	   = dataset,
+			PT_4_eta_4 = binned_sieie_hist['PT_4_eta_4']
+		)
 
 		return out
 
