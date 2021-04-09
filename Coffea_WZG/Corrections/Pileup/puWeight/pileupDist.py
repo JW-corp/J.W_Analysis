@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import argparse
 import sys, os
 import fnmatch
 import time
@@ -57,6 +58,8 @@ def MakeMCPileupDist(inFiles, outName):
 	outFile.Write()
 	print "Done ", nFiles, " files " , nEvents , " " , h1_Pileup_nTrueInt.GetEntries(), " events", "to ", outName  
 
+
+
 def TestPileupWeight(filenameData, filenameMC):
 	puWeight = PileupWeight(filenameData,filenameMC)	
 
@@ -95,20 +98,41 @@ def TestPileupWeight(filenameData, filenameMC):
 	return  puWeight.WeightList()
 
 
+
+
+
 if __name__ == '__main__':
-	#datadir = sys.argv[1]
-	#outname = sys.argv[2]
-	#inFiles = FindFiles(datadir, "*.root")
+	
+	## -- For making MC hist
+	#parser = argparse.ArgumentParser()
+
+	#parser.add_argument('--infile', type=str)
+	#parser.add_argument('--outfile', type=str)
+	#args = parser.parse_args()
+	#
+	#datadir = args.infile
+	#outname = args.outfile
+
+	##inFiles = FindFiles(datadir, "*.root")  # from DAS file structure
+	#inFiles = [datadir] # Ntuple 
+
+	#
 	#MakeMCPileupDist(inFiles, outname)
 
+# ------------------------------------------------------#
+
+
+	# -- For makine SF
+	infile = sys.argv[1]
 	startTime = time.time()
-	puWeight_arr = TestPileupWeight("../data_2018_pileup_out_runAB.root","mc/mcPileupDist_DYToEE_M-50_NNPDF31_TuneCP5_13TeV-powheg-pythia8.root")	
+
+	infile_path = "mc_Ntuple/" + infile
+	outfile_name = infile.split('.')[0] + '.npy'
+	puWeight_arr = TestPileupWeight("../data_2018_pileup_out_runABD.root",infile_path)	
 	print(puWeight_arr)
 	print(len(puWeight_arr))
 	
-	np.save('pu_weight_runAB.npy',np.array(puWeight_arr))
+
+	np.save(outfile_name,np.array(puWeight_arr))
 
 	print("RunningTime : ", time.time() - startTime)
-	
-	
-
