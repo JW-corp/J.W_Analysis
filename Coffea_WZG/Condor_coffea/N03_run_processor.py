@@ -1,4 +1,4 @@
-import awkward1 as ak
+import awkward as ak
 from coffea.nanoevents import NanoEventsFactory, NanoAODSchema
 import time
 from coffea import processor, hist
@@ -310,25 +310,6 @@ class JW_Processor(processor.ProcessorABC):
 		
 		# <----- Helper functions ------># 
 			
-		# flat dim helper function 
-		def flat_dim(arr):
-			
-			sub_arr = ak.flatten(arr)
-			mask = ~ak.is_none(sub_arr)
-
-			return ak.to_numpy(sub_arr[mask])
-		#  drop na helper function 
-		def drop_na(arr):
-
-			mask = ~ak.is_none(arr)
-
-			return arr[mask]
-		#  drop na helper function 
-		def drop_na_np(arr):
-
-			mask = ~np.isnan(arr)
-
-			return arr[mask]
 		#  Sort by PT  helper function 
 		def sort_by_pt(ele,pho,jet):
 			ele = ele[ak.argsort(ele.pt,ascending=False,axis=1)]
@@ -421,115 +402,69 @@ class JW_Processor(processor.ProcessorABC):
 
 		
 
-		##-----------  Cut flow2: Events contain 3 electron and 1 photon are selected  ( Basic cut applied )
+		##-----------  Cut flow2: Events contain 3 electron and 1 photon are selected  
 		
 
+		# 0 --Muon ( only used to calculate dR )
+		MuSelmask = (Muon.pt > 10) & (abs(Muon.eta) < 2.5)  & (Muon.tightId) & (Muon.pfRelIso04_all < 0.15)
+		#Muon = ak.mask(Muon,MuSelmask)
+		Muon = Muon[MuSelmask]
 
-		# ID variables and basic cut
-		def Particle_selection(ele,pho,mu,dataset):
-			
-			# Electron selection
-			EleSelmask = ((ele.pt > 10) & (np.abs(ele.eta + ele.deltaEtaSC) < 1.4442) & (ele.cutBased > 2) & (abs(ele.dxy) < 0.05) & (abs(ele.dz) < 0.1)) | \
-				((ele.pt > 10) & (np.abs(ele.eta + ele.deltaEtaSC) > 1.5660) & (np.abs(ele.eta + ele.deltaEtaSC) < 2.5) & (ele.cutBased > 2) & (abs(ele.dxy) < 0.1) & (abs(ele.dz) < 0.2))
-
-
-			
-			
-
-
-			# Photon selection
-			isgap_mask = (abs(pho.eta) < 1.442)  |  ((abs(pho.eta) > 1.566) & (abs(pho.eta) < 2.5))
-			Pixel_seed_mask	= ~pho.pixelSeed
-
-			
-
-			if dataset == "WZG":
-				isPrompt = (Photon.genPartFlav == 1) | (Photon.genPartFlav == 11)
-				PhoSelmask = (pho.pt > 20) & (pho.cutBased > 1) & isgap_mask &  Pixel_seed_mask & isPrompt
-
-			elif dataset == "WZ":
-				isPrompt = (Photon.genPartFlav == 1) 
-				PhoSelmask = (pho.pt > 20) & (pho.cutBased > 1) & isgap_mask &  Pixel_seed_mask & ~isPrompt
-				
-			else:
-				PhoSelmask = (pho.pt > 20) & (pho.cutBased > 1) & isgap_mask &  Pixel_seed_mask
-				
-			
-
-			# Jet selection
-			MuSelmask = (mu.pt > 10) & (abs(mu.eta) < 2.5)  & (mu.tightId) & (mu.pfRelIso04_all < 0.15)
-
-
-
-
-			return EleSelmask,PhoSelmask,MuSelmask
-
-
-		# Channel selection	--> 3 Electrons 1 or more photon  
-		Electron_mask, Photon_mask, Muon_mask	= Particle_selection(Electron,Photon,Muon,dataset)
+		# 1--Electron selection
+		EleSelmask = ((Electron.pt > 10) & (np.abs(Electron.eta + Electron.deltaEtaSC) < 1.479)  &  (Electron.cutBased > 2) & (abs(Electron.dxy) < 0.05) & (abs(Electron.dz) < 0.1)) | \
+					((Electron.pt > 10) & (np.abs(Electron.eta + Electron.deltaEtaSC) > 1.479) & (np.abs(Electron.eta + Electron.deltaEtaSC) < 2.5) & (Electron.cutBased > 2) & (abs(Electron.dxy) < 0.1) & (abs(Electron.dz) < 0.2))
 		
-		Electron = Electron[Electron_mask]
-		Photon   = Photon[Photon_mask]
-		Muon	 = Muon[Muon_mask] # only for making 		
-
-		# Channel basic evt cut
-		Ele_channel_mask = ak.num(Electron)  == 3 
-		Pho_channel_mask = ak.num(Photon) > 0
-
-		# Apply cut 2-1
-		Electron = Electron[Ele_channel_mask & Pho_channel_mask]
-		Muon	 = Muon[Ele_channel_mask & Pho_channel_mask]
-		Photon	 = Photon[Ele_channel_mask & Pho_channel_mask]
-		MET		 = MET[Ele_channel_mask & Pho_channel_mask]
-		Jet		 = Jet[Ele_channel_mask & Pho_channel_mask]
-		events   = events[Ele_channel_mask & Pho_channel_mask]
-		if not isData:pu = pu[Ele_channel_mask & Pho_channel_mask]
-	
-
-		# dR cut in Photon selection
-		def make_dR_mask(evt_electron, evt_photon, evt_muon, builder):
-			
-			
-			for evt_idx in range(len(evt_photon)): # EvtLoop
-				builder.begin_list()
-				Pho = evt_photon[evt_idx]
-				Ele = evt_electron[evt_idx]
-				Mu  = evt_muon[evt_idx]
-				
-				for pho_idx in range(len(Pho)): # PhoLoop
+		Electron = Electron[EleSelmask]
 		
-		
-					is_pass_dR = True
-					for ele_idx in range(len(Ele)): #
-						if Pho[pho_idx].delta_r(Ele[ele_idx]) < 0.5 : is_pass_dR = False
-						
-							
-					if len(Mu) != 0:
-						for mu_idx in range(len(Mu)):
-							if Pho[pho_idx].delta_r(Mu[mu_idx]) < 0.5 : is_pass_dR = False
-						
-					#print(is_pass_dR)
-					builder.boolean(is_pass_dR)
-				builder.end_list()
-				
-			return builder
-		
-		pho_dR_mask = make_dR_mask(Electron,Photon,Muon,ak.ArrayBuilder()).snapshot()
-		Photon = Photon[pho_dR_mask]
+		# Select events with 3 selected electrons
+		Tri_electron_mask = ak.num(Electron) == 3
+		Electron = Electron[Tri_electron_mask]
+		Photon = Photon[Tri_electron_mask]
+		Jet = Jet[Tri_electron_mask]
+		MET = MET[Tri_electron_mask]
+		Muon = Muon[Tri_electron_mask]
+		if not isData:pu = pu[Tri_electron_mask]
 
-		# dR evet cut
-		Pho_evtsel_mask = ak.num(Photon) > 0
-
-		# Apply cut 2-2
-		Electron = Electron[Pho_evtsel_mask]
-		Photon   = Photon[Pho_evtsel_mask]
-		Jet	  = Jet[Pho_evtsel_mask]
-		Muon	 = Muon[Pho_evtsel_mask]
-		MET		 = MET[Pho_evtsel_mask]
-		events   = events[Pho_evtsel_mask] 
-		if not isData:pu = pu[Pho_evtsel_mask]
-		
 		cut2 = np.ones(len(Photon)) * 2
+		# 2--Photon selection
+	
+		# Basic photon selection
+		isgap_mask = (abs(Photon.eta) < 1.442)  |  ((abs(Photon.eta) > 1.566) & (abs(Photon.eta) < 2.5))
+		Pixel_seed_mask = ~Photon.pixelSeed
+		PT_ID_mask = (Photon.pt > 20) & (Photon.cutBased > 1)
+		
+		# dR cut with selected Muon and Electrons
+		dr_pho_ele_mask = ak.all(Photon.metric_table(Electron) > 0.5, axis=-1) # default metric table: delta_r
+		dr_pho_mu_mask = ak.all(Photon.metric_table(Muon) > 0.5, axis=-1)
+
+
+		# genPartFlav cut
+		'''
+		if dataset == "WZG":
+			isPrompt = (Photon.genPartFlav == 1) | (Photon.genPartFlav == 11)
+			PhoSelmask = PT_ID_mask & isgap_mask &  Pixel_seed_mask & isPrompt & dr_pho_ele_mask & dr_pho_mu_mask
+
+		elif dataset == "WZ":
+			isPrompt = (Photon.genPartFlav == 1) 
+			PhoSelmask = PT_ID_mask & isgap_mask &  Pixel_seed_mask & ~isPrompt & dr_pho_ele_mask & dr_pho_mu_mask
+				
+		else:
+			PhoSelmask = PT_ID_mask  & isgap_mask &  Pixel_seed_mask & dr_pho_ele_mask & dr_pho_mu_mask
+		'''		
+
+		PhoSelmask = PT_ID_mask  & isgap_mask &  Pixel_seed_mask & dr_pho_ele_mask & dr_pho_mu_mask
+		Photon = Photon[PhoSelmask]
+
+		# Select events with 3 electrons and 1 or more photons
+		A_photon_mask = ak.num(Photon) > 0
+		Electron = Electron[A_photon_mask ]
+		Photon   = Photon[A_photon_mask]
+		Jet = Jet[A_photon_mask]
+		Muon = Muon[A_photon_mask]
+		MET = MET[A_photon_mask]
+		if not isData:pu = pu[A_photon_mask]
+		
+		cut3 = np.ones(len(Photon)) * 3
 		
 		
 		##-----------  Cut flow3: Electron Selection --> OSSF 
@@ -572,7 +507,7 @@ class JW_Processor(processor.ProcessorABC):
 		if len(Electron) == 0:
 			return out
 
-		cut3 = np.ones(ak.sum(ak.num(Electron) > 0)) * 3
+		cut4 = np.ones(ak.sum(ak.num(Electron) > 0)) * 4
 		
 		# Define Electron Triplet
 
@@ -638,14 +573,15 @@ class JW_Processor(processor.ProcessorABC):
 		##-----------  Cut4: b-jet veto  and Cut5: Event Selection
 
 		# bjet veto
-		bJet_selmask = (Jet.btagCMVA > -0.5844)
-		bJet_veto	 = ak.num(Jet[bJet_selmask])==0
-		cut4 = np.ones(ak.sum(ak.num(leading_pho[bJet_veto] > 0 ))) * 4
+
+		#bJet_selmask =  (Jet.btagCSVV2 > 0.8838) & (Jet.pt > 30) # Medium btag CSVV2 for 2018
+		#bJet_selmask = (Jet.btagCMVA > -0.5844) # original b-jet sel
+		#bJet_veto	= ak.num(Jet[bJet_selmask])==0 # CR,SR
+		#bJet_veto	= ak.num(Jet[bJet_selmask]) > 0 #CR t-enriched
 
 
 		# Z mass window
 		diele			  = Triple_eee.p4
-		#zmass_window_mask = ak.firsts((diele.mass > 60) & (diele.mass < 120)) # signal region
 		zmass_window_mask = ak.firsts(diele.mass) > 4  
 		
 
@@ -660,7 +596,7 @@ class JW_Processor(processor.ProcessorABC):
 		MET_mask = MET.pt > 20
 
 		# Mask
-		Event_sel_mask	 = zmass_window_mask & Elept_mask    # Baseline
+		Event_sel_mask	 = zmass_window_mask & Elept_mask & MET_mask  # Baseline
 
 
 		# Apply cut6
@@ -685,45 +621,45 @@ class JW_Processor(processor.ProcessorABC):
 
 
 		# Photon 
-		phoPT  = flat_dim(leading_pho_sel.pt)
-		phoEta = flat_dim(leading_pho_sel.eta)
-		phoPhi = flat_dim(leading_pho_sel.phi)
+		phoPT  = ak.flatten(leading_pho_sel.pt)
+		phoEta = ak.flatten(leading_pho_sel.eta)
+		phoPhi = ak.flatten(leading_pho_sel.phi)
 
 
 		# Photon EE
 		if len(Pho_EE.pt) != 0:
-			Pho_EE_PT		 = flat_dim(Pho_EE.pt)
-			Pho_EE_Eta			= flat_dim(Pho_EE.eta)
-			Pho_EE_Phi		= flat_dim(Pho_EE.phi)
-			Pho_EE_sieie	  = flat_dim(Pho_EE.sieie)
-			Pho_EE_hoe		= flat_dim(Pho_EE.hoe)
-			Pho_EE_Iso_all	= flat_dim(Pho_EE.pfRelIso03_all)
-			Pho_EE_Iso_charge = flat_dim(Pho_EE.pfRelIso03_chg)
+			Pho_EE_PT		 = ak.flatten(Pho_EE.pt)
+			Pho_EE_Eta			= ak.flatten(Pho_EE.eta)
+			Pho_EE_Phi		= ak.flatten(Pho_EE.phi)
+			Pho_EE_sieie	  = ak.flatten(Pho_EE.sieie)
+			Pho_EE_hoe		= ak.flatten(Pho_EE.hoe)
+			Pho_EE_Iso_all	= ak.flatten(Pho_EE.pfRelIso03_all)
+			Pho_EE_Iso_charge = ak.flatten(Pho_EE.pfRelIso03_chg)
 
 		# Photon EB
 		if len(Pho_EB.pt) !=0:
-			Pho_EB_PT		 = flat_dim(Pho_EB.pt)
-			Pho_EB_Eta		= flat_dim(Pho_EB.eta)
-			Pho_EB_Phi		= flat_dim(Pho_EB.phi)
-			Pho_EB_sieie	  = flat_dim(Pho_EB.sieie)
-			Pho_EB_hoe		= flat_dim(Pho_EB.hoe)
-			Pho_EB_Iso_all	= flat_dim(Pho_EB.pfRelIso03_all)
-			Pho_EB_Iso_charge = flat_dim(Pho_EB.pfRelIso03_chg)
+			Pho_EB_PT		 = ak.flatten(Pho_EB.pt)
+			Pho_EB_Eta		= ak.flatten(Pho_EB.eta)
+			Pho_EB_Phi		= ak.flatten(Pho_EB.phi)
+			Pho_EB_sieie	  = ak.flatten(Pho_EB.sieie)
+			Pho_EB_hoe		= ak.flatten(Pho_EB.hoe)
+			Pho_EB_Iso_all	= ak.flatten(Pho_EB.pfRelIso03_all)
+			Pho_EB_Iso_charge = ak.flatten(Pho_EB.pfRelIso03_chg)
 
 		# Electrons
-		ele1PT  = flat_dim(Triple_eee_sel.lep1.pt)
-		ele1Eta = flat_dim(Triple_eee_sel.lep1.eta)
-		ele1Phi = flat_dim(Triple_eee_sel.lep1.phi)
+		ele1PT  = ak.flatten(Triple_eee_sel.lep1.pt)
+		ele1Eta = ak.flatten(Triple_eee_sel.lep1.eta)
+		ele1Phi = ak.flatten(Triple_eee_sel.lep1.phi)
 	
-		ele2PT  = flat_dim(Triple_eee_sel.lep2.pt)
-		ele2Eta = flat_dim(Triple_eee_sel.lep2.eta)
-		ele2Phi = flat_dim(Triple_eee_sel.lep2.phi)
+		ele2PT  = ak.flatten(Triple_eee_sel.lep2.pt)
+		ele2Eta = ak.flatten(Triple_eee_sel.lep2.eta)
+		ele2Phi = ak.flatten(Triple_eee_sel.lep2.phi)
 	
-		ele3PT  = flat_dim(Triple_eee_sel.lep3.pt)
-		ele3Eta = flat_dim(Triple_eee_sel.lep3.eta)
-		ele3Phi = flat_dim(Triple_eee_sel.lep3.phi)
+		ele3PT  = ak.flatten(Triple_eee_sel.lep3.pt)
+		ele3Eta = ak.flatten(Triple_eee_sel.lep3.eta)
+		ele3Phi = ak.flatten(Triple_eee_sel.lep3.phi)
 
-		charge  = flat_dim(Triple_eee.lep1.charge +Triple_eee.lep2.charge)
+		charge  = ak.flatten(Triple_eee.lep1.charge +Triple_eee.lep2.charge)
 	
 
 		# MET
@@ -732,8 +668,8 @@ class JW_Processor(processor.ProcessorABC):
 		# M(eea) M(ee)
 		diele			  = Triple_eee_sel.p4
 		eeg_vec			  = diele + leading_pho_sel
-		Meea			  = flat_dim(eeg_vec.mass)
-		Mee				  = flat_dim(Triple_eee_sel.p4.mass)
+		Meea			  = ak.flatten(eeg_vec.mass)
+		Mee				  = ak.flatten(Triple_eee_sel.p4.mass)
 		
 
 		# W MT (--> beta )
@@ -754,21 +690,21 @@ class JW_Processor(processor.ProcessorABC):
 			return ak.to_numpy(subarr[mask2])
 
 		cuts = Event_sel_mask
-		cuts_pho_EE = flat_dim(isEE_mask)
-		cuts_pho_EB = flat_dim(isEB_mask)
+		cuts_pho_EE = ak.flatten(isEE_mask)
+		cuts_pho_EB = ak.flatten(isEB_mask)
 		
 
-		print("cut0: {0}, cut1: {1}, cut2: {2}, cut3: {3}, cut4: {4}, cut5: {5} ".format(len(Initial_events),len(cut1),len(cut2),len(cut3),len(cut4),len(cut5)))
+		print("cut0: {0}, cut1: {1}, cut2: {2}, cut3: {3}, cut4: {4}  ".format(len(Initial_events),len(cut1),len(cut2),len(cut3),len(cut4)))
 
 
 		# Weight and SF here
-		if not isData:
-			weights.add('pileup',pu)		
-			weights.add('ele_id',ele_medium_id_sf)		
-			weights.add('pho_id',get_pho_medium_id_sf)		
-			weights.add('ele_reco',ele_reco_sf)		
-			weights.add('ele_trigger',ele_trig_weight)		
-			print("#### Weight: ",weights.weight())
+		#if not isData:
+			#weights.add('pileup',pu)		
+			#weights.add('ele_id',ele_medium_id_sf)		
+			#weights.add('pho_id',get_pho_medium_id_sf)		
+			#weights.add('ele_reco',ele_reco_sf)		
+			#weights.add('ele_trigger',ele_trig_weight)		
+			#print("#### Weight: ",weights.weight())
 
 
 
@@ -1011,8 +947,10 @@ if __name__ == '__main__':
 	## Read PU weight file
 
 
-	isdata=True
+	isdata=False
 	
+
+
 	if not isdata:
 		pu_path_dict = {
 		"DY":"mcPileupDist_DYToEE_M-50_NNPDF31_TuneCP5_13TeV-powheg-pythia8.npy",
@@ -1023,11 +961,15 @@ if __name__ == '__main__':
 		"ZZ":"mcPileupDist_ZZ_TuneCP5_13TeV-pythia8.npy",
 		"tZq":"mcPileupDist_tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8.npy",
 		"WZG":"mcPileupDist_wza_UL18.npy",
-		"ZGToLLG":"mcPileupDist_ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIISummer20UL18NanoAODv2.npy",
+		"ZGToLLG":"mcPileupDist_ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8.npy",
 		"TTGJets":"mcPileupDist_TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8.npy",
 		"WGToLNuG":"mcPileupDist_WGToLNuG_01J_5f_PtG_120_TuneCP5_13TeV-amcatnloFXFX-pythia8.npy"
 		}
-		pu_path = '../Corrections/Pileup/puWeight/npy_Run2018ABD/'+ pu_path_dict[sample_name]
+		#pu_path = '../Corrections/Pileup/puWeight/npy_Run2018ABD/'+ pu_path_dict[sample_name] # Local skim
+		pu_path = '../Corrections/Pileup/puWeight/npy_Run2018ABD_pure/'+ pu_path_dict[sample_name] # Local pure
+
+
+
 		#pu_path = 'puWeight/npy_Run2018ABD/'+ pu_path_dict[sample_name]
 
 		print("Use the PU file: ",pu_path)
@@ -1061,7 +1003,7 @@ if __name__ == '__main__':
 		"Events", # Tree name
 		JW_Processor_instance, # Class
 		executor=processor.futures_executor,
-		executor_args={"schema": NanoAODSchema, "workers": 20},
+		executor_args={"schema": NanoAODSchema, "workers": 50},
 	#maxchunks=4,
 	)
 	
