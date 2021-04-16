@@ -405,14 +405,14 @@ class JW_Processor(processor.ProcessorABC):
 		
 
 		#  --Muon ( only used to calculate dR )
-		MuSelmask = (Muon.pt > 10) & (abs(Muon.eta) < 2.5)  & (Muon.tightId) & (Muon.pfRelIso04_all < 0.15)
+		MuSelmask = (Muon.pt >= 10) & (abs(Muon.eta) <= 2.5)  & (Muon.tightId) & (Muon.pfRelIso04_all < 0.15)
 		#Muon = ak.mask(Muon,MuSelmask)
 		Muon = Muon[MuSelmask]
 
 		##----------- Cut flow2: Electron Selection
 
-		EleSelmask = ((Electron.pt > 10) & (np.abs(Electron.eta + Electron.deltaEtaSC) < 1.479)  &  (Electron.cutBased > 2) & (abs(Electron.dxy) < 0.05) & (abs(Electron.dz) < 0.1)) | \
-					((Electron.pt > 10) & (np.abs(Electron.eta + Electron.deltaEtaSC) > 1.479) & (np.abs(Electron.eta + Electron.deltaEtaSC) < 2.5) & (Electron.cutBased > 2) & (abs(Electron.dxy) < 0.1) & (abs(Electron.dz) < 0.2))
+		EleSelmask = ((Electron.pt >= 10) & (np.abs(Electron.eta + Electron.deltaEtaSC) < 1.479)  &  (Electron.cutBased > 2) & (abs(Electron.dxy) < 0.05) & (abs(Electron.dz) < 0.1)) | \
+					((Electron.pt >= 10) & (np.abs(Electron.eta + Electron.deltaEtaSC) > 1.479) & (np.abs(Electron.eta + Electron.deltaEtaSC) <= 2.5) & (Electron.cutBased > 2) & (abs(Electron.dxy) < 0.1) & (abs(Electron.dz) < 0.2))
 		
 		Electron = Electron[EleSelmask]
 		
@@ -434,17 +434,16 @@ class JW_Processor(processor.ProcessorABC):
 
 
 
-		##----------- Cut flow3: Electron Selection
-		# 3--Photon selection
+		##----------- Cut flow3: Photon Selection
 	
 		# Basic photon selection
 		isgap_mask = (abs(Photon.eta) < 1.442)  |  ((abs(Photon.eta) > 1.566) & (abs(Photon.eta) < 2.5))
 		Pixel_seed_mask = ~Photon.pixelSeed
-		PT_ID_mask = (Photon.pt > 20) & (Photon.cutBased > 1)
+		PT_ID_mask = (Photon.pt >= 20) & (Photon.cutBased > 1)
 		
 		# dR cut with selected Muon and Electrons
-		dr_pho_ele_mask = ak.all(Photon.metric_table(Electron) > 0.5, axis=-1) # default metric table: delta_r
-		dr_pho_mu_mask = ak.all(Photon.metric_table(Muon) > 0.5, axis=-1)
+		dr_pho_ele_mask = ak.all(Photon.metric_table(Electron) >= 0.5, axis=-1) # default metric table: delta_r
+		dr_pho_mu_mask = ak.all(Photon.metric_table(Muon) >= 0.5, axis=-1)
 
 
 		# genPartFlav cut
@@ -603,7 +602,7 @@ class JW_Processor(processor.ProcessorABC):
 		Meeg_mask		  = ak.firsts(eeg_vec.mass > 120)
 		
 		# Electron PT cuts
-		Elept_mask = ak.firsts((leading_ele.pt > 25) & (subleading_ele.pt > 10) & (third_ele.pt > 25))
+		Elept_mask = ak.firsts((leading_ele.pt >= 25) & (subleading_ele.pt >= 10) & (third_ele.pt >= 25))
 		
 		# MET cuts
 		MET_mask = MET.pt > 20
@@ -960,7 +959,7 @@ if __name__ == '__main__':
 	## Read PU weight file
 
 
-	isdata=False
+	isdata=True
 	
 
 
