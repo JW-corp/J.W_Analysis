@@ -402,21 +402,21 @@ class JW_Processor(processor.ProcessorABC):
 
 		
 
-		##-----------  Cut flow2: Events contain 3 electron and 1 photon are selected  
 		
 
-		# 0 --Muon ( only used to calculate dR )
+		#  --Muon ( only used to calculate dR )
 		MuSelmask = (Muon.pt > 10) & (abs(Muon.eta) < 2.5)  & (Muon.tightId) & (Muon.pfRelIso04_all < 0.15)
 		#Muon = ak.mask(Muon,MuSelmask)
 		Muon = Muon[MuSelmask]
 
-		# 1--Electron selection
+		##----------- Cut flow2: Electron Selection
+
 		EleSelmask = ((Electron.pt > 10) & (np.abs(Electron.eta + Electron.deltaEtaSC) < 1.479)  &  (Electron.cutBased > 2) & (abs(Electron.dxy) < 0.05) & (abs(Electron.dz) < 0.1)) | \
 					((Electron.pt > 10) & (np.abs(Electron.eta + Electron.deltaEtaSC) > 1.479) & (np.abs(Electron.eta + Electron.deltaEtaSC) < 2.5) & (Electron.cutBased > 2) & (abs(Electron.dxy) < 0.1) & (abs(Electron.dz) < 0.2))
 		
 		Electron = Electron[EleSelmask]
 		
-		# Select events with 3 selected electrons
+		# apply cut 2
 		Tri_electron_mask = ak.num(Electron) == 3
 		Electron = Electron[Tri_electron_mask]
 		Photon = Photon[Tri_electron_mask]
@@ -424,9 +424,18 @@ class JW_Processor(processor.ProcessorABC):
 		MET = MET[Tri_electron_mask]
 		Muon = Muon[Tri_electron_mask]
 		if not isData:pu = pu[Tri_electron_mask]
+		
+		# Stop processing if there is no event remain
+		if len(Electron) == 0:
+			return out
 
 		cut2 = np.ones(len(Photon)) * 2
-		# 2--Photon selection
+
+
+
+
+		##----------- Cut flow3: Electron Selection
+		# 3--Photon selection
 	
 		# Basic photon selection
 		isgap_mask = (abs(Photon.eta) < 1.442)  |  ((abs(Photon.eta) > 1.566) & (abs(Photon.eta) < 2.5))
@@ -455,7 +464,7 @@ class JW_Processor(processor.ProcessorABC):
 		PhoSelmask = PT_ID_mask  & isgap_mask &  Pixel_seed_mask & dr_pho_ele_mask & dr_pho_mu_mask
 		Photon = Photon[PhoSelmask]
 
-		# Select events with 3 electrons and 1 or more photons
+		# Apply cut 3
 		A_photon_mask = ak.num(Photon) > 0
 		Electron = Electron[A_photon_mask ]
 		Photon   = Photon[A_photon_mask]
@@ -464,10 +473,14 @@ class JW_Processor(processor.ProcessorABC):
 		MET = MET[A_photon_mask]
 		if not isData:pu = pu[A_photon_mask]
 		
+		# Stop processing if there is no event remain
+		if len(Electron) == 0:
+			return out
+		
 		cut3 = np.ones(len(Photon)) * 3
 		
 		
-		##-----------  Cut flow3: Electron Selection --> OSSF 
+		##----------- Cut flow4: OSSF
 		# OSSF index maker
 		@numba.njit
 		def find_3lep(events_leptons,builder):
@@ -493,7 +506,7 @@ class JW_Processor(processor.ProcessorABC):
 		
 		ossf_mask = ak.num(eee_triplet_idx) == 2
 		
-		# Apply cut 3
+		# Apply cut 4
 		eee_triplet_idx = eee_triplet_idx[ossf_mask]
 		Electron= Electron[ossf_mask]
 		Photon= Photon[ossf_mask]
@@ -570,7 +583,7 @@ class JW_Processor(processor.ProcessorABC):
 
 		
 		
-		##-----------  Cut4: b-jet veto  and Cut5: Event Selection
+		##----------- Cut flow5: Event selection
 
 		# bjet veto
 
@@ -585,7 +598,7 @@ class JW_Processor(processor.ProcessorABC):
 		zmass_window_mask = ak.firsts(diele.mass) > 4  
 		
 
-		# M(eea) cuts 
+		# M(eea) cuts  ( Not applied on base-line selection )
 		eeg_vec			  = diele + leading_pho
 		Meeg_mask		  = ak.firsts(eeg_vec.mass > 120)
 		
@@ -599,7 +612,7 @@ class JW_Processor(processor.ProcessorABC):
 		Event_sel_mask	 = zmass_window_mask & Elept_mask & MET_mask  # Baseline
 
 
-		# Apply cut6
+		# Apply cut5
 		Triple_eee_sel	 = Triple_eee[Event_sel_mask]
 		leading_pho_sel	  = leading_pho[Event_sel_mask]
 		# Photon  EE and EB
@@ -679,7 +692,7 @@ class JW_Processor(processor.ProcessorABC):
 
 		
 		# --- Apply weight and hist  
-		weights = processor.Weights(len(cut3))
+		weights = processor.Weights(len(cut4))
 
 
 		# --- skim cut-weight 
@@ -694,7 +707,7 @@ class JW_Processor(processor.ProcessorABC):
 		cuts_pho_EB = ak.flatten(isEB_mask)
 		
 
-		print("cut0: {0}, cut1: {1}, cut2: {2}, cut3: {3}, cut4: {4}  ".format(len(Initial_events),len(cut1),len(cut2),len(cut3),len(cut4)))
+		print("cut0: {0}, cut1: {1}, cut2: {2}, cut3: {3}, cut4: {4} ,cut5 {5} ".format(len(Initial_events),len(cut1),len(cut2),len(cut3),len(cut4), len(cut5)))
 
 
 		# Weight and SF here

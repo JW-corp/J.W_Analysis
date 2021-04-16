@@ -51,7 +51,7 @@ hsum_dR_aj = hist.Hist(
 hsum_cutflow = hist.Hist(
 	'Events',
 	hist.Cat('dataset', 'Dataset'),
-	hist.Bin('cutflow', 'Cut index', [0, 1, 2, 3,4,5,6])
+	hist.Bin('cutflow', 'Cut index', [0, 1, 2, 3,4,5,6,7])
 )
 
 hsum_charge= hist.Hist(
@@ -94,24 +94,24 @@ hsum_ele3pt =  hist.Hist(
 hsum_ele1eta= hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
-	hist.Bin("ele1eta","Leading Electron $\eta$ [GeV]", 20, -5, 5),
+	hist.Bin("ele1eta","Leading Electron $\eta$ [GeV]", 100, -5, 5),
 )
 
 hsum_ele2eta =  hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
-	hist.Bin("ele2eta","Subleading Electron $\eta$ [GeV]", 20, -5, 5),
+	hist.Bin("ele2eta","Subleading Electron $\eta$ [GeV]", 100, -5, 5),
 )
 hsum_ele1phi =  hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
-	hist.Bin("ele1phi","Leading Electron $\phi$ [GeV]", 20, -3.15, 3.15),
+	hist.Bin("ele1phi","Leading Electron $\phi$ [GeV]", 100, -3.15, 3.15),
 )
 
 hsum_ele2phi =  hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
-	hist.Bin("ele2phi","Subleading Electron $\phi$ [GeV]", 20, -3.15, 3.15),
+	hist.Bin("ele2phi","Subleading Electron $\phi$ [GeV]", 100, -3.15, 3.15),
 )
 hsum_nElectrons = hist.Hist(
 	"Events",
@@ -128,12 +128,12 @@ hsum_pho_EE_pt =  hist.Hist(
 hsum_pho_EE_eta =  hist.Hist(
     "Events",
     hist.Cat("dataset","Dataset"),
-    hist.Bin("pho_EE_eta","Photon EE $\eta$ ", 50, -5, 5),
+    hist.Bin("pho_EE_eta","Photon EE $\eta$ ", 100, -5, 5),
 )
 hsum_pho_EE_phi =  hist.Hist(
     "Events",
     hist.Cat("dataset","Dataset"),
-    hist.Bin("pho_EE_phi","Photon EE $\phi$ ", 50, -3.15, 3.15),
+    hist.Bin("pho_EE_phi","Photon EE $\phi$ ", 100, -3.15, 3.15),
 )
 hsum_pho_EE_hoe = hist.Hist(
     "Events",
@@ -168,12 +168,12 @@ hsum_pho_EB_pt =  hist.Hist(
 hsum_pho_EB_eta =  hist.Hist(
     "Events",
     hist.Cat("dataset","Dataset"),
-    hist.Bin("pho_EB_eta","Photon EB $\eta$ ", 50, -5, 5),
+    hist.Bin("pho_EB_eta","Photon EB $\eta$ ", 100, -5, 5),
 )
 hsum_pho_EB_phi =  hist.Hist(
     "Events",
     hist.Cat("dataset","Dataset"),
-    hist.Bin("pho_EB_phi","Photon EB $\phi$ ", 50, -3.15, 3.15),
+    hist.Bin("pho_EB_phi","Photon EB $\phi$ ", 100, -3.15, 3.15),
 )
 hsum_pho_EB_hoe = hist.Hist(
     "Events",
@@ -258,8 +258,7 @@ def reduce(folder,sample_list,histname):
 
 
 ## --File Directories
-#file_path = "Output_dir_noWegiht"
-file_path = "210318RunABD"
+file_path = "Base_line_210416"
 
 
 
@@ -336,7 +335,7 @@ scales={
 }
 
 
-h1.scale(scales,axis='dataset')
+#h1.scale(scales,axis='dataset')
 
 
 
@@ -459,11 +458,11 @@ hist.plotratio(
 	unc='num'
 )
 
-
+np.set_printoptions(suppress=True)
 
 print("##" * 20)
-#for i,j in h1.values().items():
-#	print(i,":",j)
+for i,j in h1.values().items():
+	print(i,":",j)
 
 
 rax.set_ylabel('Data/MC')
@@ -475,7 +474,7 @@ ax.autoscale(axis='x', tight=True)
 ax.set_ylim(ymin,ymax)
 ax.set_xlim(xmin,xmax)
 ax.set_xlabel('')
-ax.set_yscale('log')
+#ax.set_yscale('log')
 
 
 rax.set_xlabel('Delta R(pho jet1)')
