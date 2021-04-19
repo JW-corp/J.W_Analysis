@@ -580,35 +580,48 @@ class JW_Processor(processor.ProcessorABC):
 			pt2  = ak.flatten(subleading_ele.pt)
 			ele_trig_weight = Trigger_Weight(eta1,pt1,eta2,pt2)
 
+
 		
 		
 		##----------- Cut flow5: Event selection
 
-		# bjet veto
-
-		#bJet_selmask =  (Jet.btagCSVV2 > 0.8838) & (Jet.pt > 30) # Medium btag CSVV2 for 2018
-		#bJet_selmask = (Jet.btagCMVA > -0.5844) # original b-jet sel
-		#bJet_veto	= ak.num(Jet[bJet_selmask])==0 # CR,SR
-		#bJet_veto	= ak.num(Jet[bJet_selmask]) > 0 #CR t-enriched
-
+		
+		# Mee cut 
+		diele		  = Triple_eee.p4
+		Mee_cut_mask  = ak.firsts(diele.mass) > 4  
+		
 
 		# Z mass window
-		diele			  = Triple_eee.p4
-		zmass_window_mask = ak.firsts(diele.mass) > 4  
+		#zmass_window_mask = ak.firsts(abs(diele.mass - 91.1876)) < 15 # SR, CR_ZZA, CR_Z+jets, CR_Conversion
+		#zmass_window_mask = ak.firsts(abs(diele.mass - 91.1876)) > 5 #  CR_t-enriched
+		#zmass_window_mask = ak.firsts(abs(diele.mass - 91.1876)) > 15 #  CR_Conversion
+
+		# M(eee) cut SR, CR_ZZA, CR_Z+jets, CR_t enriched
+		#eee = Triple_eee.lep1 + Triple_eee.lep2 + Triple_eee.lep3
+		#Meee_cut_mask = ak.firsts(eee.mass > 100)		
+		#Meee_cut_mask = ak.firsts(eee.mass <= 100)		
+
+
+		# b-Jet veto cut  #SR, CR_ZZA, CR_Z+jets, CR_Conversion
+		#bjet_mask = (Jet.btagCSVV2 > 0.4184)	&  (Jet.pt > 30) 
+		#bjet_veto_mask = ak.num(Jet[bjet_mask]) == 0
+		#bjet_veto_mask = ak.num(Jet[bjet_mask]) > 0 # CR_t-enriched
 		
 
-		# M(eea) cuts  ( Not applied on base-line selection )
-		eeg_vec			  = diele + leading_pho
-		Meeg_mask		  = ak.firsts(eeg_vec.mass > 120)
-		
+
 		# Electron PT cuts
 		Elept_mask = ak.firsts((leading_ele.pt >= 25) & (subleading_ele.pt >= 10) & (third_ele.pt >= 25))
 		
 		# MET cuts
-		MET_mask = MET.pt > 20
+		MET_mask = MET.pt > 20 # Baseline
+		#MET_mask = MET.pt > 30 #  SR, CR-ZZE, CR-t-entirched
+		#MET_mask = MET.pt <= 30 #  CR-Z+jets. CR-Conversion
 
+		
 		# Mask
-		Event_sel_mask	 = zmass_window_mask & Elept_mask & MET_mask  # Baseline
+		#Event_sel_mask = Elept_mask & MET_mask & bjet_veto_mask & Mee_cut_mask & zmass_window_mask  & Meee_cut_mask # SR,CR
+		Event_sel_mask = Elept_mask & MET_mask  & Mee_cut_mask # SR,CR
+		
 
 
 		# Apply cut5
@@ -710,13 +723,13 @@ class JW_Processor(processor.ProcessorABC):
 
 
 		# Weight and SF here
-		#if not isData:
-			#weights.add('pileup',pu)		
-			#weights.add('ele_id',ele_medium_id_sf)		
-			#weights.add('pho_id',get_pho_medium_id_sf)		
-			#weights.add('ele_reco',ele_reco_sf)		
-			#weights.add('ele_trigger',ele_trig_weight)		
-			#print("#### Weight: ",weights.weight())
+		if not isData:
+			weights.add('pileup',pu)		
+			weights.add('ele_id',ele_medium_id_sf)		
+			weights.add('pho_id',get_pho_medium_id_sf)		
+			weights.add('ele_reco',ele_reco_sf)		
+			weights.add('ele_trigger',ele_trig_weight)		
+			print("#### Weight: ",weights.weight())
 
 
 
@@ -959,7 +972,7 @@ if __name__ == '__main__':
 	## Read PU weight file
 
 
-	isdata=True
+	isdata=False
 	
 
 

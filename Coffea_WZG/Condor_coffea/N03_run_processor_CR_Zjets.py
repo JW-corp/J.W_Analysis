@@ -98,15 +98,20 @@ class JW_Processor(processor.ProcessorABC):
 				hist.Cat("dataset","Dataset"),
 				hist.Bin("mass","$m_{e+e-}$ [GeV]", 100, 0, 200),
 			),
-			"mass_eea": hist.Hist(
+			"mass_eee": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("mass_eea","$m_{e+e-\gamma}$ [GeV]", 300, 0, 600),
+				hist.Bin("mass_eee","$m_{eee}$ [GeV]", 300, 0, 600),
+			),
+			"MT": hist.Hist(
+				"Events",
+				hist.Cat("dataset","Dataset"),
+				hist.Bin("MT","W MT [GeV]", 100, 0, 200),
 			),
 			"met": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("met","met [GeV]", 300, 0, 600),
+				hist.Bin("met","met [GeV]", 100, 0, 50),
 			),
 
 
@@ -587,20 +592,16 @@ class JW_Processor(processor.ProcessorABC):
 		
 
 		# Z mass window
-		#zmass_window_mask = ak.firsts(abs(diele.mass - 91.1876)) < 15 # SR, CR_ZZA, CR_Z+jets, CR_Conversion
-		#zmass_window_mask = ak.firsts(abs(diele.mass - 91.1876)) > 5 #  CR_t-enriched
-		#zmass_window_mask = ak.firsts(abs(diele.mass - 91.1876)) > 15 #  CR_Conversion
+		zmass_window_mask = ak.firsts(abs(diele.mass - 91.1876)) < 15 # SR, CR_ZZA, CR_Z+jets, CR_Conversion
 
 		# M(eee) cut SR, CR_ZZA, CR_Z+jets, CR_t enriched
-		#eee = Triple_eee.lep1 + Triple_eee.lep2 + Triple_eee.lep3
-		#Meee_cut_mask = ak.firsts(eee.mass > 100)		
-		#Meee_cut_mask = ak.firsts(eee.mass <= 100)		
+		eee = Triple_eee.lep1 + Triple_eee.lep2 + Triple_eee.lep3
+		Meee_cut_mask = ak.firsts(eee.mass > 100)		
 
 
 		# b-Jet veto cut  #SR, CR_ZZA, CR_Z+jets, CR_Conversion
-		#bjet_mask = (Jet.btagCSVV2 > 0.4184)	&  (Jet.pt > 30) 
-		#bjet_veto_mask = ak.num(Jet[bjet_mask]) == 0
-		#bjet_veto_mask = ak.num(Jet[bjet_mask]) > 0 # CR_t-enriched
+		bjet_mask = (Jet.btagCSVV2 > 0.4184)	&  (Jet.pt > 30) 
+		bjet_veto_mask = ak.num(Jet[bjet_mask]) == 0
 		
 
 
@@ -608,14 +609,11 @@ class JW_Processor(processor.ProcessorABC):
 		Elept_mask = ak.firsts((leading_ele.pt >= 25) & (subleading_ele.pt >= 10) & (third_ele.pt >= 25))
 		
 		# MET cuts
-		MET_mask = MET > 20 # Baseline
-		#MET_mask = MET.pt > 30 #  SR, CR-ZZE, CR-t-entirched
-		#MET_mask = MET.pt <= 30 #  CR-Z+jets. CR-Conversion
+		MET_mask = MET.pt <= 30 #  CR-Z+jets. CR-Conversion
 
 		
 		# Mask
-		#Event_sel_mask = Elept_mask & MET_mask & bjet_veto_mask & Mee_cut_mask & zmass_window_mask  & Meee_cut_mask # SR,CR
-		Event_sel_mask = Elept_mask & MET_mask  & Mee_cut_mask # SR,CR
+		Event_sel_mask = Elept_mask & MET_mask & bjet_veto_mask & Mee_cut_mask & zmass_window_mask  & Meee_cut_mask # SR,CR
 		
 
 
@@ -683,15 +681,18 @@ class JW_Processor(processor.ProcessorABC):
 	
 
 		# MET
-		met = ak.to_numpy(MET_sel)
+		met = ak.to_numpy(MET_sel.pt)
 		
-		# M(eea) M(ee)
+		# M(eee) M(ee)
 		diele			  = Triple_eee_sel.p4
 		eeg_vec			  = diele + leading_pho_sel
-		Meea			  = ak.flatten(eeg_vec.mass)
 		Mee				  = ak.flatten(Triple_eee_sel.p4.mass)
-		
+		Meee = ak.flatten(eee.mass)
 
+		# W MT (--> beta )
+		Ele3 = ak.flatten(Triple_eee_sel.lep3)
+		MT = np.sqrt(2*Ele3.pt * MET_sel.pt * (1-np.cos(abs(MET_sel.delta_phi(Ele3)))))
+		MT = np.array(MT)
 
 		
 		# --- Apply weight and hist  
@@ -760,14 +761,19 @@ class JW_Processor(processor.ProcessorABC):
 
 
 			# --mass -- #
+		out['MT'].fill(
+			dataset=dataset,
+			MT=MT,
+			weight = skim_weight(weights.weight() * cuts)
+		)
 		out["mass"].fill(
 			dataset=dataset,
 			mass=Mee,
 			weight = skim_weight(weights.weight() * cuts)
 		)
-		out["mass_eea"].fill(
+		out["mass_eee"].fill(
 			dataset=dataset,
-			mass_eea = Meea,
+			mass_eee = Meee,
 			weight = skim_weight(weights.weight() * cuts)
 		)
 
@@ -958,7 +964,7 @@ if __name__ == '__main__':
 	## Read PU weight file
 
 
-	isdata=False
+	isdata=True
 	
 
 
