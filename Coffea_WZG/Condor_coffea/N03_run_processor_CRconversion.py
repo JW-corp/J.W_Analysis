@@ -963,7 +963,7 @@ if __name__ == '__main__':
 	## Read PU weight file
 
 
-	isdata=False
+	isdata=True
 	
 
 

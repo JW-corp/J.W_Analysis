@@ -961,7 +961,7 @@ if __name__ == '__main__':
 	## Read PU weight file
 
 
-	isdata=False
+	isdata=True
 	
 
 
@@ -1017,7 +1017,7 @@ if __name__ == '__main__':
 		"Events", # Tree name
 		JW_Processor_instance, # Class
 		executor=processor.futures_executor,
-		executor_args={"schema": NanoAODSchema, "workers": 50},
+		executor_args={"schema": NanoAODSchema, "workers": 16},
 	#maxchunks=4,
 	)
 	
