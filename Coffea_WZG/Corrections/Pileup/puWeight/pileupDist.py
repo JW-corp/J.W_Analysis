@@ -103,21 +103,21 @@ def TestPileupWeight(filenameData, filenameMC):
 
 if __name__ == '__main__':
 	
-	## -- For making MC hist
-	#parser = argparse.ArgumentParser()
-
-	#parser.add_argument('--infile', type=str)
-	#parser.add_argument('--outfile', type=str)
-	#args = parser.parse_args()
-	#
-	#datadir = args.infile
-	#outname = args.outfile
-
-	##inFiles = FindFiles(datadir, "*.root")  # from DAS file structure
-	#inFiles = [datadir] # Ntuple 
-
-	#
-	#MakeMCPileupDist(inFiles, outname)
+#	# -- For making MC hist
+#	parser = argparse.ArgumentParser()
+#
+#	parser.add_argument('--infile', type=str)
+#	parser.add_argument('--outfile', type=str)
+#	args = parser.parse_args()
+#	
+#	datadir = args.infile
+#	outname = args.outfile
+#
+#	inFiles = FindFiles(datadir, "*.root")  # from DAS file structure
+#	#inFiles = [datadir] # Ntuple 
+#
+#	
+#	MakeMCPileupDist(inFiles, outname)
 
 # ------------------------------------------------------#
 
@@ -126,9 +126,9 @@ if __name__ == '__main__':
 	infile = sys.argv[1]
 	startTime = time.time()
 
-	infile_path = "mc_Ntuple/" + infile
+	infile_path = "mc_pure/2017/" + infile
 	outfile_name = infile.split('.')[0] + '.npy'
-	puWeight_arr = TestPileupWeight("../data_2018_pileup_out_runABD.root",infile_path)	
+	puWeight_arr = TestPileupWeight("../2017/data_2018_pileup_out.root",infile_path)	
 	print(puWeight_arr)
 	print(len(puWeight_arr))
 	
