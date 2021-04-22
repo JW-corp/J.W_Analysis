@@ -10,7 +10,7 @@ lumi= 53.03 * 1000
 
 
 GenDict={
-'WZG':55000,
+'WZG':128000,
 "DY":1933600,
 "WZ":7986000,
 "ZZ":2000000,
@@ -441,7 +441,7 @@ hist.plot1d(
 	ax=ax,
 	clear=False,
 	stack=True,
-	order=['TTWJets' ,'tZq' ,'TTGJets' ,'TTZtoLL' ,'WZ' ,'ZZ' ,'ZGToLLG' ,'WZG'],
+	order=['TTWJets' ,'tZq' ,'TTGJets' ,'TTZtoLL' ,'WZG' ,'WZ' ,'ZZ' ,'ZGToLLG'],
 	fill_opts=fill_opts,
 	error_opts = error_opts,
 )
