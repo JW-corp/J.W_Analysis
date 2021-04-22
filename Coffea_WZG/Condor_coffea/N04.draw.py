@@ -305,7 +305,7 @@ sample_list = ['DY' ,'WZ' ,'ZZ' ,'TTWJets','TTZtoLL','tZq' ,'Egamma','WZG','ZGTo
 #histname = "ele1phi"; xmin=-3.15; xmax=3.15; ymin=100; ymax=5e+6;
 #histname = "ele2phi"; xmin=-3.15; xmax=3.15; ymin=100; ymax=5e+6;
 
-histname = "cutflow"; xmin=0; xmax=6; ymin=1; ymax=5e+6
+#histname = "cutflow"; xmin=0; xmax=6; ymin=1; ymax=5e+6
 
 		# --- Photon --- #
 
@@ -318,7 +318,7 @@ histname = "cutflow"; xmin=0; xmax=6; ymin=1; ymax=5e+6
 #histname = "pho_EB_Iso_chg"; xmin=0; xmax=0.03; ymin=0.01; ymax=5e+7;
 
 #histname = "dR_aj"; xmin=0; xmax=1; ymin=0.01; ymax=10;
-#histname = "pho_EE_pt"; xmin=0; xmax=200; ymin=0; ymax=8;
+histname = "pho_EE_pt"; xmin=0; xmax=200; ymin=0; ymax=8;
 #histname = "pho_EE_eta"; xmin=-3; xmax=3; ymin=1; ymax=5e+6;
 #histname = "pho_EE_phi"; xmin=-3.15; xmax=3.15; ymin=1; ymax=5e+6;
 #histname = "pho_EE_hoe"; xmin=0; xmax=0.2; ymin=0.001; ymax=5e+6;
@@ -350,7 +350,7 @@ scales={
 }
 
 
-#h1.scale(scales,axis='dataset')
+h1.scale(scales,axis='dataset')
 
 ## --Rebin
 #h1 = h1.rebin(histname,hist.Bin("met","met [GeV]", 10, 0, 200))
@@ -363,7 +363,7 @@ scales={
 #h1 = h1.rebin(histname,hist.Bin("mass","M_{ee} [GeV]",50,0,200))
 
 #h1 = h1.rebin(histname,hist.Bin("pho_EB_pt","Photon EB $P_{T}$ [GeV]", 30, 0, 600))
-#h1 = h1.rebin(histname,hist.Bin("pho_EE_pt","Photon EE $P_{T}$ [GeV]", 30, 0, 600))
+h1 = h1.rebin(histname,hist.Bin("pho_EE_pt","Photon EE $P_{T}$ [GeV]", 30, 0, 600))
 
 
 
@@ -441,10 +441,7 @@ hist.plot1d(
 	ax=ax,
 	clear=False,
 	stack=True,
-	order = ['TTWJets' ,'tZq' ,'TTGJets' ,'TTZtoLL' ,'ZGToLLG' ,'ZZ' ,'WZG' ,'WZ'], # Baseline
-	#order=["TTWJets" ,"tZq" ,"TTZtoLL" ,"TTGJets" ,"ZGToLLG" ,"WZG" ,"ZZ" ,"WZ"], # SR
-	#order = ['tZq' ,'TTZtoLL' ,'WZG' ,'ZGToLLG' ,'ZZ'], # CR_Z+jets
-
+	order=['TTWJets' ,'tZq' ,'TTGJets' ,'TTZtoLL' ,'WZ' ,'ZZ' ,'ZGToLLG' ,'WZG'],
 	fill_opts=fill_opts,
 	error_opts = error_opts,
 )
@@ -487,7 +484,7 @@ ax.autoscale(axis='x', tight=True)
 ax.set_ylim(ymin,ymax)
 ax.set_xlim(xmin,xmax)
 ax.set_xlabel('')
-ax.set_yscale('log')
+#ax.set_yscale('log')
 
 
 ##leg = ax.legend()
