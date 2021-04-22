@@ -11,12 +11,12 @@ lumi= 53.03 * 1000
 GenDict={
 'WZG':55000,
 "DY":1933600,
-"WZ":4000000,
+"WZ":7986000,
 "ZZ":2000000,
 "TTWJets":4963867,
 "TTZtoLL":13914900,
 "tZq":12748300,
-"ZGToLLG" :29904768,
+"ZGToLLG" :28636926,
 "TTGJets" :4647426,
 "WGToLNuG":20371504
 }
@@ -260,10 +260,9 @@ def reduce(folder,sample_list,histname):
 
 
 ## --File Directories
-#file_path = "210415_TTWJets"
-file_path = "210415_TTZtoLL"
-#file_path = "210415_tZq"
-#file_path= "210415_TTZtoL_Sen"
+file_path = "test_Ntuple"
+
+
 
 
 ## --Sample Lists
@@ -295,11 +294,11 @@ sample_list = ['DY' ,'WZ' ,'ZZ' ,'TTWJets','TTZtoLL','tZq' ,'Egamma','WZG','ZGTo
 #histname = "ele1phi"; xmin=-3.15; xmax=3.15; ymin=100; ymax=5e+6;
 #histname = "ele2phi"; xmin=-3.15; xmax=3.15; ymin=100; ymax=5e+6;
 
-#histname = "cutflow"; xmin=0; xmax=6; ymin=1; ymax=5e+6
+histname = "cutflow"; xmin=0; xmax=6; ymin=1; ymax=5e+6
 
 		# --- Photon --- #
 #histname = "dR_aj"; xmin=0; xmax=1; ymin=0.01; ymax=10;
-histname = "pho_EE_pt"; xmin=0; xmax=200; ymin=0; ymax=7;
+#histname = "pho_EE_pt"; xmin=0; xmax=200; ymin=0; ymax=7;
 #histname = "pho_EE_eta"; xmin=-3; xmax=3; ymin=0; ymax=200;
 #histname = "pho_EE_phi"; xmin=-3.15; xmax=3.15; ymin=1; ymax=5e+6;
 #histname = "pho_EE_hoe"; xmin=0; xmax=0.2; ymin=0.001; ymax=5e+6;
@@ -350,7 +349,7 @@ scales={
 
 #h1 = h1.rebin(histname,hist.Bin("ele1pt","Leading electron from Z  $P_{T}$ [GeV]",100,0,600))
 #h1 = h1.rebin(histname,hist.Bin("ele2pt","Subleading electron from Z  $P_{T}$ [GeV]",100,0,600))
-h1 = h1.rebin(histname,hist.Bin("ele3pt","electron from W  $P_{T}$ [GeV]",100,0,600))
+#h1 = h1.rebin(histname,hist.Bin("ele3pt","electron from W  $P_{T}$ [GeV]",100,0,600))
 #h1 = h1.rebin(histname,hist.Bin("mass","M_{ee} [GeV]",50,0,200))
 
 #h1 = h1.rebin(histname,hist.Bin("pho_EB_pt","Photon EB $P_{T}$ [GeV]", 30, 0, 600))
@@ -412,15 +411,17 @@ error_opts = {
 	'linewidth': 0
 }
 
+print("##" * 20)
+for i,j in h1.values().items():
+	print(i,":",j)
 
 
 
 
 # MC plotting
 import re
-#notdata = re.compile('(?!Egamma)')
-
-samplename = 'TTZtoLL'
+samplename = re.compile('(?!Egamma)')
+#samplename = 'TTZtoLL'
 
 hist.plot1d(
 	h1[samplename],
@@ -443,9 +444,6 @@ hist.plot1d(
 '''
 
 
-print("##" * 20)
-for i,j in h1.values().items():
-	print(i,":",j)
 
 
 

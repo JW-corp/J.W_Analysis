@@ -8,15 +8,16 @@ import time
 ## Parameter set
 lumi= 53.03 * 1000
 
+
 GenDict={
 'WZG':55000,
 "DY":1933600,
-"WZ":4000000,
+"WZ":7986000,
 "ZZ":2000000,
 "TTWJets":4963867,
 "TTZtoLL":13914900,
 "tZq":12748300,
-"ZGToLLG" :29904768,
+"ZGToLLG" :28636926,
 "TTGJets" :4647426,
 "WGToLNuG":20371504
 }
@@ -34,6 +35,13 @@ xsecDict={
 "TTGJets" : 4.078,
 "WGToLNuG": 1.249
 }
+
+
+hsum_mass_eee =  hist.Hist(
+	"Events",
+	hist.Cat("dataset","Dataset"),
+	hist.Bin("mass_eee","$m_{eee}$ [GeV]", 300, 0, 600),
+)
 
 
 hsum_MT = hist.Hist(
@@ -210,7 +218,7 @@ histdict = {'nPV':hsum_nPV,'nPV_nw':hsum_nPV_nw, "cutflow":hsum_cutflow,"ele1pt"
 'pho_EE_hoe':hsum_pho_EE_hoe,'pho_EE_sieie': hsum_pho_EE_sieie, 'pho_EE_Iso_all': hsum_pho_EE_Iso_all, 'pho_EE_Iso_chg':hsum_pho_EE_Iso_chg,\
 'pho_EB_pt':hsum_pho_EB_pt, 'pho_EB_eta':hsum_pho_EB_eta, 'pho_EB_phi':hsum_pho_EB_phi,\
 'pho_EB_hoe':hsum_pho_EB_hoe,'pho_EB_sieie': hsum_pho_EB_sieie, 'pho_EB_Iso_all': hsum_pho_EB_Iso_all, 'pho_EB_Iso_chg':hsum_pho_EB_Iso_chg,
-'met':hsum_met,'dR_aj':hsum_dR_aj,'MT':hsum_MT}
+'met':hsum_met,'dR_aj':hsum_dR_aj,'MT':hsum_MT,'mass_eee':hsum_mass_eee}
 
 
 
@@ -258,8 +266,13 @@ def reduce(folder,sample_list,histname):
 
 
 ## --File Directories
-file_path = "Base_line_210416"
-
+file_path = "Base_line_210416_Allweight"
+#file_path = "Base_line_210416_no_weight"
+#file_path = "SR_210419"
+#file_path = "CR_Zjets_210419"
+#file_path = "CR_tenriched_210419"
+#file_path = "CR_conversion_210419"
+#file_path = "210420_SEN_BaseLine"
 
 
 ## --Sample Lists
@@ -273,18 +286,18 @@ sample_list = ['DY' ,'WZ' ,'ZZ' ,'TTWJets','TTZtoLL','tZq' ,'Egamma','WZG','ZGTo
 		
 		# --- MET --- #
 
-#histname = "met"; xmin=0; xmax=200; ymin=0; ymax=10;
-
+#histname = "met"; xmin=0; xmax=200; ymin=0; ymax=20; 
 
 		# --- Electron --- #
-#histname = "mass"; xmin=60; xmax=120; ymin=0; ymax=6;
+#histname = "mass"; xmin=0; xmax=200; ymin=0; ymax=20;
+#histname = "mass_eee", xmin=0, xmax=600, ymin=0, ymax=10;
 #histname = "MT"; xmin=0; xmax=200; ymin=0; ymax=8;
 #histname = "nPV"; xmin=0; xmax=100; ymin=1; ymax=1e+3;
 #histname = "nPV_nw"; xmin=0; xmax=100; ymin=1; ymax=1e+3;
 
-#histname = "ele1pt"; xmin=0; xmax=200; ymin=0; ymax=6;
-#histname = "ele2pt"; xmin=0; xmax=200; ymin=0; ymax=12; 
-#histname = "ele3pt"; xmin=0; xmax=200; ymin=0; ymax=10;
+#histname = "ele1pt"; xmin=0; xmax=200; ymin=0; ymax=10;
+#histname = "ele2pt"; xmin=0; xmax=200; ymin=0; ymax=20; 
+#histname = "ele3pt"; xmin=0; xmax=200; ymin=0; ymax=20;
 
 #histname = "ele1eta"; xmin=-2.5; xmax=2.5; ymin=100; ymax=5e+6;
 #histname = "ele2eta"; xmin=-2.5; xmax=2.5; ymin=100; ymax=5e+6;
@@ -295,8 +308,17 @@ sample_list = ['DY' ,'WZ' ,'ZZ' ,'TTWJets','TTZtoLL','tZq' ,'Egamma','WZG','ZGTo
 histname = "cutflow"; xmin=0; xmax=6; ymin=1; ymax=5e+6
 
 		# --- Photon --- #
+
+#histname = "pho_EB_pt"; xmin=0; xmax=200; ymin=0; ymax=15;
+#histname = "pho_EB_eta"; xmin=-3; xmax=3; ymin=1; ymax=5e+6;
+#histname = "pho_EB_phi"; xmin=-3.15; xmax=3.15; ymin=1; ymax=5e+6;
+#histname = "pho_EB_hoe"; xmin=0; xmax=0.15; ymin=0.001; ymax=1e+7;
+#histname = "pho_EB_sieie"; xmin=0; xmax=0.012; ymin=0.01; ymax=5e+6;
+#histname = "pho_EB_Iso_all"; xmin=0; xmax=0.12; ymin=0.01; ymax=5e+7;
+#histname = "pho_EB_Iso_chg"; xmin=0; xmax=0.03; ymin=0.01; ymax=5e+7;
+
 #histname = "dR_aj"; xmin=0; xmax=1; ymin=0.01; ymax=10;
-#histname = "pho_EE_pt"; xmin=0; xmax=200; ymin=0; ymax=7;
+#histname = "pho_EE_pt"; xmin=0; xmax=200; ymin=0; ymax=8;
 #histname = "pho_EE_eta"; xmin=-3; xmax=3; ymin=1; ymax=5e+6;
 #histname = "pho_EE_phi"; xmin=-3.15; xmax=3.15; ymin=1; ymax=5e+6;
 #histname = "pho_EE_hoe"; xmin=0; xmax=0.2; ymin=0.001; ymax=5e+6;
@@ -304,13 +326,6 @@ histname = "cutflow"; xmin=0; xmax=6; ymin=1; ymax=5e+6
 #histname = "pho_EE_Iso_all"; xmin=0; xmax=0.2; ymin=0.01; ymax=5e+6;
 #histname = "pho_EE_Iso_chg"; xmin=0; xmax=0.03; ymin=0.01; ymax=5e+6;
 
-#histname = "pho_EB_pt"; xmin=0; xmax=200; ymin=0; ymax=8;
-#histname = "pho_EB_eta"; xmin=-3; xmax=3; ymin=1; ymax=5e+6;
-#histname = "pho_EB_phi"; xmin=-3.15; xmax=3.15; ymin=1; ymax=5e+6;
-#histname = "pho_EB_hoe"; xmin=0; xmax=0.15; ymin=0.001; ymax=1e+7;
-#histname = "pho_EB_sieie"; xmin=0; xmax=0.012; ymin=0.01; ymax=5e+6;
-#histname = "pho_EB_Iso_all"; xmin=0; xmax=0.12; ymin=0.01; ymax=5e+7;
-#histname = "pho_EB_Iso_chg"; xmin=0; xmax=0.03; ymin=0.01; ymax=5e+7;
 
 
 ################################################################
@@ -337,12 +352,9 @@ scales={
 
 #h1.scale(scales,axis='dataset')
 
-
-
 ## --Rebin
-
-
-#h1 = h1.rebin(histname,hist.Bin("mass","Z mass",10,60,120))
+#h1 = h1.rebin(histname,hist.Bin("met","met [GeV]", 10, 0, 200))
+#h1 = h1.rebin(histname,hist.Bin("mass","Z mass",10,0,200))
 #h1 = h1.rebin(histname,hist.Bin("MT","W MT [GeV]", 20, 0, 200))
 
 #h1 = h1.rebin(histname,hist.Bin("ele1pt","Leading electron from Z  $P_{T}$ [GeV]",30,0,600))
@@ -352,10 +364,6 @@ scales={
 
 #h1 = h1.rebin(histname,hist.Bin("pho_EB_pt","Photon EB $P_{T}$ [GeV]", 30, 0, 600))
 #h1 = h1.rebin(histname,hist.Bin("pho_EE_pt","Photon EE $P_{T}$ [GeV]", 30, 0, 600))
-
-
-#h1 = h1.rebin(histname,hist.Bin("met","met [GeV]", 10, 0, 200))
-
 
 
 
@@ -391,7 +399,10 @@ fig.subplots_adjust(hspace=.07)
 from cycler import cycler
 #colors = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c']
 
-colors= ['r','g','b','orange','pink','navy','yellow']
+prop_cycle = plt.rcParams['axes.prop_cycle']
+colors = prop_cycle.by_key()['color']
+
+#colors= ['#e31a1c','navy','g','b','orange','pink','r','yellow']
 
 ax.set_prop_cycle(cycler(color=colors))
 
@@ -416,6 +427,9 @@ data_err_opts = {
 }
 
 
+print("##" * 20)
+for i,j in h1.values().items():
+	print(i,":",j[-2])
 
 
 # MC plotting
@@ -427,9 +441,10 @@ hist.plot1d(
 	ax=ax,
 	clear=False,
 	stack=True,
-	order=["TTWJets" ,"tZq" ,"TTZtoLL" ,"WZ" ,"WZG" ,"ZGToLLG","ZZ"],
-	#order=["TTWJets" ,"tZq" ,"TTZtoLL" ,"WZ" ,"WZG" ,"ZZ","ZGToLLG"],
-	#order=["TTWJets" ,"WZ" ,"ZZ" ,"TTZtoLL" ,"tZq" ,"WZG"],
+	order = ['TTWJets' ,'tZq' ,'TTGJets' ,'TTZtoLL' ,'ZGToLLG' ,'ZZ' ,'WZG' ,'WZ'], # Baseline
+	#order=["TTWJets" ,"tZq" ,"TTZtoLL" ,"TTGJets" ,"ZGToLLG" ,"WZG" ,"ZZ" ,"WZ"], # SR
+	#order = ['tZq' ,'TTZtoLL' ,'WZG' ,'ZGToLLG' ,'ZZ'], # CR_Z+jets
+
 	fill_opts=fill_opts,
 	error_opts = error_opts,
 )
@@ -460,12 +475,10 @@ hist.plotratio(
 
 np.set_printoptions(suppress=True)
 
-print("##" * 20)
-for i,j in h1.values().items():
-	print(i,":",j)
 
 
 rax.set_ylabel('Data/MC')
+
 rax.set_ylim(0,2)
 
 
@@ -474,11 +487,10 @@ ax.autoscale(axis='x', tight=True)
 ax.set_ylim(ymin,ymax)
 ax.set_xlim(xmin,xmax)
 ax.set_xlabel('')
-#ax.set_yscale('log')
+ax.set_yscale('log')
 
 
-rax.set_xlabel('Delta R(pho jet1)')
-#leg = ax.legend()
+##leg = ax.legend()
 
 
 lum = plt.text(1., 1., r"53.03 fb$^{-1}$ (13 TeV)",
