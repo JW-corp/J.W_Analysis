@@ -11,6 +11,11 @@ import numpy as np
 from coffea import lumi_tools
 import numba
 
+# -- Coffea 0.8.0 --> Must fix!! 
+import warnings
+warnings.filterwarnings('ignore')
+
+
 # ---> Class JW Processor
 class JW_Processor(processor.ProcessorABC):
 
@@ -354,6 +359,20 @@ class JW_Processor(processor.ProcessorABC):
 			return vec
 
 		# <----- Selection ------># 
+		
+		Initial_events = events
+		# Good Run ( Golden Json files )
+		from coffea import lumi_tools
+
+		if isData:
+			lumi_mask_builder = lumi_tools.LumiMask(injson)
+			lumimask = ak.Array(lumi_mask_builder.__call__(events.run,events.luminosityBlock))
+			events = events[lumimask]
+			#print("{0}%  of files pass good-run conditions".format(len(events)/ len(Initial_events)))
+
+		# Stop processing if there is no event remain
+		if len(events) == 0:
+			return out
 
 
 		##----------- Cut flow1: Passing Triggers
@@ -370,7 +389,7 @@ class JW_Processor(processor.ProcessorABC):
 
 
 		# single lepton trigger
-		is_single_ele_trigger=False
+		is_single_ele_trigger=True
 		if not is_single_ele_trigger:
 			single_ele_triggers_arr=np.ones(len(events), dtype=np.bool)
 		else:
@@ -381,17 +400,7 @@ class JW_Processor(processor.ProcessorABC):
 
 		events.Electron,events.Photon,events.Jet = sort_by_pt(events.Electron,events.Photon,events.Jet)
 		
-		Initial_events = events
 
-
-		# Good Run ( Golden Json files )
-		from coffea import lumi_tools
-
-		if isData:
-			lumi_mask_builder = lumi_tools.LumiMask(injson)
-			lumimask = ak.Array(lumi_mask_builder.__call__(events.run,events.luminosityBlock))
-			events = events[lumimask]
-			print("{0}%  of files pass good-run conditions".format(len(events)/ len(Initial_events)))
 
 
 		# Good Primary vertex
@@ -414,9 +423,11 @@ class JW_Processor(processor.ProcessorABC):
 		Jet = events.Jet
 
 		
+		# Stop processing if there is no event remain
+		if len(Electron) == 0:
+			return out
 
 		
-
 		#  --Muon ( only used to calculate dR )
 		MuSelmask = (Muon.pt >= 10) & (abs(Muon.eta) <= 2.5)  & (Muon.tightId) & (Muon.pfRelIso04_all < 0.15)
 		#Muon = ak.mask(Muon,MuSelmask)
@@ -452,7 +463,11 @@ class JW_Processor(processor.ProcessorABC):
 		# Basic photon selection
 		isgap_mask = (abs(Photon.eta) < 1.442)  |  ((abs(Photon.eta) > 1.566) & (abs(Photon.eta) < 2.5))
 		Pixel_seed_mask = ~Photon.pixelSeed
-		PT_ID_mask = (Photon.pt >= 20) & (Photon.cutBased > 1)
+
+		if (dataset == "ZZ") and (self._year == '2017'):
+			PT_ID_mask = (Photon.pt >= 20) & (Photon.cutBasedBitmap >= 3) # 2^0(Loose) + 2^1(Medium) + 2^2(Tights)
+		else:
+			PT_ID_mask = (Photon.pt >= 20) & (Photon.cutBased > 1)
 		
 		# dR cut with selected Muon and Electrons
 		dr_pho_ele_mask = ak.all(Photon.metric_table(Electron) >= 0.5, axis=-1) # default metric table: delta_r
@@ -748,7 +763,6 @@ class JW_Processor(processor.ProcessorABC):
 			# 2016,2017 are not applied yet
 			if self._year == "2018":
 				weights.add('ele_trigger',ele_trig_weight)		
-			print("#### Weight: ",weights.weight())
 
 
 
@@ -1047,7 +1061,7 @@ if __name__ == '__main__':
 		"Events", # Tree name
 		JW_Processor_instance, # Class
 		executor=processor.futures_executor,
-		executor_args={"schema": NanoAODSchema, "workers": 16},
+		executor_args={"schema": NanoAODSchema, "workers": 50},
 	#maxchunks=4,
 	)
 	
