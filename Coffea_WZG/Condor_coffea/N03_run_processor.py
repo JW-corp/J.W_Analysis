@@ -448,6 +448,7 @@ class JW_Processor(processor.ProcessorABC):
 		MET = MET[Tri_electron_mask]
 		Muon = Muon[Tri_electron_mask]
 		if not isData:pu = pu[Tri_electron_mask]
+		events = events[Tri_electron_mask]
 		
 		# Stop processing if there is no event remain
 		if len(Electron) == 0:
@@ -499,6 +500,7 @@ class JW_Processor(processor.ProcessorABC):
 		Muon = Muon[A_photon_mask]
 		MET = MET[A_photon_mask]
 		if not isData:pu = pu[A_photon_mask]
+		events = events[A_photon_mask]
 		
 		# Stop processing if there is no event remain
 		if len(Electron) == 0:
@@ -540,6 +542,7 @@ class JW_Processor(processor.ProcessorABC):
 		Jet= Jet[ossf_mask]
 		MET = MET[ossf_mask]
 		if not isData: pu = pu[ossf_mask]
+		events = events[ossf_mask]
 
 	
 
@@ -658,12 +661,14 @@ class JW_Processor(processor.ProcessorABC):
 		# Apply cut5
 		Triple_eee_sel	 = Triple_eee[Event_sel_mask]
 		leading_pho_sel	  = leading_pho[Event_sel_mask]
+		MET_sel			  = MET[Event_sel_mask]
+		events = events[Event_sel_mask]
+
 		# Photon  EE and EB
 		isEE_mask = leading_pho.isScEtaEE
 		isEB_mask = leading_pho.isScEtaEB
 		Pho_EE = leading_pho[isEE_mask & Event_sel_mask]
 		Pho_EB = leading_pho[isEB_mask & Event_sel_mask]
-		MET_sel			  = MET[Event_sel_mask]
 
 		
 		cut5 = np.ones(ak.sum(ak.num(leading_pho_sel) > 0)) * 5
@@ -672,7 +677,8 @@ class JW_Processor(processor.ProcessorABC):
 		if len(leading_pho_sel) == 0:
 			return out
 
-
+		for i in events.event:
+			print("###EVT: ",i)
 		## -------------------- Prepare making hist --------------#
 
 
@@ -750,7 +756,7 @@ class JW_Processor(processor.ProcessorABC):
 		cuts_pho_EB = ak.flatten(isEB_mask)
 		
 
-		print("cut0: {0}, cut1: {1}, cut2: {2}, cut3: {3}, cut4: {4} ,cut5 {5} ".format(len(Initial_events),len(cut1),len(cut2),len(cut3),len(cut4), len(cut5)))
+	#	print("cut0: {0}, cut1: {1}, cut2: {2}, cut3: {3}, cut4: {4} ,cut5 {5} ".format(len(Initial_events),len(cut1),len(cut2),len(cut3),len(cut4), len(cut5)))
 
 
 		# Weight and SF here
@@ -1061,7 +1067,7 @@ if __name__ == '__main__':
 		"Events", # Tree name
 		JW_Processor_instance, # Class
 		executor=processor.futures_executor,
-		executor_args={"schema": NanoAODSchema, "workers": 50},
+		executor_args={"schema": NanoAODSchema, "workers": 1},
 	#maxchunks=4,
 	)
 	

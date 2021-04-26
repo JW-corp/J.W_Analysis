@@ -11,34 +11,34 @@ import numpy as np
 from coffea import lumi_tools
 import numba
 
+# -- Coffea 0.8.0 --> Must fix!! 
+import warnings
+warnings.filterwarnings('ignore')
+
+
 # ---> Class JW Processor
 class JW_Processor(processor.ProcessorABC):
 
 
 
 	# -- Initializer
-	def __init__(self,year,sample_name,xsec,puweight_arr,corrections):
+	def __init__(self,year,sample_name,puweight_arr,corrections):
 
-
-		lumis = { #Values from https://twiki.cern.ch/twiki/bin/viewauth/CMS/PdmVAnalysisSummaryTable													  
-		#'2016': 35.92,
-		#'2017': 41.53,
-		'2018': 21.1
-		}	
 
 		
 
 		# Parameter set
 		self._year = year
-		self._lumi = lumis[self._year] * 1000
 
-		self._xsec = xsec
-		
 		
 
 		# Trigger set
 		self._doubleelectron_triggers  ={
 			'2018': [
+					"Ele23_Ele12_CaloIdL_TrackIdL_IsoVL", # Recomended
+					],
+
+			'2017':[
 					"Ele23_Ele12_CaloIdL_TrackIdL_IsoVL", # Recomended
 					]
 		}
@@ -79,17 +79,6 @@ class JW_Processor(processor.ProcessorABC):
 				hist.Cat('dataset', 'Dataset'),
 				hist.Bin('cutflow', 'Cut index', [0, 1, 2, 3, 4,5,6,7])
 			),
-			"nPV": hist.Hist(
-				"Events",
-				hist.Cat("dataset","Dataset"),
-				hist.Bin("nPV","Number of Primary vertex",100, 0, 100),
-			),
-			"nPV_nw": hist.Hist(
-				"Events",
-				hist.Cat("dataset","Dataset"),
-				hist.Bin("nPV_nw","Number of Primary vertex",100, 0, 100),
-			),
-
 
 			# -- Kinematics -- #
 
@@ -200,11 +189,6 @@ class JW_Processor(processor.ProcessorABC):
 				hist.Cat("dataset","Dataset"),
 				hist.Bin("pho_EE_sieie","Photon EE sieie", 100, 0, 0.03),
 			),
-			"pho_EE_Iso_all": hist.Hist(
-				"Events",
-				hist.Cat("dataset","Dataset"),
-				hist.Bin("pho_EE_Iso_all","Photon EE pfReoIso03_all", 100, 0, 0.3),
-			),
 			"pho_EE_Iso_chg": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
@@ -239,11 +223,6 @@ class JW_Processor(processor.ProcessorABC):
 				hist.Cat("dataset","Dataset"),
 				hist.Bin("pho_EB_sieie","Photon EB sieie", 100, 0, 0.012),
 			),
-			"pho_EB_Iso_all": hist.Hist(
-				"Events",
-				hist.Cat("dataset","Dataset"),
-				hist.Bin("pho_EB_Iso_all","Photon EB pfReoIso03_all", 100, 0, 0.15),
-			),
 			"pho_EB_Iso_chg": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
@@ -274,24 +253,34 @@ class JW_Processor(processor.ProcessorABC):
 		if len(events) == 0:
 			return out
 
+
+		# Golden Json file 
+		if (self._year == "2018") and isData:
+			injson = "/x5/cms/jwkim/gitdir/JWCorp/JW_analysis/Coffea_WZG/Corrections/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt.RunABD"
+		
+		if (self._year == "2017") and isData:
+			injson="/x5/cms/jwkim/gitdir/JWCorp/JW_analysis/Coffea_WZG/Corrections/Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt"
+
+
+
 		# <----- Get Scale factors ------># 
 
 		if not isData:
 	
 			# Egamma reco ID
-			get_ele_reco_sf		 = self._corrections['get_ele_reco_sf'][self._year]
+			get_ele_reco_above20_sf	 = self._corrections['get_ele_reco_above20_sf'][self._year]
 			get_ele_medium_id_sf = self._corrections['get_ele_medium_id_sf'][self._year]
 			get_pho_medium_id_sf = self._corrections['get_pho_medium_id_sf'][self._year]
 	
 			
-
-			# DoubleEG trigger
-			get_ele_trig_leg1_SF		= self._corrections['get_ele_trig_leg1_SF'][self._year]
-			get_ele_trig_leg1_data_Eff	= self._corrections['get_ele_trig_leg1_data_Eff'][self._year]
-			get_ele_trig_leg1_mc_Eff	= self._corrections['get_ele_trig_leg1_mc_Eff'][self._year]
-			get_ele_trig_leg2_SF		= self._corrections['get_ele_trig_leg2_SF'][self._year]
-			get_ele_trig_leg2_data_Eff  = self._corrections['get_ele_trig_leg2_data_Eff'][self._year]
-			get_ele_trig_leg2_mc_Eff	= self._corrections['get_ele_trig_leg2_mc_Eff'][self._year]
+			# DoubleEG trigger # 2016, 2017 are not applied yet
+			if self._year == "2018": 
+				get_ele_trig_leg1_SF		= self._corrections['get_ele_trig_leg1_SF'][self._year]
+				get_ele_trig_leg1_data_Eff	= self._corrections['get_ele_trig_leg1_data_Eff'][self._year]
+				get_ele_trig_leg1_mc_Eff	= self._corrections['get_ele_trig_leg1_mc_Eff'][self._year]
+				get_ele_trig_leg2_SF		= self._corrections['get_ele_trig_leg2_SF'][self._year]
+				get_ele_trig_leg2_data_Eff  = self._corrections['get_ele_trig_leg2_data_Eff'][self._year]
+				get_ele_trig_leg2_mc_Eff	= self._corrections['get_ele_trig_leg2_mc_Eff'][self._year]
 			
 			# PU weight with custom made npy and multi-indexing
 			pu_weight_idx = ak.values_astype(events.Pileup.nTrueInt,"int64")
@@ -344,6 +333,20 @@ class JW_Processor(processor.ProcessorABC):
 			return vec
 
 		# <----- Selection ------># 
+		
+		Initial_events = events
+		# Good Run ( Golden Json files )
+		from coffea import lumi_tools
+
+		if isData:
+			lumi_mask_builder = lumi_tools.LumiMask(injson)
+			lumimask = ak.Array(lumi_mask_builder.__cal__(events.run,events.luminosityBlock))
+			events = events[lumimask]
+			#print("{0}%  of files pass good-run conditions".format(len(events)/ len(Initial_events)))
+
+		# Stop processing if there is no event remain
+		if len(events) == 0:
+			return out
 
 
 		##----------- Cut flow1: Passing Triggers
@@ -369,16 +372,9 @@ class JW_Processor(processor.ProcessorABC):
 				if path not in events.HLT.fields: continue
 				single_ele_triggers_arr = single_ele_triggers_arr | events.HLT[path]
 
-		# Sort particle order by PT  # RunD --> has problem
 		events.Electron,events.Photon,events.Jet = sort_by_pt(events.Electron,events.Photon,events.Jet)
 		
-		Initial_events = events
 
-
-		# Good Primary vertex
-		nPV		 = events.PV.npvsGood 
-		if not isData: nPV = nPV * pu
-		nPV_nw = nPV
 
 
 
@@ -396,9 +392,11 @@ class JW_Processor(processor.ProcessorABC):
 		Jet = events.Jet
 
 		
+		# Stop processing if there is no event remain
+		if len(Electron) == 0:
+			return out
 
 		
-
 		#  --Muon ( only used to calculate dR )
 		MuSelmask = (Muon.pt >= 10) & (abs(Muon.eta) <= 2.5)  & (Muon.tightId) & (Muon.pfRelIso04_all < 0.15)
 		#Muon = ak.mask(Muon,MuSelmask)
@@ -419,6 +417,7 @@ class JW_Processor(processor.ProcessorABC):
 		MET = MET[Tri_electron_mask]
 		Muon = Muon[Tri_electron_mask]
 		if not isData:pu = pu[Tri_electron_mask]
+		events = events[Tri_electron_mask]
 		
 		# Stop processing if there is no event remain
 		if len(Electron) == 0:
@@ -434,7 +433,11 @@ class JW_Processor(processor.ProcessorABC):
 		# Basic photon selection
 		isgap_mask = (abs(Photon.eta) < 1.442)  |  ((abs(Photon.eta) > 1.566) & (abs(Photon.eta) < 2.5))
 		Pixel_seed_mask = ~Photon.pixelSeed
-		PT_ID_mask = (Photon.pt >= 20) & (Photon.cutBased > 1)
+
+		if (dataset == "ZZ") and (self._year == '2017'):
+			PT_ID_mask = (Photon.pt >= 20) & (Photon.cutBasedBitmap >= 3) # 2^0(Loose) + 2^1(Medium) + 2^2(Tights)
+		else:
+			PT_ID_mask = (Photon.pt >= 20) & (Photon.cutBased > 1)
 		
 		# dR cut with selected Muon and Electrons
 		dr_pho_ele_mask = ak.all(Photon.metric_table(Electron) >= 0.5, axis=-1) # default metric table: delta_r
@@ -466,6 +469,7 @@ class JW_Processor(processor.ProcessorABC):
 		Muon = Muon[A_photon_mask]
 		MET = MET[A_photon_mask]
 		if not isData:pu = pu[A_photon_mask]
+		events = events[A_photon_mask]
 		
 		# Stop processing if there is no event remain
 		if len(Electron) == 0:
@@ -507,6 +511,7 @@ class JW_Processor(processor.ProcessorABC):
 		Jet= Jet[ossf_mask]
 		MET = MET[ossf_mask]
 		if not isData: pu = pu[ossf_mask]
+		events = events[ossf_mask]
 
 	
 
@@ -561,8 +566,8 @@ class JW_Processor(processor.ProcessorABC):
 			## -------------< Egamma ID and Reco Scale factor > -----------------##
 			get_pho_medium_id_sf = get_pho_medium_id_sf(ak.flatten(leading_pho.eta),ak.flatten(leading_pho.pt))
 
-			ele_reco_sf = get_ele_reco_sf(ak.flatten(leading_ele.deltaEtaSC + leading_ele.eta),ak.flatten(leading_ele.pt))* get_ele_reco_sf(ak.flatten(subleading_ele.deltaEtaSC + subleading_ele.eta),ak.flatten(subleading_ele.pt))\
-							* get_ele_reco_sf(ak.flatten(third_ele.deltaEtaSC + third_ele.eta),ak.flatten(third_ele.pt))
+			ele_reco_sf = get_ele_reco_above20_sf(ak.flatten(leading_ele.deltaEtaSC + leading_ele.eta),ak.flatten(leading_ele.pt))* get_ele_reco_above20_sf(ak.flatten(subleading_ele.deltaEtaSC + subleading_ele.eta),ak.flatten(subleading_ele.pt))\
+							* get_ele_reco_above20_sf(ak.flatten(third_ele.deltaEtaSC + third_ele.eta),ak.flatten(third_ele.pt))
 		
 			ele_medium_id_sf = get_ele_medium_id_sf(ak.flatten(leading_ele.deltaEtaSC + leading_ele.eta),ak.flatten(leading_ele.pt))* get_ele_medium_id_sf(ak.flatten(subleading_ele.deltaEtaSC + subleading_ele.eta),ak.flatten(subleading_ele.pt))\
 							* get_ele_medium_id_sf(ak.flatten(third_ele.deltaEtaSC + third_ele.eta),ak.flatten(third_ele.pt))
@@ -573,7 +578,10 @@ class JW_Processor(processor.ProcessorABC):
 			eta2 = ak.flatten(subleading_ele.deltaEtaSC + subleading_ele.eta)
 			pt1  = ak.flatten(leading_ele.pt)	
 			pt2  = ak.flatten(subleading_ele.pt)
-			ele_trig_weight = Trigger_Weight(eta1,pt1,eta2,pt2)
+
+			# -- 2017,2016 are not applied yet
+			if self._year == '2018':
+				ele_trig_weight = Trigger_Weight(eta1,pt1,eta2,pt2)
 
 
 		
@@ -622,12 +630,14 @@ class JW_Processor(processor.ProcessorABC):
 		# Apply cut5
 		Triple_eee_sel	 = Triple_eee[Event_sel_mask]
 		leading_pho_sel	  = leading_pho[Event_sel_mask]
+		MET_sel			  = MET[Event_sel_mask]
+		events = events[Event_sel_mask]
+
 		# Photon  EE and EB
 		isEE_mask = leading_pho.isScEtaEE
 		isEB_mask = leading_pho.isScEtaEB
 		Pho_EE = leading_pho[isEE_mask & Event_sel_mask]
 		Pho_EB = leading_pho[isEB_mask & Event_sel_mask]
-		MET_sel			  = MET[Event_sel_mask]
 
 		
 		cut5 = np.ones(ak.sum(ak.num(leading_pho_sel) > 0)) * 5
@@ -636,7 +646,8 @@ class JW_Processor(processor.ProcessorABC):
 		if len(leading_pho_sel) == 0:
 			return out
 
-
+		for i in events.event:
+			print("###EVT: ",i)
 		## -------------------- Prepare making hist --------------#
 
 
@@ -653,7 +664,6 @@ class JW_Processor(processor.ProcessorABC):
 			Pho_EE_Phi		= ak.flatten(Pho_EE.phi)
 			Pho_EE_sieie	  = ak.flatten(Pho_EE.sieie)
 			Pho_EE_hoe		= ak.flatten(Pho_EE.hoe)
-			Pho_EE_Iso_all	= ak.flatten(Pho_EE.pfRelIso03_all)
 			Pho_EE_Iso_charge = ak.flatten(Pho_EE.pfRelIso03_chg)
 
 		# Photon EB
@@ -663,7 +673,6 @@ class JW_Processor(processor.ProcessorABC):
 			Pho_EB_Phi		= ak.flatten(Pho_EB.phi)
 			Pho_EB_sieie	  = ak.flatten(Pho_EB.sieie)
 			Pho_EB_hoe		= ak.flatten(Pho_EB.hoe)
-			Pho_EB_Iso_all	= ak.flatten(Pho_EB.pfRelIso03_all)
 			Pho_EB_Iso_charge = ak.flatten(Pho_EB.pfRelIso03_chg)
 
 		# Electrons
@@ -710,7 +719,7 @@ class JW_Processor(processor.ProcessorABC):
 		cuts_pho_EB = ak.flatten(isEB_mask)
 		
 
-		print("cut0: {0}, cut1: {1}, cut2: {2}, cut3: {3}, cut4: {4} ,cut5 {5} ".format(len(Initial_events),len(cut1),len(cut2),len(cut3),len(cut4), len(cut5)))
+	#	print("cut0: {0}, cut1: {1}, cut2: {2}, cut3: {3}, cut4: {4} ,cut5 {5} ".format(len(Initial_events),len(cut1),len(cut2),len(cut3),len(cut4), len(cut5)))
 
 
 		# Weight and SF here
@@ -718,9 +727,11 @@ class JW_Processor(processor.ProcessorABC):
 			weights.add('pileup',pu)		
 			weights.add('ele_id',ele_medium_id_sf)		
 			weights.add('pho_id',get_pho_medium_id_sf)		
-			weights.add('ele_reco',ele_reco_sf)		
-			weights.add('ele_trigger',ele_trig_weight)		
-			print("#### Weight: ",weights.weight())
+			weights.add('ele_reco',ele_reco_sf)
+
+			# 2016,2017 are not applied yet
+			if self._year == "2018":
+				weights.add('ele_trigger',ele_trig_weight)		
 
 
 
@@ -738,15 +749,6 @@ class JW_Processor(processor.ProcessorABC):
 			)
 		
 		
-		# Primary vertex
-		out['nPV'].fill(
-			dataset=dataset,
-			nPV = nPV,
-		)
-		out['nPV_nw'].fill(
-			dataset=dataset,
-			nPV_nw = nPV_nw
-		)
 
 		# Fill hist
 
@@ -857,11 +859,6 @@ class JW_Processor(processor.ProcessorABC):
 				pho_EE_sieie=Pho_EE_sieie,
 				weight = skim_weight(weights.weight() *cuts *  cuts_pho_EE)
 			)
-			out["pho_EE_Iso_all"].fill(
-				dataset=dataset,
-				pho_EE_Iso_all=Pho_EE_Iso_all,
-				weight = skim_weight(weights.weight() *cuts *  cuts_pho_EE)
-			)
 			out["pho_EE_Iso_chg"].fill(
 				dataset=dataset,
 				pho_EE_Iso_chg=Pho_EE_Iso_charge,
@@ -895,11 +892,6 @@ class JW_Processor(processor.ProcessorABC):
 				pho_EB_sieie=Pho_EB_sieie,
 				weight = skim_weight(weights.weight() *cuts *  cuts_pho_EB)
 			)
-			out["pho_EB_Iso_all"].fill(
-				dataset=dataset,
-				pho_EB_Iso_all=Pho_EB_Iso_all,
-				weight = skim_weight(weights.weight() *cuts *  cuts_pho_EB)
-			)
 			out["pho_EB_Iso_chg"].fill(
 				dataset=dataset,
 				pho_EB_Iso_chg=Pho_EB_Iso_charge,
@@ -928,6 +920,10 @@ if __name__ == '__main__':
 				help="--metadata xxx.json")
 	parser.add_argument('--dataset', type=str,
 				help="--dataset ex) Egamma_Run2018A_280000")
+	parser.add_argument('--year', type=str,
+				help="--year 2018", default="2017")
+	parser.add_argument('--isdata', type=bool,
+				help="--isdata False",default=False)
 	args = parser.parse_args()
 	
 	
@@ -936,8 +932,8 @@ if __name__ == '__main__':
 	N_node = args.nWorker
 	metadata = args.metadata
 	data_sample = args.dataset
-	year='2018'
-	xsecDY=2137.0
+	year=args.year
+	isdata = args.isdata
 
 	## Json file reader
 	with open(metadata) as fin:
@@ -946,19 +942,18 @@ if __name__ == '__main__':
 
 
 	filelist = glob.glob(datadict[data_sample])
-
 	sample_name = data_sample.split('_')[0]
 	
 	
-	## Read Correction file <-- on developing -->
 	corr_file = "../Corrections/corrections.coffea"
-	#corr_file = "corrections.coffea"
+	#corr_file = "corrections.coffea" # Condor-batch
+	
+
 	corrections = load(corr_file)
 
 	## Read PU weight file
 
 
-	isdata=False
 	
 
 
@@ -976,12 +971,15 @@ if __name__ == '__main__':
 		"TTGJets":"mcPileupDist_TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8.npy",
 		"WGToLNuG":"mcPileupDist_WGToLNuG_01J_5f_PtG_120_TuneCP5_13TeV-amcatnloFXFX-pythia8.npy"
 		}
-		#pu_path = '../Corrections/Pileup/puWeight/npy_Run2018ABD/'+ pu_path_dict[sample_name] # Local skim
-		pu_path = '../Corrections/Pileup/puWeight/npy_Run2018ABD_pure/'+ pu_path_dict[sample_name] # Local pure
 
 
+		if year == '2018':
+			pu_path = '../Corrections/Pileup/puWeight/npy_Run2018ABD_pure/'+ pu_path_dict[sample_name] # Local pure 2018
+			#pu_path = '../Corrections/Pileup/puWeight/npy_Run2018ABD/'+ pu_path_dict[sample_name] # Local skim 2018
+			
+		if year == '2017':
+			pu_path = '../Corrections/Pileup/puWeight/npy_Run2017/' + pu_path_dict[sample_name]# 2017
 
-		#pu_path = 'puWeight/npy_Run2018ABD/'+ pu_path_dict[sample_name]
 
 		print("Use the PU file: ",pu_path)
 		with open(pu_path,'rb') as f:
@@ -989,12 +987,6 @@ if __name__ == '__main__':
 
 	else:
 		pu=-1
-
-#	# test one file 
-#	sample_name="DY"
-#	sample_name="DY"
-#	filelist=["/x6/cms/store_skim_2ElIdPt20/mc/RunIISummer19UL18NanoAODv2/DYToEE_M-50_NNPDF31_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v15_L1v1-v1/280000/59AB328B-F0E3-F544-98BB-E5E55577C649_skim_2ElIdPt20.root"]
-#
 
 	
 
@@ -1005,7 +997,7 @@ if __name__ == '__main__':
 	
 	
 	# Class -> Object
-	JW_Processor_instance = JW_Processor(year,sample_name,xsecDY,pu,corrections)
+	JW_Processor_instance = JW_Processor(year,sample_name,pu,corrections)
 	
 	
 	## -->Multi-node Executor
@@ -1014,7 +1006,7 @@ if __name__ == '__main__':
 		"Events", # Tree name
 		JW_Processor_instance, # Class
 		executor=processor.futures_executor,
-		executor_args={"schema": NanoAODSchema, "workers": 50},
+		executor_args={"schema": NanoAODSchema, "workers": 1},
 	#maxchunks=4,
 	)
 	
