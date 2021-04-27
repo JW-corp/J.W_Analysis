@@ -250,82 +250,82 @@ class JW_Processor(processor.ProcessorABC):
 			"PT_1_eta_1": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_1_eta_1","20 < pt <30 & |eta| < 1", 200, 0, 0.1),
+				hist.Bin("PT_1_eta_1","20 < pt <30 & |eta| < 1", 200, 0, 0.02),
 			),
 			"PT_1_eta_2": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_1_eta_2","20 < pt <30 & 1 < |eta| < 1.5", 200, 0, 0.1),
+				hist.Bin("PT_1_eta_2","20 < pt <30 & 1 < |eta| < 1.5", 200, 0, 0.02),
 			),
 			"PT_1_eta_3": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_1_eta_3","20 < pt <30 & 1.5 < |eta| < 2", 200, 0, 0.1),
+				hist.Bin("PT_1_eta_3","20 < pt <30 & 1.5 < |eta| < 2", 200, 0, 0.05),
 			),
 			"PT_1_eta_4": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_1_eta_4","20 < pt <30 & 2 < |eta| < 2.5", 200, 0, 0.1),
+				hist.Bin("PT_1_eta_4","20 < pt <30 & 2 < |eta| < 2.5", 200, 0, 0.05),
 			),
 			"PT_2_eta_1": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_2_eta_1","30 < pt <40 & |eta| < 1", 200, 0, 0.1),
+				hist.Bin("PT_2_eta_1","30 < pt <40 & |eta| < 1", 200, 0, 0.02),
 			),
 			"PT_2_eta_2": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_2_eta_2","30 < pt <40 & 1 < |eta| < 1.5", 200, 0, 0.1),
+				hist.Bin("PT_2_eta_2","30 < pt <40 & 1 < |eta| < 1.5", 200, 0, 0.02),
 			),
 			"PT_2_eta_3": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_2_eta_3","30 < pt <40 & 1.5 < |eta| < 2", 200, 0, 0.1),
+				hist.Bin("PT_2_eta_3","30 < pt <40 & 1.5 < |eta| < 2", 200, 0, 0.05),
 			),
 			"PT_2_eta_4": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_2_eta_4","30 < pt <40 & 2 < |eta| < 2.5", 200, 0, 0.1),
+				hist.Bin("PT_2_eta_4","30 < pt <40 & 2 < |eta| < 2.5", 200, 0, 0.05),
 			),
 			"PT_3_eta_1": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_3_eta_1","40 < pt <50 & |eta| < 1", 200, 0, 0.1),
+				hist.Bin("PT_3_eta_1","40 < pt <50 & |eta| < 1", 200, 0, 0.02),
 			),
 			"PT_3_eta_2": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_3_eta_2","40 < pt <50 & 1 < |eta| < 1.5", 200, 0, 0.1),
+				hist.Bin("PT_3_eta_2","40 < pt <50 & 1 < |eta| < 1.5", 200, 0, 0.02),
 			),
 			"PT_3_eta_3": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_3_eta_3","40 < pt <50 & 1.5 < |eta| < 2", 200, 0, 0.1),
+				hist.Bin("PT_3_eta_3","40 < pt <50 & 1.5 < |eta| < 2", 200, 0, 0.05),
 			),
 			"PT_3_eta_4": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_3_eta_4","40 < pt <50 & 2 < |eta| < 2.5", 200, 0, 0.1),
+				hist.Bin("PT_3_eta_4","40 < pt <50 & 2 < |eta| < 2.5", 200, 0, 0.05),
 			),
 			"PT_4_eta_1": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_4_eta_1","50 < pt & |eta| < 1", 200, 0, 0.1),
+				hist.Bin("PT_4_eta_1","50 < pt & |eta| < 1", 200, 0, 0.02),
 			),
 			"PT_4_eta_2": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_4_eta_2","50 <pt  & 1 < |eta| < 1.5", 200, 0, 0.1),
+				hist.Bin("PT_4_eta_2","50 <pt  & 1 < |eta| < 1.5", 200, 0, 0.02),
 			),
 			"PT_4_eta_3": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_4_eta_3","50 < pt  & 1.5 < |eta| < 2", 200, 0, 0.1),
+				hist.Bin("PT_4_eta_3","50 < pt  & 1.5 < |eta| < 2", 200, 0, 0.05),
 			),
 			"PT_4_eta_4": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_4_eta_4","50 < pt  & 2 < |eta| < 2.5", 200, 0, 0.1),
+				hist.Bin("PT_4_eta_4","50 < pt  & 2 < |eta| < 2.5", 200, 0, 0.05),
 			)
 
 			})
@@ -1175,8 +1175,7 @@ if __name__ == '__main__':
 
 
 	filelist = glob.glob(datadict[data_sample])
-	#sample_name = data_sample.split('_')[0]
-	sample_name = "Real_template"
+	sample_name = data_sample.split('_')[0]
 	
 	
 	corr_file = "../Corrections/corrections.coffea"
@@ -1220,6 +1219,7 @@ if __name__ == '__main__':
 
 	
 
+	sample_name = "Real_template"
 	print("Processing the sample: ",sample_name)
 	samples = {
 		sample_name : filelist

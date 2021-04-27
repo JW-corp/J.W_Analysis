@@ -257,82 +257,82 @@ class JW_Processor(processor.ProcessorABC):
 			"PT_1_eta_1": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_1_eta_1","20 < pt <30 & |eta| < 1", 200, 0, 0.1),
+				hist.Bin("PT_1_eta_1","20 < pt <30 & |eta| < 1", 200, 0, 0.02),
 			),
 			"PT_1_eta_2": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_1_eta_2","20 < pt <30 & 1 < |eta| < 1.5", 200, 0, 0.1),
+				hist.Bin("PT_1_eta_2","20 < pt <30 & 1 < |eta| < 1.5", 200, 0, 0.02),
 			),
 			"PT_1_eta_3": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_1_eta_3","20 < pt <30 & 1.5 < |eta| < 2", 200, 0, 0.1),
+				hist.Bin("PT_1_eta_3","20 < pt <30 & 1.5 < |eta| < 2", 200, 0, 0.05),
 			),
 			"PT_1_eta_4": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_1_eta_4","20 < pt <30 & 2 < |eta| < 2.5", 200, 0, 0.1),
+				hist.Bin("PT_1_eta_4","20 < pt <30 & 2 < |eta| < 2.5", 200, 0, 0.05),
 			),
 			"PT_2_eta_1": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_2_eta_1","30 < pt <40 & |eta| < 1", 200, 0, 0.1),
+				hist.Bin("PT_2_eta_1","30 < pt <40 & |eta| < 1", 200, 0, 0.02),
 			),
 			"PT_2_eta_2": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_2_eta_2","30 < pt <40 & 1 < |eta| < 1.5", 200, 0, 0.1),
+				hist.Bin("PT_2_eta_2","30 < pt <40 & 1 < |eta| < 1.5", 200, 0, 0.02),
 			),
 			"PT_2_eta_3": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_2_eta_3","30 < pt <40 & 1.5 < |eta| < 2", 200, 0, 0.1),
+				hist.Bin("PT_2_eta_3","30 < pt <40 & 1.5 < |eta| < 2", 200, 0, 0.05),
 			),
 			"PT_2_eta_4": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_2_eta_4","30 < pt <40 & 2 < |eta| < 2.5", 200, 0, 0.1),
+				hist.Bin("PT_2_eta_4","30 < pt <40 & 2 < |eta| < 2.5", 200, 0, 0.05),
 			),
 			"PT_3_eta_1": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_3_eta_1","40 < pt <50 & |eta| < 1", 200, 0, 0.1),
+				hist.Bin("PT_3_eta_1","40 < pt <50 & |eta| < 1", 200, 0, 0.02),
 			),
 			"PT_3_eta_2": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_3_eta_2","40 < pt <50 & 1 < |eta| < 1.5", 200, 0, 0.1),
+				hist.Bin("PT_3_eta_2","40 < pt <50 & 1 < |eta| < 1.5", 200, 0, 0.02),
 			),
 			"PT_3_eta_3": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_3_eta_3","40 < pt <50 & 1.5 < |eta| < 2", 200, 0, 0.1),
+				hist.Bin("PT_3_eta_3","40 < pt <50 & 1.5 < |eta| < 2", 200, 0, 0.05),
 			),
 			"PT_3_eta_4": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_3_eta_4","40 < pt <50 & 2 < |eta| < 2.5", 200, 0, 0.1),
+				hist.Bin("PT_3_eta_4","40 < pt <50 & 2 < |eta| < 2.5", 200, 0, 0.05),
 			),
 			"PT_4_eta_1": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_4_eta_1","50 < pt & |eta| < 1", 200, 0, 0.1),
+				hist.Bin("PT_4_eta_1","50 < pt & |eta| < 1", 200, 0, 0.02),
 			),
 			"PT_4_eta_2": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_4_eta_2","50 <pt  & 1 < |eta| < 1.5", 200, 0, 0.1),
+				hist.Bin("PT_4_eta_2","50 <pt  & 1 < |eta| < 1.5", 200, 0, 0.02),
 			),
 			"PT_4_eta_3": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_4_eta_3","50 < pt  & 1.5 < |eta| < 2", 200, 0, 0.1),
+				hist.Bin("PT_4_eta_3","50 < pt  & 1.5 < |eta| < 2", 200, 0, 0.05),
 			),
 			"PT_4_eta_4": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_4_eta_4","50 < pt  & 2 < |eta| < 2.5", 200, 0, 0.1),
+				hist.Bin("PT_4_eta_4","50 < pt  & 2 < |eta| < 2.5", 200, 0, 0.05),
 			)
 
 
@@ -403,95 +403,95 @@ class JW_Processor(processor.ProcessorABC):
 		# Cut-based ID modification
 		@numba.njit 
 		def PhotonVID(vid, idBit):
-		    rBit = 0
-		    for x in range(0, 7):
-		        rBit |= (1 << x) if ((vid >> (x * 2)) & 0b11 >= idBit) else 0
-		    return rBit
+			rBit = 0
+			for x in range(0, 7):
+				rBit |= (1 << x) if ((vid >> (x * 2)) & 0b11 >= idBit) else 0
+			return rBit
 		
 		# Inverse Sieie and upper limit
 		@numba.njit 
 		def make_fake_obj_mask(Pho,builder):
 		
-		    #for eventIdx,pho in enumerate(tqdm(Pho)):   # --Event Loop
-		    for eventIdx,pho in enumerate(Pho):
-		        builder.begin_list()
-		        if len(pho) < 1: continue;
-		    
-		            
-		        for phoIdx,_ in enumerate(pho):# --Photon Loop
-		        
-		            vid = Pho[eventIdx][phoIdx].vidNestedWPBitmap
-		            vid_cuts1 = PhotonVID(vid,1) # Loose photon
-		            vid_cuts2 = PhotonVID(vid,2) # Medium photon
-		            vid_cuts3 = PhotonVID(vid,3) # Tight photon
+			#for eventIdx,pho in enumerate(tqdm(Pho)):   # --Event Loop
+			for eventIdx,pho in enumerate(Pho):
+				builder.begin_list()
+				if len(pho) < 1: continue;
+			
+					
+				for phoIdx,_ in enumerate(pho):# --Photon Loop
+				
+					vid = Pho[eventIdx][phoIdx].vidNestedWPBitmap
+					vid_cuts1 = PhotonVID(vid,1) # Loose photon
+					vid_cuts2 = PhotonVID(vid,2) # Medium photon
+					vid_cuts3 = PhotonVID(vid,3) # Tight photon
 		
-		            # Field name
-		            # |0|0|0|0|0|0|0| 
-		            # |IsoPho|IsoNeu|IsoChg|Sieie|hoe|scEta|PT|
+					# Field name
+					# |0|0|0|0|0|0|0| 
+					# |IsoPho|IsoNeu|IsoChg|Sieie|hoe|scEta|PT|
 		
-		            # 1. Turn off cut (ex turn off Sieie
-		            # |1|1|1|0|1|1|1| = |1|1|1|0|1|1|1|
+					# 1. Turn off cut (ex turn off Sieie
+					# |1|1|1|0|1|1|1| = |1|1|1|0|1|1|1|
 		
-		            # 2. Inverse cut (ex inverse Sieie)
-		            # |1|1|1|1|1|1|1| = |1|1|1|0|1|1|1|
+					# 2. Inverse cut (ex inverse Sieie)
+					# |1|1|1|1|1|1|1| = |1|1|1|0|1|1|1|
 		
-		            
-		                
-		            #if (vid_cuts2 & 0b1111111 == 0b1111111): # Cut applied
-		            if (vid_cuts2 & 0b1111111 == 0b1110111): # Inverse Sieie
-		            #if (vid_cuts2 & 0b1110111 == 0b1110111): # Without Sieie
-		            
-		                if (Pho[eventIdx][phoIdx].isScEtaEB) & (Pho[eventIdx][phoIdx].sieie < 0.01015 * 1.75):
-		                    builder.boolean(True)
-		            
-		                elif (Pho[eventIdx][phoIdx].isScEtaEE) & (Pho[eventIdx][phoIdx].sieie < 0.0272 * 1.75):
-		                    builder.boolean(True)
-		                else: builder.boolean(False)
+					
+						
+					#if (vid_cuts2 & 0b1111111 == 0b1111111): # Cut applied
+					if (vid_cuts2 & 0b1111111 == 0b1110111): # Inverse Sieie
+					#if (vid_cuts2 & 0b1110111 == 0b1110111): # Without Sieie
+					
+						if (Pho[eventIdx][phoIdx].isScEtaEB) & (Pho[eventIdx][phoIdx].sieie < 0.01015 * 1.75):
+							builder.boolean(True)
+					
+						elif (Pho[eventIdx][phoIdx].isScEtaEE) & (Pho[eventIdx][phoIdx].sieie < 0.0272 * 1.75):
+							builder.boolean(True)
+						else: builder.boolean(False)
 		
-		                
-		            else:
+						
+					else:
 		
-		                builder.boolean(False)
+						builder.boolean(False)
 		
-		        builder.end_list()
-		                
-		    return builder
+				builder.end_list()
+						
+			return builder
 
 		# Inverse IsoChg and upper and lower limit
 		@numba.njit 
 		def make_IsochgSide_mask(Pho,builder):
 		
 		
-		    #for eventIdx,pho in enumerate(tqdm(Pho)): # --Event Loop
-		    for eventIdx,pho in enumerate(Pho): # --Event Loop
-		        builder.begin_list()
-		        if len(pho) < 1: continue;
-		        
-		        for phoIdx,_ in enumerate(pho): # --Photon Loop
-		            
-		            vid = Pho[eventIdx][phoIdx].vidNestedWPBitmap
-		            vid_cuts1 = PhotonVID(vid,1) # Loose photon
-		            vid_cuts2 = PhotonVID(vid,2) # Medium photon
-		            vid_cuts3 = PhotonVID(vid,3) # Tight photon
+			#for eventIdx,pho in enumerate(tqdm(Pho)): # --Event Loop
+			for eventIdx,pho in enumerate(Pho): # --Event Loop
+				builder.begin_list()
+				if len(pho) < 1: continue;
+				
+				for phoIdx,_ in enumerate(pho): # --Photon Loop
+					
+					vid = Pho[eventIdx][phoIdx].vidNestedWPBitmap
+					vid_cuts1 = PhotonVID(vid,1) # Loose photon
+					vid_cuts2 = PhotonVID(vid,2) # Medium photon
+					vid_cuts3 = PhotonVID(vid,3) # Tight photon
 		
-		            #if (vid_cuts2 & 0b1111111 == 0b1111111): # Cut applied
-		            if (vid_cuts2 & 0b1111111 == 0b1101111): # Inverse Isochg
-		            #if (vid_cuts2 & 0b1101111 == 0b1101111): # Withtou Isochg
-		                isochg = Pho[eventIdx][phoIdx].pfRelIso03_chg * Pho[eventIdx][phoIdx].pt
-		                
-		                if (isochg >= 4) & (isochg <= 10):               
-		                    builder.boolean(True)
-		                else: 
-		                    builder.boolean(False)
+					#if (vid_cuts2 & 0b1111111 == 0b1111111): # Cut applied
+					if (vid_cuts2 & 0b1111111 == 0b1101111): # Inverse Isochg
+					#if (vid_cuts2 & 0b1101111 == 0b1101111): # Withtou Isochg
+						isochg = Pho[eventIdx][phoIdx].pfRelIso03_chg * Pho[eventIdx][phoIdx].pt
+						
+						if (isochg >= 4) & (isochg <= 10):			   
+							builder.boolean(True)
+						else: 
+							builder.boolean(False)
 		
-		                
-		            else:
-		                #builder.begin_list()
-		                builder.boolean(False)
-		                #builder.end_list()      
-		        builder.end_list()
-		                
-		    return builder
+						
+					else:
+						#builder.begin_list()
+						builder.boolean(False)
+						#builder.end_list()	  
+				builder.end_list()
+						
+			return builder
 
 
 
@@ -816,7 +816,6 @@ class JW_Processor(processor.ProcessorABC):
 			binned_sieie_hist[name] = make_bins(ak.flatten(leading_pho_sel.pt), ak.flatten(abs(leading_pho_sel.eta)),ak.flatten(leading_pho_sel.sieie), name)
 		
 
-		print("## show me the last bin: ",binned_sieie_hist['PT_4_eta_4'])
 
 
 		# -------------------- Fill hist ---------------------------#	
@@ -1049,6 +1048,8 @@ class JW_Processor(processor.ProcessorABC):
 				PT_4_eta_3 = binned_sieie_hist['PT_4_eta_3']
 			)
 		if len(binned_sieie_hist['PT_4_eta_4'] > 0):
+			print("## show me the last bin: ",binned_sieie_hist['PT_4_eta_4'])
+			print("## show me the first bin: ",binned_sieie_hist['PT_1_eta_1'])
 			out['PT_4_eta_4'].fill(
 				dataset	   = dataset,
 				PT_4_eta_4 = binned_sieie_hist['PT_4_eta_4']

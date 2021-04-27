@@ -159,16 +159,6 @@ class JW_Processor(processor.ProcessorABC):
 				hist.Cat("dataset","Dataset"),
 				hist.Bin("pho_EE_Iso_chg","Photon EE pfReoIso03_charge", 200, 0, 1),
 			),
-			"pho_sieie_check": hist.Hist(
-				"Events",
-				hist.Cat("dataset","Dataset"),
-				hist.Bin("pho_sieie_check","Photon sieie", 200, 0, 0.1),
-			),
-			"pho_Iso_chg_check": hist.Hist(
-				"Events",
-				hist.Cat("dataset","Dataset"),
-				hist.Bin("pho_Iso_chg_check","Photon fReoIso03_charge", 200, 0, 10),
-			),
 
 			# -- Photon EB -- #
 
@@ -200,17 +190,6 @@ class JW_Processor(processor.ProcessorABC):
 				"Events",
 				hist.Cat("dataset","Dataset"),
 				hist.Bin("pho_EB_sieie","Photon EB sieie", 200, 0, 0.1),
-			),
-			"pho_EB_Iso_chg_check": hist.Hist(
-				"Events",
-				hist.Cat("dataset","Dataset"),
-				hist.Bin("pho_EB_Iso_chg_check","Photon EB pfReoIso03_charge", 100, 0, 0.03),
-			),
-
-			"pho_EB_sieie_check": hist.Hist(
-				"Events",
-				hist.Cat("dataset","Dataset"),
-				hist.Bin("pho_EB_sieie_check","Photon EB sieie", 100, 0, 0.1),
 			),
 
 
@@ -257,82 +236,84 @@ class JW_Processor(processor.ProcessorABC):
 			"PT_1_eta_1": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_1_eta_1","20 < pt <30 & |eta| < 1", 200, 0, 0.1),
+				hist.Bin("PT_1_eta_1","20 < pt <30 & |eta| < 1", 200, 0, 0.02),
 			),
 			"PT_1_eta_2": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_1_eta_2","20 < pt <30 & 1 < |eta| < 1.5", 200, 0, 0.1),
+				hist.Bin("PT_1_eta_2","20 < pt <30 & 1 < |eta| < 1.5", 200, 0, 0.02),
 			),
 			"PT_1_eta_3": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_1_eta_3","20 < pt <30 & 1.5 < |eta| < 2", 200, 0, 0.1),
+				hist.Bin("PT_1_eta_3","20 < pt <30 & 1.5 < |eta| < 2", 200, 0, 0.05),
 			),
 			"PT_1_eta_4": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_1_eta_4","20 < pt <30 & 2 < |eta| < 2.5", 200, 0, 0.1),
+				hist.Bin("PT_1_eta_4","20 < pt <30 & 2 < |eta| < 2.5", 200, 0, 0.05),
+
+
 			),
 			"PT_2_eta_1": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_2_eta_1","30 < pt <40 & |eta| < 1", 200, 0, 0.1),
+				hist.Bin("PT_2_eta_1","30 < pt <40 & |eta| < 1", 200, 0, 0.02),
 			),
 			"PT_2_eta_2": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_2_eta_2","30 < pt <40 & 1 < |eta| < 1.5", 200, 0, 0.1),
+				hist.Bin("PT_2_eta_2","30 < pt <40 & 1 < |eta| < 1.5", 200, 0, 0.02),
 			),
 			"PT_2_eta_3": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_2_eta_3","30 < pt <40 & 1.5 < |eta| < 2", 200, 0, 0.1),
+				hist.Bin("PT_2_eta_3","30 < pt <40 & 1.5 < |eta| < 2", 200, 0, 0.05),
 			),
 			"PT_2_eta_4": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_2_eta_4","30 < pt <40 & 2 < |eta| < 2.5", 200, 0, 0.1),
+				hist.Bin("PT_2_eta_4","30 < pt <40 & 2 < |eta| < 2.5", 200, 0, 0.05),
 			),
 			"PT_3_eta_1": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_3_eta_1","40 < pt <50 & |eta| < 1", 200, 0, 0.1),
+				hist.Bin("PT_3_eta_1","40 < pt <50 & |eta| < 1", 200, 0, 0.02),
 			),
 			"PT_3_eta_2": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_3_eta_2","40 < pt <50 & 1 < |eta| < 1.5", 200, 0, 0.1),
+				hist.Bin("PT_3_eta_2","40 < pt <50 & 1 < |eta| < 1.5", 200, 0, 0.02),
 			),
 			"PT_3_eta_3": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_3_eta_3","40 < pt <50 & 1.5 < |eta| < 2", 200, 0, 0.1),
+				hist.Bin("PT_3_eta_3","40 < pt <50 & 1.5 < |eta| < 2", 200, 0, 0.05),
 			),
 			"PT_3_eta_4": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_3_eta_4","40 < pt <50 & 2 < |eta| < 2.5", 200, 0, 0.1),
+				hist.Bin("PT_3_eta_4","40 < pt <50 & 2 < |eta| < 2.5", 200, 0, 0.05),
 			),
 			"PT_4_eta_1": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_4_eta_1","50 < pt & |eta| < 1", 200, 0, 0.1),
+				hist.Bin("PT_4_eta_1","50 < pt & |eta| < 1", 200, 0, 0.02),
 			),
 			"PT_4_eta_2": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_4_eta_2","50 <pt  & 1 < |eta| < 1.5", 200, 0, 0.1),
+				hist.Bin("PT_4_eta_2","50 <pt  & 1 < |eta| < 1.5", 200, 0, 0.02),
 			),
 			"PT_4_eta_3": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_4_eta_3","50 < pt  & 1.5 < |eta| < 2", 200, 0, 0.1),
+				hist.Bin("PT_4_eta_3","50 < pt  & 1.5 < |eta| < 2", 200, 0, 0.05),
 			),
 			"PT_4_eta_4": hist.Hist(
 				"Events",
 				hist.Cat("dataset","Dataset"),
-				hist.Bin("PT_4_eta_4","50 < pt  & 2 < |eta| < 2.5", 200, 0, 0.1),
+				hist.Bin("PT_4_eta_4","50 < pt  & 2 < |eta| < 2.5", 200, 0, 0.05),
 			)
 
 
@@ -707,11 +688,6 @@ class JW_Processor(processor.ProcessorABC):
 		Pho_Phi = ak.flatten(leading_pho_sel.phi)
 
 
-				# -- Just check -- #
-		pho_check_sieie  = ak.flatten(Photon_sieie_inv.sieie)
-		pho_check_Isochg = ak.flatten(Photon_Isochg_inv.pfRelIso03_chg *Photon_Isochg_inv.pt)
-
-
 				# -- Pho EB --#
 		Pho_EB_PT  = ak.flatten(Pho_EB.pt)
 		Pho_EB_Eta = ak.flatten(Pho_EB.eta)
@@ -777,7 +753,6 @@ class JW_Processor(processor.ProcessorABC):
 			binned_sieie_hist[name] = make_bins(ak.flatten(leading_pho_sel.pt), ak.flatten(abs(leading_pho_sel.eta)),ak.flatten(leading_pho_sel.sieie), name)
 		
 
-		print("## show me the last bin: ",binned_sieie_hist['PT_4_eta_4'])
 
 
 		# -------------------- Fill hist ---------------------------#	
@@ -887,15 +862,6 @@ class JW_Processor(processor.ProcessorABC):
 		)
 
 
-		# -- Just check -- #
-		out["pho_sieie_check"].fill(
-			dataset=dataset,
-			pho_sieie_check = pho_check_sieie
-		)
-		out["pho_Iso_chg_check"].fill(
-			dataset=dataset,
-			pho_Iso_chg_check = pho_check_Isochg
-		)
 
 
 
@@ -1010,6 +976,7 @@ class JW_Processor(processor.ProcessorABC):
 				PT_4_eta_3 = binned_sieie_hist['PT_4_eta_3']
 			)
 		if len(binned_sieie_hist['PT_4_eta_4'] > 0):
+			print("## show me the last bin: ",binned_sieie_hist['PT_4_eta_4'])
 			out['PT_4_eta_4'].fill(
 				dataset	   = dataset,
 				PT_4_eta_4 = binned_sieie_hist['PT_4_eta_4']
