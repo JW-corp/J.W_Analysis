@@ -457,43 +457,6 @@ class JW_Processor(processor.ProcessorABC):
 		                
 		    return builder
 
-		# Inverse IsoChg and upper and lower limit
-		@numba.njit 
-		def make_IsochgSide_mask(Pho,builder):
-		
-		
-		    #for eventIdx,pho in enumerate(tqdm(Pho)): # --Event Loop
-		    for eventIdx,pho in enumerate(Pho): # --Event Loop
-		        builder.begin_list()
-		        if len(pho) < 1: continue;
-		        
-		        for phoIdx,_ in enumerate(pho): # --Photon Loop
-		            
-		            vid = Pho[eventIdx][phoIdx].vidNestedWPBitmap
-		            vid_cuts1 = PhotonVID(vid,1) # Loose photon
-		            vid_cuts2 = PhotonVID(vid,2) # Medium photon
-		            vid_cuts3 = PhotonVID(vid,3) # Tight photon
-		
-		            #if (vid_cuts2 & 0b1111111 == 0b1111111): # Cut applied
-		            if (vid_cuts2 & 0b1111111 == 0b1101111): # Inverse Isochg
-		            #if (vid_cuts2 & 0b1101111 == 0b1101111): # Withtou Isochg
-		                isochg = Pho[eventIdx][phoIdx].pfRelIso03_chg * Pho[eventIdx][phoIdx].pt
-		                
-		                if (isochg >= 4) & (isochg <= 10):               
-		                    builder.boolean(True)
-		                else: 
-		                    builder.boolean(False)
-		
-		                
-		            else:
-		                #builder.begin_list()
-		                builder.boolean(False)
-		                #builder.end_list()      
-		        builder.end_list()
-		                
-		    return builder
-
-
 
 
 		# Golden Json file 
@@ -610,12 +573,10 @@ class JW_Processor(processor.ProcessorABC):
 
 		# ID for fake photon
 		is_photon_sieie   = make_fake_obj_mask(Photon, ak.ArrayBuilder()).snapshot()
-		is_photon_Isochg  = make_IsochgSide_mask(Photon,ak.ArrayBuilder()).snapshot()
-		Photon_template_mask = (is_photon_sieie) | (is_photon_Isochg)
+		is_photon_medium  = (Photon.cutBased > 1)
 
-		Photon_sieie_inv  = Photon[is_photon_sieie]
-		Photon_Isochg_inv = Photon[is_photon_Isochg]
-		
+		Photon_template_mask = (is_photon_sieie) | (is_photon_medium)
+
 		PhoSelmask = PT_mask  & isgap_mask &  Pixel_seed_mask & dr_pho_ele_mask & dr_pho_mu_mask & Photon_template_mask
 		Photon = Photon[PhoSelmask]
 
@@ -1093,8 +1054,8 @@ if __name__ == '__main__':
 
 
 	filelist = glob.glob(datadict[data_sample])
-	sample_name = "Fake_template"
 	#sample_name = data_sample.split('_')[0]
+	sample_name = "data_template"
 	
 
 	print(sample_name)
@@ -1118,6 +1079,8 @@ if __name__ == '__main__':
 	
 	#outname = data_sample + '.futures'
 	outname = sample_name + '_' + data_sample + '.futures'
+	
+
 	save(result,outname)
 	
 	elapsed_time = time.time() - start
