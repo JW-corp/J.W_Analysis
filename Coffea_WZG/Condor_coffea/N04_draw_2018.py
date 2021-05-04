@@ -268,6 +268,7 @@ def reduce(folder,sample_list,histname):
 ## --File Directories
 
 file_name = "210504_Baseline"
+#file_name = "Base_line_210416_Allweight"
 file_path = "results/" + file_name
 
 
@@ -300,7 +301,7 @@ sample_list = ['DY' ,'WZ' ,'ZZ' ,'TTWJets','TTZtoLL','tZq' ,'Egamma','WZG','ZGTo
 #histname = "ele1phi"; xmin=-3.15; xmax=3.15; ymin=100; ymax=5e+6;
 #histname = "ele2phi"; xmin=-3.15; xmax=3.15; ymin=100; ymax=5e+6;
 
-histname = "cutflow"; xmin=0; xmax=6; ymin=1; ymax=5e+6
+histname = "cutflow"; xmin=0; xmax=7; ymin=1; ymax=5e+6
 
 		# --- Photon --- #
 
@@ -343,7 +344,7 @@ scales={
 }
 
 
-h1.scale(scales,axis='dataset')
+#h1.scale(scales,axis='dataset')
 
 ## --Rebin
 #h1 = h1.rebin(histname,hist.Bin("met","met [GeV]", 10, 0, 200))
@@ -481,7 +482,7 @@ ax.autoscale(axis="x", tight=True)
 ax.set_ylim(ymin, ymax)
 ax.set_xlim(xmin, xmax)
 ax.set_xlabel('')
-ax.set_yscale('log')
+#ax.set_yscale('log')
 
 
 lum = plt.text(
