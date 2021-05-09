@@ -122,7 +122,8 @@ def make_json(data, fake, real):
 					{
 						"data": real,
 						"modifiers": [
-							{"name": "scale_real", "type": "shapefactor", "data": None},
+							#{"name": "scale_real", "type": "shapefactor", "data": None},
+							{"name": "scale_real", "type": "normfactor", "data": None},
 							{"name": "dummy", "type": "normfactor", "data": None},
 						],
 						"name": "real",
@@ -130,7 +131,8 @@ def make_json(data, fake, real):
 					{
 						"data": fake,
 						"modifiers": [
-							{"name": "scale_fake", "type": "shapefactor", "data": None}
+							#{"name": "scale_fake", "type": "shapefactor", "data": None}
+							{"name": "scale_fake", "type": "normfactor", "data": None}
 						],
 						"name": "fake",
 					},
@@ -207,7 +209,7 @@ if __name__ == "__main__":
 	import argparse
 	parser = argparse.ArgumentParser()
 	parser.add_argument('infile_name', type=str,
-            help="python Fit.py PT_1_eta_1.npy")
+			help="python Fit.py PT_1_eta_1.npy")
 	args = parser.parse_args()
 	
 
@@ -244,44 +246,35 @@ if __name__ == "__main__":
 	fit_results = pyhf.infer.mle.fit(data, model)
 
 	# Calculate Scale Factor
-	SF_real = []
-	SF_fake = []
-
+	SF_real = 0
+	SF_fake = 0
+	
 	for i, label in enumerate(get_parameter_names(model)):
 		print(f"{label}: {fit_results[i]}")
 
 		if label.startswith("scale_real"):
-			SF_real.append(fit_results[i])
+			SF_real = fit_results[i]
 		elif label.startswith("scale_fake"):
-			SF_fake.append(fit_results[i])
+			SF_fake = fit_results[i]
 
 	print("Real template SF: ", SF_real)
 	print("Fake template SF: ", SF_fake)
 
+	Fake_template['contents'] = Fake_template['contents'] * SF_fake
+	Real_template['contents'] = Real_template['contents'] * SF_real
+	Fit_data = Fake_template['contents'] + Real_template['contents']
+	## Apply Scale Factor
+	#start = idx[0]
+	#end = idx[-1] + 1
 
-	# Apply Scale Factor
-	start = idx[0]
-	end = idx[-1] + 1
-
-	Fit_data = np.zeros(len(Fake_template["contents"]))
-	Fit_data[start:end] = (
-		Fake_template["contents"][start:end] * SF_fake
-		+ Real_template["contents"][start:end] * SF_real
-	)
-	
-	Fake_template['contents'][start:end] = Fake_template['contents'][start:end] * SF_fake
-	Real_template['contents'][start:end] = Real_template['contents'][start:end] * SF_real
-
-	
+	#Fit_data = np.zeros(len(Fake_template["contents"]))
+	#Fit_data[start:end] = (
+	#	Fake_template["contents"][start:end] * SF_fake
+	#	+ Real_template["contents"][start:end] * SF_real
+	#)
+	#
+	#Fake_template['contents'][start:end] = Fake_template['contents'][start:end] * SF_fake
+	#Real_template['contents'][start:end] = Real_template['contents'][start:end] * SF_real
 	limit = set_limit(infile_name)
 	fake_frac = fake_fraction(data_template,Fake_template,limit)
-
-
 	draw(infile_name, data_template, Fake_template, Real_template, Fit_data,fake_frac)
-
-
-
-
-
-
-
