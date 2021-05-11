@@ -101,13 +101,10 @@ def preproc(data, fake, real):
 
 			index.append(i)
 
-	start = index[0]
-	end = index[-1] + 1
-
-	data_prc = list(data["contents"][start:end])
-	fake_proc = list(fake["contents"][start:end])
-	real_proc = list(real["contents"][start:end])
-	bin_proc = list(data["bins"][start:end])
+	data_prc = list(data["contents"][index])
+	fake_proc = list(fake["contents"][index])
+	real_proc = list(real["contents"][index])
+	bin_proc = list(data["bins"][index])
 	index_proc = index
 
 	return data_prc, fake_proc, real_proc, bin_proc, index
