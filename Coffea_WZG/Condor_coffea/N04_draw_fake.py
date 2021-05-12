@@ -4,8 +4,12 @@ from coffea.util import load, save
 import matplotlib.pyplot as plt
 import coffea.hist as hist
 import time
-import Particle_Info_DB
+import sys
 
+
+sys.path.append("util")
+import Particle_Info_DB
+import Hist_fake_dict
 
 def reduce(folder, sample_list, histname):
 	hists = {}
@@ -38,6 +42,7 @@ isReal = True
 year = "2018"
 
 file_name = "210427_FakeTemplate_v2"
+
 file_path = "results/" + file_name
 
 
@@ -49,22 +54,46 @@ GenDict = dict_[year]["Gen"]
 xsecDict = dict_[year]["xsec"]
 
 
-histname = "PT_1_eta_1";xmin=0; xmax=0.02; ymin=0.; ymax=1000;
-#histname = "PT_1_eta_2";xmin=0; xmax=0.02; ymin=0.; ymax=1000;
-# histname = "PT_1_eta_3";xmin=0; xmax=0.05; ymin=0.; ymax=500;
-# histname = "PT_1_eta_4";xmin=0; xmax=0.05; ymin=0.; ymax=300;
-# histname = "PT_2_eta_1";xmin=0; xmax=0.02; ymin=0.; ymax=1500;
-# histname = "PT_2_eta_2";xmin=0; xmax=0.02; ymin=0.; ymax=500;
-# histname = "PT_2_eta_3";xmin=0; xmax=0.05; ymin=0.; ymax=200;
-# histname = "PT_2_eta_4";xmin=0; xmax=0.05; ymin=0.; ymax=150;
-# histname = "PT_3_eta_1";xmin=0; xmax=0.02; ymin=0.; ymax=500;
-# histname = "PT_3_eta_2";xmin=0; xmax=0.02; ymin=0.; ymax=200;
-# histname = "PT_3_eta_3";xmin=0; xmax=0.05; ymin=0.; ymax=100;
-# histname = "PT_3_eta_4";xmin=0; xmax=0.05; ymin=0.; ymax=60;
-# histname = "PT_4_eta_1";xmin=0; xmax=0.02; ymin=0.; ymax=1000;
-# histname = "PT_4_eta_2";xmin=0; xmax=0.02; ymin=0.; ymax=300;
-# histname = "PT_4_eta_3";xmin=0; xmax=0.05; ymin=0.; ymax=200;
-# histname = "PT_4_eta_4";xmin=0; xmax=0.05; ymin=0.; ymax=100;
+
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("hist_name", type=str, help="PT_1_eta_1")
+args = parser.parse_args()
+
+
+
+histname = args.hist_name
+
+hist_info = Hist_fake_dict.hist_info
+xmin = hist_info[histname]['xmin']
+xmax = hist_info[histname]['xmax']
+ymin = hist_info[histname]['ymin']
+ymax = hist_info[histname]['ymax']
+name = hist_info[histname]['name']
+bins = hist_info[histname]['bins']
+
+
+
+#histname = "PT_1_eta_1";xmin=0; xmax=0.02; ymin=0.1; ymax=1e+6;
+#histname = "PT_1_eta_2";xmin=0; xmax=0.02; ymin=0.1; ymax=1e+5;
+#histname = "PT_1_eta_3";xmin=0; xmax=0.05; ymin=0.1; ymax=1e+5;
+#histname = "PT_1_eta_4";xmin=0; xmax=0.05; ymin=0.1; ymax=1e+5;
+
+#histname = "PT_2_eta_1";xmin=0; xmax=0.02; ymin=0.1; ymax=1e+6;
+#histname = "PT_2_eta_2";xmin=0; xmax=0.02; ymin=0.1; ymax=1e+5;
+#histname = "PT_2_eta_3";xmin=0; xmax=0.05; ymin=0.1; ymax=1e+4;
+#histname = "PT_2_eta_4";xmin=0; xmax=0.05; ymin=0.1; ymax=1e+4;
+
+#histname = "PT_3_eta_1";xmin=0; xmax=0.02; ymin=0.1; ymax=1e+5;
+#histname = "PT_3_eta_2";xmin=0; xmax=0.02; ymin=0.1; ymax=1e+5;
+#histname = "PT_3_eta_3";xmin=0; xmax=0.05; ymin=0.1; ymax=1e+4;
+#histname = "PT_3_eta_4";xmin=0; xmax=0.05; ymin=0.1; ymax=1e+4;
+
+#histname = "PT_4_eta_1";xmin=0; xmax=0.02; ymin=0.1; ymax=1e+5;
+#histname = "PT_4_eta_2";xmin=0; xmax=0.02; ymin=0.1; ymax=1e+5;
+#histname = "PT_4_eta_3";xmin=0; xmax=0.05; ymin=0.1; ymax=1e+4;
+#histname = "PT_4_eta_4";xmin=0; xmax=0.05; ymin=0.1; ymax=1e+4;
 
 h1 = reduce(file_path, sample_list, histname)
 
@@ -72,26 +101,31 @@ h1 = reduce(file_path, sample_list, histname)
 scales = {
 	"Real_template": lumi_factor * 1000 * xsecDict["WZG"] / GenDict["WZG"],
 }
-h1.scale(scales,axis='dataset')
+#h1.scale(scales,axis='dataset')
 ## --Rebin
 
 
-h1 = h1.rebin(histname, hist.Bin("PT_1_eta_1", "20 < pt <30 & |eta| < 1", 25, 0, 0.02))
-# h1 = h1.rebin(histname,hist.Bin("PT_1_eta_2","20 < pt <30 & 1 < |eta| < 1.5", 50, 0, 0.02))
-# h1 = h1.rebin(histname,hist.Bin("PT_1_eta_3","20 < pt <30 & 1.5 < |eta| < 2", 50, 0, 0.05))
-# h1 = h1.rebin(histname,hist.Bin("PT_1_eta_4","20 < pt <30 & 2 < |eta| < 2.5", 50, 0, 0.05))
-# h1 = h1.rebin(histname,hist.Bin("PT_2_eta_1","30 < pt <40 & |eta| < 1", 50, 0, 0.02))
-# h1 = h1.rebin(histname,hist.Bin("PT_2_eta_2","30 < pt <40 & 1 < |eta| < 1.5", 50, 0, 0.02))
-# h1 = h1.rebin(histname,hist.Bin("PT_2_eta_3","30 < pt <40 & 1.5 < |eta| < 2", 50, 0, 0.05))
-# h1 = h1.rebin(histname,hist.Bin("PT_2_eta_4","30 < pt <40 & 2 < |eta| < 2.5", 50, 0, 0.05))
-# h1 = h1.rebin(histname,hist.Bin("PT_3_eta_1","40 < pt <50 & |eta| < 1", 50, 0, 0.02))
-# h1 = h1.rebin(histname,hist.Bin("PT_3_eta_2","40 < pt <50 & 1 < |eta| < 1.5", 50, 0, 0.02))
-# h1 = h1.rebin(histname,hist.Bin("PT_3_eta_3","40 < pt <50 & 1.5 < |eta| < 2", 50, 0, 0.05))
-# h1 = h1.rebin(histname,hist.Bin("PT_3_eta_4","40 < pt <50 & 2 < |eta| < 2.5", 50, 0, 0.05))
-# h1 = h1.rebin(histname,hist.Bin("PT_4_eta_1","50 < pt & |eta| < 1", 50, 0, 0.02))
-# h1 = h1.rebin(histname,hist.Bin("PT_4_eta_2","50 <pt  & 1 < |eta| < 1.5", 50, 0, 0.02))
-# h1 = h1.rebin(histname,hist.Bin("PT_4_eta_3","50 < pt  & 1.5 < |eta| < 2", 50, 0, 0.05))
-# h1 = h1.rebin(histname,hist.Bin("PT_4_eta_4","50 < pt  & 2 < |eta| < 2.5", 50, 0, 0.05))
+#h1 = h1.rebin(histname, hist.Bin("PT_1_eta_1", "20 < pt <30 & |eta| < 1", 200, 0, 0.02))
+#h1 = h1.rebin(histname,hist.Bin("PT_1_eta_2","20 < pt <30 & 1 < |eta| < 1.5", 200, 0, 0.02))
+#h1 = h1.rebin(histname,hist.Bin("PT_1_eta_3","20 < pt <30 & 1.5 < |eta| < 2", 200, 0, 0.05))
+#h1 = h1.rebin(histname,hist.Bin("PT_1_eta_4","20 < pt <30 & 2 < |eta| < 2.5", 200, 0, 0.05))
+
+#h1 = h1.rebin(histname,hist.Bin("PT_2_eta_1","30 < pt <40 & |eta| < 1", 200, 0, 0.02))
+#h1 = h1.rebin(histname,hist.Bin("PT_2_eta_2","30 < pt <40 & 1 < |eta| < 1.5", 200, 0, 0.02))
+#h1 = h1.rebin(histname,hist.Bin("PT_2_eta_3","30 < pt <40 & 1.5 < |eta| < 2", 200, 0, 0.05))
+#h1 = h1.rebin(histname,hist.Bin("PT_2_eta_4","30 < pt <40 & 2 < |eta| < 2.5", 200, 0, 0.05))
+
+#h1 = h1.rebin(histname,hist.Bin("PT_3_eta_1","40 < pt <50 & |eta| < 1", 200, 0, 0.02))
+#h1 = h1.rebin(histname,hist.Bin("PT_3_eta_2","40 < pt <50 & 1 < |eta| < 1.5", 200, 0, 0.02))
+#h1 = h1.rebin(histname,hist.Bin("PT_3_eta_3","40 < pt <50 & 1.5 < |eta| < 2", 200, 0, 0.05))
+#h1 = h1.rebin(histname,hist.Bin("PT_3_eta_4","40 < pt <50 & 2 < |eta| < 2.5", 200, 0, 0.05))
+
+#h1 = h1.rebin(histname,hist.Bin("PT_4_eta_1","50 < pt & |eta| < 1", 200, 0, 0.02))
+#h1 = h1.rebin(histname,hist.Bin("PT_4_eta_2","50 <pt  & 1 < |eta| < 1.5", 200, 0, 0.02))
+#h1 = h1.rebin(histname,hist.Bin("PT_4_eta_3","50 < pt  & 1.5 < |eta| < 2", 200, 0, 0.05))
+#h1 = h1.rebin(histname,hist.Bin("PT_4_eta_4","50 < pt  & 2 < |eta| < 2.5", 200, 0, 0.05))
+
+h1 = h1.rebin(histname,hist.Bin(histname,name,bins, xmin,xmax))
 
 
 # ----> Plotting
@@ -118,7 +152,7 @@ fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(7, 7), sharex=True)
 
 fake_error_opts = {
 	"linestyle": "none",
-	"marker": ".",
+	"marker": "+",
 	"markersize": 10.0,
 	"color": "royalblue",
 	"elinewidth": 1,
@@ -126,7 +160,7 @@ fake_error_opts = {
 
 real_error_opts = {
 	"linestyle": "none",
-	"marker": ".",
+	"marker": "+",
 	"markersize": 10.0,
 	"color": "darkorange",
 	"elinewidth": 1,
@@ -134,11 +168,20 @@ real_error_opts = {
 
 data_error_opts = {
 	"linestyle": "none",
-	"marker": ".",
+	"marker": "+",
 	"markersize": 10.0,
 	"color": "black",
 	"elinewidth": 1,
 }
+
+print("###" * 10)
+
+a = h1['Fake_template'].values()
+b = h1['Real_template'].values()
+c = h1['data_template'].values()
+print(a)
+print(b)
+print(c)
 
 
 # Fake template
@@ -148,7 +191,7 @@ if isFake:
 		ax=ax,
 		clear=False,
 		error_opts=fake_error_opts,
-		density=True
+		#density=True
 	)
 
 
@@ -160,7 +203,7 @@ if isReal:
 		ax=ax,
 		clear=False,
 		error_opts=real_error_opts,
-		density=True
+		#density=True
 	)
 
 # Data template
@@ -170,7 +213,7 @@ if isData:
 		ax=ax,
 		clear=False,
 		error_opts=data_error_opts,
-		density=True
+		#density=True
 	)
 
 np.set_printoptions(suppress=True)
@@ -179,7 +222,7 @@ ax.autoscale(axis="x", tight=True)
 ax.set_ylim(ymin, ymax)
 ax.set_xlim(xmin, xmax)
 # ax.set_xlabel('')
-# ax.set_yscale('log')
+ax.set_yscale('log')
 
 lum = plt.text(
 	1.0,
@@ -195,7 +238,7 @@ lum = plt.text(
 outname = histname + "_" + file_name + ".png"
 
 plt.savefig(outname)
-plt.show()
+#plt.show()
 
 
 print("Start.. Data extracting.")
@@ -249,15 +292,14 @@ for tp_name in tp_names:
 print(out_dict)
 
 
-
 for i in range(len(out_dict['data_template']['contents'])):
 	print(\
-	out_dict['data_template']['bins'][i],
+	out_dict['data_template']['bins'][i]," ",
 	out_dict['data_template']['contents'][i],
 	out_dict['Fake_template']['contents'][i],
 	out_dict['Real_template']['contents'][i]
 	)
 
 
-out_npy_name = "Fitting/" + histname + '.npy'
+out_npy_name = "Fitting_v2/" + histname + '.npy'
 np.save(out_npy_name,out_dict)

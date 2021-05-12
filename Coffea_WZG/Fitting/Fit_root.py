@@ -126,7 +126,7 @@ if __name__ == "__main__":
 	parser.add_argument("bins", type=int, help="python Fit.py PT_1_eta_1.npy 200")
 	args = parser.parse_args()
 
-	infile_name = args.infile_name
+	infile_name = args.infile_name + '.npy'
 	name = infile_name.split('.')[0]
 	Eta_index = int(infile_name.split(".")[0].split("_")[-1])
 
@@ -191,7 +191,7 @@ if __name__ == "__main__":
 		/ h_data.Integral(0, h_data.GetXaxis().FindFixBin(limit))
 	)
 
-	print("Fake fraction in medium cut range: ", fake_fraction)
+	print("### File name:{0} Fake fraction: {1}".format(args.infile_name,fake_fraction))
 
 	# Draw "After fit"
 	h_data.Draw("Ep")
