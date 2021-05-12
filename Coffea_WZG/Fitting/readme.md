@@ -1,5 +1,12 @@
 ## Template fit method for Fake-Photon estimation study  
 
+### Pre-requisite
+The fitting code use the input as "npy" file which has information about bin and bin-contents of histogram
+Before the start, we need make this "npy" file from "coffea-processor" output
+ - [preprocess](https://github.com/JW-corp/J.W_Analysis/blob/main/Coffea_WZG/Condor_coffea/N04_draw_fake.py)
+
+
+
 ### Files 
 
  - [Fit_root.py](https://github.com/JW-corp/J.W_Analysis/blob/main/Coffea_WZG/Fitting/Fit_root.py): Fit using TFractionFitter in ROOT (stable)
