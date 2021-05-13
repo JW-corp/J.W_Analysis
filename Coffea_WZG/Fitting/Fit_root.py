@@ -23,7 +23,6 @@ label_name = {"PT_1_eta_1": "20 < pt <30 & |eta| < 1"
 ,"PT_4_eta_4":"50 < pt  & 2 < |eta| < 2.5"}
 
 
-
 def read_data(infile):
 	indict = np.load(infile, allow_pickle=True)[()]
 	return indict["data_template"], indict["Fake_template"], indict["Real_template"]
@@ -173,10 +172,11 @@ if __name__ == "__main__":
 
 	# Fitting
 	ffitter,frac_fake,frac_real,err_fake,err_real = fit(h_data,mc)
+	h_fit = ffitter.GetPlot()
 
 	# Scale factor
-	SF_fake = frac_fake * h_data.Integral()	/ h_fake.Integral()
-	SF_real = frac_real * h_data.Integral()	/ h_real.Integral()
+	SF_fake = frac_fake * h_fit.Integral()	/ h_fake.Integral()
+	SF_real = frac_real * h_fit.Integral()	/ h_real.Integral()
 	print("SF_fake = {0:.2f}, SF_real = {1:.2f}".format(SF_fake,SF_real))
 
 	# Weight hist
@@ -188,7 +188,7 @@ if __name__ == "__main__":
 	fake_fraction = (
 		SF_fake
 		* h_fake.Integral(0, h_fake.GetXaxis().FindFixBin(limit))
-		/ h_data.Integral(0, h_data.GetXaxis().FindFixBin(limit))
+		/ h_fit.Integral(0, h_fit.GetXaxis().FindFixBin(limit))
 	)
 
 	print("### File name:{0} Fake fraction: {1}".format(args.infile_name,fake_fraction))
@@ -196,7 +196,6 @@ if __name__ == "__main__":
 	# Draw "After fit"
 	h_data.Draw("Ep")
 
-	h_fit = ffitter.GetPlot()
 	h_fit.SetLineColor(2)
 	h_fit.Draw("same hist")
 	h_fake.Draw("same hist")
