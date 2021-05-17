@@ -246,6 +246,7 @@ def reduce(folder,sample_list,histname):
 		hists[filename] = hin.copy()
 		if filename.split('_')[0] not in sample_list:
 			continue
+
 		sumwdict['DY'] += hists[filename]['sumw']['DY']
 		sumwdict['WZ'] += hists[filename]['sumw']['WZ']
 		sumwdict['ZZ'] += hists[filename]['sumw']['ZZ']
@@ -267,13 +268,16 @@ def reduce(folder,sample_list,histname):
 
 ## --File Directories
 
-file_name = "210504_Baseline"
+#file_name = "210504_Baseline"
 #file_name = "Base_line_210416_Allweight"
+file_name = "210504_Baseline"
+#file_name = "210504_Baseline_tightmuonveto"
 file_path = "results/" + file_name
 
 
+
 ## --Sample Lists
-sample_list = ['DY' ,'WZ' ,'ZZ' ,'TTWJets','TTZtoLL','tZq' ,'Egamma','WZG','ZGToLLG','TTGJets','WGToLNuG']
+sample_list = ['DY' ,'WZ' ,'ZZ' ,'TTWJets','TTZtoLL','tZq' ,'Egamma','WZG','ZGToLLG','TTGJets','WGToLNuG','FakePhoton']
 
 
 
@@ -344,7 +348,7 @@ scales={
 }
 
 
-#h1.scale(scales,axis='dataset')
+h1.scale(scales,axis='dataset')
 
 ## --Rebin
 #h1 = h1.rebin(histname,hist.Bin("met","met [GeV]", 10, 0, 200))
@@ -382,7 +386,7 @@ plt.rcParams.update({
 fig, (ax, rax) = plt.subplots(
 	nrows=2,
 	ncols=1,
-	figsize=(7,7),
+	figsize=(10,10),
 	gridspec_kw={"height_ratios": (3, 1)},
 	sharex=True
 )
@@ -443,10 +447,15 @@ hist.plot1d(
 	ax=ax,
 	clear=False,
 	stack=True,
-	order=['TTWJets' ,'tZq' ,'TTGJets' ,'TTZtoLL','WZ' ,'ZZ' ,'ZGToLLG','WZG'],
+	#order=['TTWJets' ,'tZq' ,'TTGJets' ,'TTZtoLL','WZ' ,'ZZ' ,'ZGToLLG','WZG'],
+	order=['TTWJets' ,'tZq' ,'TTGJets' ,'TTZtoLL','WZ' ,'ZGToLLG' ,'ZZ','WZG','Fake_Photon'],
 	fill_opts=fill_opts,
 	error_opts = error_opts,
 )
+
+
+
+
 
 
 # DATA plotting
@@ -482,7 +491,7 @@ ax.autoscale(axis="x", tight=True)
 ax.set_ylim(ymin, ymax)
 ax.set_xlim(xmin, xmax)
 ax.set_xlabel('')
-#ax.set_yscale('log')
+ax.set_yscale('log')
 
 
 lum = plt.text(

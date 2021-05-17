@@ -10,6 +10,8 @@ import argparse
 import numpy as np
 from coffea import lumi_tools
 import numba
+import pandas as pd
+
 
 # -- Coffea 0.8.0 --> Must fix!!
 import warnings
@@ -21,10 +23,12 @@ warnings.filterwarnings("ignore")
 class JW_Processor(processor.ProcessorABC):
 
 	# -- Initializer
-	def __init__(self, year, sample_name, puweight_arr, corrections):
+	def __init__(self, year, sample_name, puweight_arr, corrections,isFake):
 
 		# Parameter set
 		self._year = year
+		self._isFake = isFake
+
 
 		# Trigger set
 		self._doubleelectron_triggers = {
@@ -244,6 +248,8 @@ class JW_Processor(processor.ProcessorABC):
 
 		# Data or MC
 		isData = "genWeight" not in events.fields
+		isFake = self._isFake
+
 
 		# Stop processing if there is no event remain
 		if len(events) == 0:
@@ -735,12 +741,12 @@ class JW_Processor(processor.ProcessorABC):
 		Pho_EE = leading_pho[isEE_mask & Event_sel_mask]
 		Pho_EB = leading_pho[isEB_mask & Event_sel_mask]
 
-		cut6 = np.ones(ak.sum(ak.num(leading_pho_sel) > 0)) * 6
 
 		# Stop processing if there is no event remain
 		if len(leading_pho_sel) == 0:
 			return out
 
+		cut6 = np.ones(ak.sum(ak.num(leading_pho_sel) > 0)) * 6
 		for i in events.event:
 			print("###EVT: ", i)
 
@@ -803,22 +809,126 @@ class JW_Processor(processor.ProcessorABC):
 		MT = np.array(MT)
 
 		# --- Apply weight and hist
-		weights = processor.Weights(len(cut5))
+		
+		if isFake:
+			weights = processor.Weights(len(cut6))
+		else:
+			weights = processor.Weights(len(cut5))
+			
+
+
+		# -------------------- Sieie bins---------------------------#
+		def make_bins(pt, eta, bin_range_str):
+
+			bin_dict = {
+				"PT_1_eta_1": (pt > 20) & (pt < 30) & (eta < 1),
+				"PT_1_eta_2": (pt > 20) & (pt < 30) & (eta > 1) & (eta < 1.5),
+				"PT_1_eta_3": (pt > 20) & (pt < 30) & (eta > 1.5) & (eta < 2),
+				"PT_1_eta_4": (pt > 20) & (pt < 30) & (eta > 2) & (eta < 2.5),
+				"PT_2_eta_1": (pt > 30) & (pt < 40) & (eta < 1),
+				"PT_2_eta_2": (pt > 30) & (pt < 40) & (eta > 1) & (eta < 1.5),
+				"PT_2_eta_3": (pt > 30) & (pt < 40) & (eta > 1.5) & (eta < 2),
+				"PT_2_eta_4": (pt > 30) & (pt < 40) & (eta > 2) & (eta < 2.5),
+				"PT_3_eta_1": (pt > 40) & (pt < 50) & (eta < 1),
+				"PT_3_eta_2": (pt > 40) & (pt < 50) & (eta > 1) & (eta < 1.5),
+				"PT_3_eta_3": (pt > 40) & (pt < 50) & (eta > 1.5) & (eta < 2),
+				"PT_3_eta_4": (pt > 40) & (pt < 50) & (eta > 2) & (eta < 2.5),
+				"PT_4_eta_1": (pt > 50) & (eta < 1),
+				"PT_4_eta_2": (pt > 50) & (eta > 1) & (eta < 1.5),
+				"PT_4_eta_3": (pt > 50) & (eta > 1.5) & (eta < 2),
+				"PT_4_eta_4": (pt > 50) & (eta > 2) & (eta < 2.5),
+			}
+
+			binmask = bin_dict[bin_range_str]
+
+			return binmask
+
+		bin_name_list = [
+			"PT_1_eta_1",
+			"PT_1_eta_2",
+			"PT_1_eta_3",
+			"PT_1_eta_4",
+			"PT_2_eta_1",
+			"PT_2_eta_2",
+			"PT_2_eta_3",
+			"PT_2_eta_4",
+			"PT_3_eta_1",
+			"PT_3_eta_2",
+			"PT_3_eta_3",
+			"PT_3_eta_4",
+			"PT_4_eta_1",
+			"PT_4_eta_2",
+			"PT_4_eta_3",
+			"PT_4_eta_4",
+		]
+
+
+
+		## -- Fake-fraction Lookup table --##
+		if isFake:
+			# Make Bin-range mask
+			binned_pteta_mask = {}
+			for name in bin_name_list:
+				binned_pteta_mask[name] = make_bins(
+					ak.flatten(leading_pho_sel.pt),
+					ak.flatten(abs(leading_pho_sel.eta)),
+					name,
+				)
+			# Read Fake fraction --> Mapping bin name to int()
+			in_dict = np.load('Fitting_v2/results_210517.npy',allow_pickle="True")[()]
+			idx=0
+			fake_dict ={}
+			for i,j in in_dict.items():
+				fake_dict[idx] = j
+				idx+=1
+
+
+			# Reconstruct Fake_weight
+			fw= 0
+			for i,j in binned_pteta_mask.items():
+				fw = fw + j*fake_dict[bin_name_list.index(i)]
+
+
+			# Process 0 weight to 1
+			@numba.njit
+			def zero_one(x):
+				if x == 0:
+					x = 1
+				return x
+			vec_zero_one = np.vectorize(zero_one)
+			fw = vec_zero_one(fw)
+
+
+
 
 		# --- skim cut-weight
-		def skim_weight(arr):
-			mask1 = ~ak.is_none(arr)
-			subarr = arr[mask1]
-			mask2 = subarr != 0
-			return ak.to_numpy(subarr[mask2])
+		if not isFake:
+			def skim_weight(arr):
+				mask1 = ~ak.is_none(arr)
+				subarr = arr[mask1]
+				mask2 = subarr != 0
+				return ak.to_numpy(subarr[mask2])
+		else:
+			def skim_weight(arr):
+				return arr
 
-		cuts = Event_sel_mask
-		cuts_pho_EE = ak.flatten(isEE_mask)
-		cuts_pho_EB = ak.flatten(isEB_mask)
+
+		if not isFake:
+			cuts = Event_sel_mask
+			cuts_pho_EE = ak.flatten(isEE_mask)
+			cuts_pho_EB = ak.flatten(isEB_mask)
+
+		if isFake:
+			cuts = np.ones(len(Event_sel_mask))
+			cuts_pho_EE = ak.flatten(isEE_mask & Event_sel_mask)
+			cuts_pho_EB = ak.flatten(isEB_mask & Event_sel_mask)
 
 
+		if isFake:
+			weights.add("fake_fraction", fw)
+			
 		# Weight and SF here
-		if not isData:
+		if not (isData | isFake):
 			weights.add("pileup", pu)
 			weights.add("ele_id", ele_medium_id_sf)
 			weights.add("pho_id", get_pho_medium_id_sf)
@@ -1006,7 +1116,8 @@ if __name__ == "__main__":
 		"--dataset", type=str, help="--dataset ex) Egamma_Run2018A_280000"
 	)
 	parser.add_argument("--year", type=str, help="--year 2018", default="2017")
-	parser.add_argument("--isdata", type=bool, help="--isdata False", default=False)
+	parser.add_argument("--isdata", type=bool, help="--isdata True", default=False)
+	parser.add_argument("--isFake", type=bool, help="--isFake True", default=False)
 	args = parser.parse_args()
 
 	## Prepare files
@@ -1015,13 +1126,18 @@ if __name__ == "__main__":
 	data_sample = args.dataset
 	year = args.year
 	isdata = args.isdata
+	isFake = args.isFake
 
 	## Json file reader
 	with open(metadata) as fin:
 		datadict = json.load(fin)
 
 	filelist = glob.glob(datadict[data_sample])
-	sample_name = data_sample.split("_")[0]
+
+	if isFake:
+		sample_name = "Fake_Photon"
+	else:
+		sample_name = data_sample.split("_")[0]
 
 	corr_file = "../Corrections/corrections.coffea"
 	# corr_file = "corrections.coffea" # Condor-batch
@@ -1069,7 +1185,7 @@ if __name__ == "__main__":
 	samples = {sample_name: filelist}
 
 	# Class -> Object
-	JW_Processor_instance = JW_Processor(year, sample_name, pu, corrections)
+	JW_Processor_instance = JW_Processor(year, sample_name, pu, corrections,isFake)
 
 	## -->Multi-node Executor
 	result = processor.run_uproot_job(
@@ -1081,7 +1197,10 @@ if __name__ == "__main__":
 		# maxchunks=4,
 	)
 
-	outname = data_sample + ".futures"
+	if isFake:
+		outname =sample_name + "_" + data_sample + ".futures"
+	else:
+		outname = data_sample + ".futures"
 	# outname = 'DY_test.futures'
 	save(result, outname)
 
