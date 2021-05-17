@@ -433,95 +433,54 @@ class JW_Processor(processor.ProcessorABC):
 		# Cut-based ID modification
 		@numba.njit 
 		def PhotonVID(vid, idBit):
-		    rBit = 0
-		    for x in range(0, 7):
-		        rBit |= (1 << x) if ((vid >> (x * 2)) & 0b11 >= idBit) else 0
-		    return rBit
+			rBit = 0
+			for x in range(0, 7):
+				rBit |= (1 << x) if ((vid >> (x * 2)) & 0b11 >= idBit) else 0
+			return rBit
 		
 		# Inverse Sieie and upper limit
 		@numba.njit 
 		def make_fake_obj_mask(Pho,builder):
 		
-		    #for eventIdx,pho in enumerate(tqdm(Pho)):   # --Event Loop
-		    for eventIdx,pho in enumerate(Pho):
-		        builder.begin_list()
-		        if len(pho) < 1: continue;
-		    
-		            
-		        for phoIdx,_ in enumerate(pho):# --Photon Loop
-		        
-		            vid = Pho[eventIdx][phoIdx].vidNestedWPBitmap
-		            vid_cuts1 = PhotonVID(vid,1) # Loose photon
-		            vid_cuts2 = PhotonVID(vid,2) # Medium photon
-		            vid_cuts3 = PhotonVID(vid,3) # Tight photon
+			#for eventIdx,pho in enumerate(tqdm(Pho)):   # --Event Loop
+			for eventIdx,pho in enumerate(Pho):
+				builder.begin_list()
+				if len(pho) < 1: continue;
+			
+					
+				for phoIdx,_ in enumerate(pho):# --Photon Loop
+				
+					vid = Pho[eventIdx][phoIdx].vidNestedWPBitmap
+					vid_cuts1 = PhotonVID(vid,1) # Loose photon
+					vid_cuts2 = PhotonVID(vid,2) # Medium photon
+					vid_cuts3 = PhotonVID(vid,3) # Tight photon
 		
-		            # Field name
-		            # |0|0|0|0|0|0|0| 
-		            # |IsoPho|IsoNeu|IsoChg|Sieie|hoe|scEta|PT|
+					# Field name
+					# |0|0|0|0|0|0|0| 
+					# |IsoPho|IsoNeu|IsoChg|Sieie|hoe|scEta|PT|
 		
-		            # 1. Turn off cut (ex turn off Sieie
-		            # |1|1|1|0|1|1|1| = |1|1|1|0|1|1|1|
+					# 1. Turn off cut (ex turn off Sieie
+					# |1|1|1|0|1|1|1| = |1|1|1|0|1|1|1|
 		
-		            # 2. Inverse cut (ex inverse Sieie)
-		            # |1|1|1|1|1|1|1| = |1|1|1|0|1|1|1|
+					# 2. Inverse cut (ex inverse Sieie)
+					# |1|1|1|1|1|1|1| = |1|1|1|0|1|1|1|
 		
-		            
-		                
-		            #if (vid_cuts2 & 0b1111111 == 0b1111111): # Cut applied
-		            if (vid_cuts2 & 0b1111111 == 0b1110111): # Inverse Sieie
-		            #if (vid_cuts2 & 0b1110111 == 0b1110111): # Without Sieie
-		            
-		                if (Pho[eventIdx][phoIdx].isScEtaEB) & (Pho[eventIdx][phoIdx].sieie < 0.01015 * 1.75):
-		                    builder.boolean(True)
-		            
-		                elif (Pho[eventIdx][phoIdx].isScEtaEE) & (Pho[eventIdx][phoIdx].sieie < 0.0272 * 1.75):
-		                    builder.boolean(True)
-		                else: builder.boolean(False)
+					
+						
+					#if (vid_cuts2 & 0b1111111 == 0b1111111): # Cut applied
+					#if (vid_cuts2 & 0b1111111 == 0b1110111): # Inverse Sieie
+					if (vid_cuts2 & 0b1100111 == 0b1100111): # Without Sieie
+					
+						builder.boolean(True)
+						
+					else:
 		
-		                
-		            else:
+						builder.boolean(False)
 		
-		                builder.boolean(False)
-		
-		        builder.end_list()
-		                
-		    return builder
+				builder.end_list()
+						
+			return builder
 
-		# Inverse IsoChg and upper and lower limit
-		@numba.njit 
-		def make_IsochgSide_mask(Pho,builder):
-		
-		
-		    #for eventIdx,pho in enumerate(tqdm(Pho)): # --Event Loop
-		    for eventIdx,pho in enumerate(Pho): # --Event Loop
-		        builder.begin_list()
-		        if len(pho) < 1: continue;
-		        
-		        for phoIdx,_ in enumerate(pho): # --Photon Loop
-		            
-		            vid = Pho[eventIdx][phoIdx].vidNestedWPBitmap
-		            vid_cuts1 = PhotonVID(vid,1) # Loose photon
-		            vid_cuts2 = PhotonVID(vid,2) # Medium photon
-		            vid_cuts3 = PhotonVID(vid,3) # Tight photon
-		
-		            #if (vid_cuts2 & 0b1111111 == 0b1111111): # Cut applied
-		            if (vid_cuts2 & 0b1111111 == 0b1101111): # Inverse Isochg
-		            #if (vid_cuts2 & 0b1101111 == 0b1101111): # Withtou Isochg
-		                isochg = Pho[eventIdx][phoIdx].pfRelIso03_chg * Pho[eventIdx][phoIdx].pt
-		                
-		                if (isochg >= 4) & (isochg <= 10):               
-		                    builder.boolean(True)
-		                else: 
-		                    builder.boolean(False)
-		
-		                
-		            else:
-		                #builder.begin_list()
-		                builder.boolean(False)
-		                #builder.end_list()      
-		        builder.end_list()
-		                
-		    return builder
 
 		# <----- Selection ------># 
 		
@@ -597,22 +556,17 @@ class JW_Processor(processor.ProcessorABC):
 		# --Gen Photon for dR
 		genparts = events.GenPart
 		pdgID_mask = (genparts.pdgId == 22)
-		# mask1:  isPrompt | isHardProcess | fromHardProcess | isFirstCopy | isLastCopy
-		mask1 = (1 << 0) | (1 << 7) | (1 << 8) | (1 << 12) | (1 << 13)
 		# mask2: isPrompt | fromHardProcess | isLastCopy
 		mask2 = (1 << 0) | (1 << 8) | (1 << 13)
 		# https://github.com/PKUHEPEWK/WGamma/blob/master/2018/wgRealPhotonTemplateModule.py
 
-		status_mask = ((genparts.statusFlags & mask1) == mask1 ) | ((genparts.statusFlags & mask2) == mask2 )
-		gen_photons  = genparts[pdgID_mask & status_mask]
+		status_mask = ((genparts.statusFlags & mask2) == mask2 )
+		gen_photons = genparts[pdgID_mask & status_mask]
 
 		assert( ak.all(ak.num(gen_photons) == 1)) # Raise error if len(gen_photon) != 1
-
-		
 	
 		#  --Muon ( only used to calculate dR )
 		MuSelmask = (Muon.pt >= 10) & (abs(Muon.eta) <= 2.5)  & (Muon.tightId) & (Muon.pfRelIso04_all < 0.15)
-		#Muon = ak.mask(Muon,MuSelmask)
 		Muon = Muon[MuSelmask]
 
 		##----------- Cut flow2: Electron Selection
@@ -652,7 +606,9 @@ class JW_Processor(processor.ProcessorABC):
 		dr_pho_ele_mask = ak.all(Photon.metric_table(Electron) >= 0.5, axis=-1) # default metric table: delta_r
 		dr_pho_mu_mask = ak.all(Photon.metric_table(Muon) >= 0.5, axis=-1)
 
-		PhoSelmask = PT_mask  & isgap_mask &  Pixel_seed_mask & dr_pho_ele_mask & dr_pho_mu_mask
+		Photon_template_mask = make_fake_obj_mask(Photon, ak.ArrayBuilder()).snapshot()
+
+		PhoSelmask = PT_mask  & isgap_mask &  Pixel_seed_mask & dr_pho_ele_mask & dr_pho_mu_mask & Photon_template_mask
 		Photon = Photon[PhoSelmask]
 
 		# Apply cut 3
@@ -938,7 +894,7 @@ class JW_Processor(processor.ProcessorABC):
 		cuts_pho_EB = ak.flatten(isEB_mask)
 		
 
-	#	print("cut0: {0}, cut1: {1}, cut2: {2}, cut3: {3}, cut4: {4} ,cut5 {5} ".format(len(Initial_events),len(cut1),len(cut2),len(cut3),len(cut4), len(cut5)))
+		print("cut0: {0}, cut1: {1}, cut2: {2}, cut3: {3}, cut4: {4} ,cut5 {5} ".format(len(Initial_events),len(cut1),len(cut2),len(cut3),len(cut4), len(cut5)))
 
 
 		# Weight and SF here
