@@ -298,10 +298,10 @@ class JW_Processor(processor.ProcessorABC):
 			pu_weight_idx = ak.values_astype(events.Pileup.nTrueInt, "int64")
 			pu = self._puweight_arr[pu_weight_idx]
 
-		selection = processor.PackedSelection()
+			print("## pu_idx: ",len(pu_weight_idx),pu_weight_idx)
+			print("## pu_arr: ",len(self._puweight_arr),self._puweight_arr)
+			print("## pu:",len(pu),pu)
 
-		# Cut flow
-		cut0 = np.zeros(len(events))
 
 		# <----- Helper functions ------>#
 
@@ -357,6 +357,12 @@ class JW_Processor(processor.ProcessorABC):
 		if len(events) == 0:
 			return out
 
+
+		# Cut flow
+		cut0 = np.zeros(len(events))
+		if not isFake:
+			out["cutflow"].fill(dataset=dataset, cutflow=cut0)
+
 		##----------- Cut flow1: Passing Triggers
 
 		# double lepton trigger
@@ -387,16 +393,25 @@ class JW_Processor(processor.ProcessorABC):
 
 		# Good Primary vertex
 		nPV = events.PV.npvsGood
+		nPV_nw = events.PV.npvsGood
 		if not isData:
 			nPV = nPV * pu
-		nPV_nw = nPV
+
+			print(pu)
+
 
 		# Apply cut1
 		events = events[double_ele_triggers_arr]
 		if not isData:
 			pu = pu[double_ele_triggers_arr]
 
+		# Stop processing if there is no event remain
+		if len(events) == 0:
+			return out
+
 		cut1 = np.ones(len(events))
+		if not isFake:
+			out["cutflow"].fill(dataset=dataset, cutflow=cut1)
 
 		# Set Particles
 		Electron = events.Electron
@@ -405,9 +420,6 @@ class JW_Processor(processor.ProcessorABC):
 		MET = events.MET
 		Jet = events.Jet
 
-		# Stop processing if there is no event remain
-		if len(Electron) == 0:
-			return out
 
 		#  --Muon ( only used to calculate dR )
 		MuSelmask = (
@@ -470,6 +482,8 @@ class JW_Processor(processor.ProcessorABC):
 			return out
 
 		cut2 = np.ones(len(Photon)) * 2
+		if not isFake:
+			out["cutflow"].fill(dataset=dataset, cutflow=cut2)
 
 		##----------- Cut flow3: 4th lepton veto (Loose Muon)
 		# Veto 4th Loose muon
@@ -489,6 +503,8 @@ class JW_Processor(processor.ProcessorABC):
 			return out
 
 		cut3 = np.ones(len(Photon)) * 3
+		if not isFake:
+			out["cutflow"].fill(dataset=dataset, cutflow=cut3)
 
 
 		##----------- Cut flow4: Photon Selection
@@ -546,7 +562,99 @@ class JW_Processor(processor.ProcessorABC):
 		if len(Electron) == 0:
 			return out
 
+		def make_leading_pair(target, base):
+			return target[ak.argmax(base.pt, axis=1, keepdims=True)]
+
+		leading_pho = make_leading_pair(Photon, Photon)
+
+		# -------------------- Make Fake Photon BKGs---------------------------#
+		def make_bins(pt, eta, bin_range_str):
+
+			bin_dict = {
+				"PT_1_eta_1": (pt > 20) & (pt < 30) & (eta < 1),
+				"PT_1_eta_2": (pt > 20) & (pt < 30) & (eta > 1) & (eta < 1.5),
+				"PT_1_eta_3": (pt > 20) & (pt < 30) & (eta > 1.5) & (eta < 2),
+				"PT_1_eta_4": (pt > 20) & (pt < 30) & (eta > 2) & (eta < 2.5),
+				"PT_2_eta_1": (pt > 30) & (pt < 40) & (eta < 1),
+				"PT_2_eta_2": (pt > 30) & (pt < 40) & (eta > 1) & (eta < 1.5),
+				"PT_2_eta_3": (pt > 30) & (pt < 40) & (eta > 1.5) & (eta < 2),
+				"PT_2_eta_4": (pt > 30) & (pt < 40) & (eta > 2) & (eta < 2.5),
+				"PT_3_eta_1": (pt > 40) & (pt < 50) & (eta < 1),
+				"PT_3_eta_2": (pt > 40) & (pt < 50) & (eta > 1) & (eta < 1.5),
+				"PT_3_eta_3": (pt > 40) & (pt < 50) & (eta > 1.5) & (eta < 2),
+				"PT_3_eta_4": (pt > 40) & (pt < 50) & (eta > 2) & (eta < 2.5),
+				"PT_4_eta_1": (pt > 50) & (eta < 1),
+				"PT_4_eta_2": (pt > 50) & (eta > 1) & (eta < 1.5),
+				"PT_4_eta_3": (pt > 50) & (eta > 1.5) & (eta < 2),
+				"PT_4_eta_4": (pt > 50) & (eta > 2) & (eta < 2.5),
+			}
+
+			binmask = bin_dict[bin_range_str]
+
+			return binmask
+
+		bin_name_list = [
+			"PT_1_eta_1",
+			"PT_1_eta_2",
+			"PT_1_eta_3",
+			"PT_1_eta_4",
+			"PT_2_eta_1",
+			"PT_2_eta_2",
+			"PT_2_eta_3",
+			"PT_2_eta_4",
+			"PT_3_eta_1",
+			"PT_3_eta_2",
+			"PT_3_eta_3",
+			"PT_3_eta_4",
+			"PT_4_eta_1",
+			"PT_4_eta_2",
+			"PT_4_eta_3",
+			"PT_4_eta_4",
+		]
+
+
+
+		## -- Fake-fraction Lookup table --##
+		if isFake:
+			# Make Bin-range mask
+			binned_pteta_mask = {}
+			for name in bin_name_list:
+				binned_pteta_mask[name] = make_bins(
+					ak.flatten(leading_pho.pt),
+					ak.flatten(abs(leading_pho.eta)),
+					name,
+				)
+			# Read Fake fraction --> Mapping bin name to int()
+			in_dict = np.load('Fitting_v2/results_210517.npy',allow_pickle="True")[()]
+			idx=0
+			fake_dict ={}
+			for i,j in in_dict.items():
+				fake_dict[idx] = j
+				idx+=1
+
+
+			# Reconstruct Fake_weight
+			fw= 0
+			for i,j in binned_pteta_mask.items():
+				fw = fw + j*fake_dict[bin_name_list.index(i)]
+
+
+			# Process 0 weight to 1
+			@numba.njit
+			def zero_one(x):
+				if x == 0:
+					x = 1
+				return x
+			vec_zero_one = np.vectorize(zero_one)
+			fw = vec_zero_one(fw)
+		else:
+			fw = np.ones(len(events))
+
 		cut4 = np.ones(len(Photon)) * 4
+		print('Fake fraction weight: ',len(fw),len(cut4),fw)
+		out["cutflow"].fill(dataset=dataset, cutflow=cut4,weight=fw)
+
+
 
 		##----------- Cut flow5: OSSF
 		# OSSF index maker
@@ -580,6 +688,8 @@ class JW_Processor(processor.ProcessorABC):
 		eee_triplet_idx = eee_triplet_idx[ossf_mask]
 		Electron = Electron[ossf_mask]
 		Photon = Photon[ossf_mask]
+		leading_pho	= leading_pho[ossf_mask]
+		fw = fw[ossf_mask]
 		Jet = Jet[ossf_mask]
 		MET = MET[ossf_mask]
 		if not isData:
@@ -591,6 +701,7 @@ class JW_Processor(processor.ProcessorABC):
 			return out
 
 		cut5 = np.ones(ak.sum(ak.num(Electron) > 0)) * 5
+		out["cutflow"].fill(dataset=dataset, cutflow=cut5,weight=fw)
 
 		# Define Electron Triplet
 
@@ -612,13 +723,9 @@ class JW_Processor(processor.ProcessorABC):
 		subleading_ele = Triple_eee.lep2
 		third_ele = Triple_eee.lep3
 
-		def make_leading_pair(target, base):
-			return target[ak.argmax(base.pt, axis=1, keepdims=True)]
-
-		leading_pho = make_leading_pair(Photon, Photon)
-
+		
 		# -- Scale Factor for each electron
-
+		
 		# Trigger weight helper function
 		def Trigger_Weight(eta1, pt1, eta2, pt2):
 			per_ev_MC = (
@@ -734,6 +841,7 @@ class JW_Processor(processor.ProcessorABC):
 		leading_pho_sel = leading_pho[Event_sel_mask]
 		MET_sel = MET[Event_sel_mask]
 		events = events[Event_sel_mask]
+		fw = fw[Event_sel_mask]
 
 		# Photon  EE and EB
 		isEE_mask = leading_pho.isScEtaEE
@@ -747,8 +855,7 @@ class JW_Processor(processor.ProcessorABC):
 			return out
 
 		cut6 = np.ones(ak.sum(ak.num(leading_pho_sel) > 0)) * 6
-		for i in events.event:
-			print("###EVT: ", i)
+		out["cutflow"].fill(dataset=dataset, cutflow=cut6,weight=fw)
 
 		## -------------------- Prepare making hist --------------#
 
@@ -816,91 +923,6 @@ class JW_Processor(processor.ProcessorABC):
 			weights = processor.Weights(len(cut5))
 			
 
-
-		# -------------------- Sieie bins---------------------------#
-		def make_bins(pt, eta, bin_range_str):
-
-			bin_dict = {
-				"PT_1_eta_1": (pt > 20) & (pt < 30) & (eta < 1),
-				"PT_1_eta_2": (pt > 20) & (pt < 30) & (eta > 1) & (eta < 1.5),
-				"PT_1_eta_3": (pt > 20) & (pt < 30) & (eta > 1.5) & (eta < 2),
-				"PT_1_eta_4": (pt > 20) & (pt < 30) & (eta > 2) & (eta < 2.5),
-				"PT_2_eta_1": (pt > 30) & (pt < 40) & (eta < 1),
-				"PT_2_eta_2": (pt > 30) & (pt < 40) & (eta > 1) & (eta < 1.5),
-				"PT_2_eta_3": (pt > 30) & (pt < 40) & (eta > 1.5) & (eta < 2),
-				"PT_2_eta_4": (pt > 30) & (pt < 40) & (eta > 2) & (eta < 2.5),
-				"PT_3_eta_1": (pt > 40) & (pt < 50) & (eta < 1),
-				"PT_3_eta_2": (pt > 40) & (pt < 50) & (eta > 1) & (eta < 1.5),
-				"PT_3_eta_3": (pt > 40) & (pt < 50) & (eta > 1.5) & (eta < 2),
-				"PT_3_eta_4": (pt > 40) & (pt < 50) & (eta > 2) & (eta < 2.5),
-				"PT_4_eta_1": (pt > 50) & (eta < 1),
-				"PT_4_eta_2": (pt > 50) & (eta > 1) & (eta < 1.5),
-				"PT_4_eta_3": (pt > 50) & (eta > 1.5) & (eta < 2),
-				"PT_4_eta_4": (pt > 50) & (eta > 2) & (eta < 2.5),
-			}
-
-			binmask = bin_dict[bin_range_str]
-
-			return binmask
-
-		bin_name_list = [
-			"PT_1_eta_1",
-			"PT_1_eta_2",
-			"PT_1_eta_3",
-			"PT_1_eta_4",
-			"PT_2_eta_1",
-			"PT_2_eta_2",
-			"PT_2_eta_3",
-			"PT_2_eta_4",
-			"PT_3_eta_1",
-			"PT_3_eta_2",
-			"PT_3_eta_3",
-			"PT_3_eta_4",
-			"PT_4_eta_1",
-			"PT_4_eta_2",
-			"PT_4_eta_3",
-			"PT_4_eta_4",
-		]
-
-
-
-		## -- Fake-fraction Lookup table --##
-		if isFake:
-			# Make Bin-range mask
-			binned_pteta_mask = {}
-			for name in bin_name_list:
-				binned_pteta_mask[name] = make_bins(
-					ak.flatten(leading_pho_sel.pt),
-					ak.flatten(abs(leading_pho_sel.eta)),
-					name,
-				)
-			# Read Fake fraction --> Mapping bin name to int()
-			in_dict = np.load('Fitting_v2/results_210517.npy',allow_pickle="True")[()]
-			idx=0
-			fake_dict ={}
-			for i,j in in_dict.items():
-				fake_dict[idx] = j
-				idx+=1
-
-
-			# Reconstruct Fake_weight
-			fw= 0
-			for i,j in binned_pteta_mask.items():
-				fw = fw + j*fake_dict[bin_name_list.index(i)]
-
-
-			# Process 0 weight to 1
-			@numba.njit
-			def zero_one(x):
-				if x == 0:
-					x = 1
-				return x
-			vec_zero_one = np.vectorize(zero_one)
-			fw = vec_zero_one(fw)
-
-
-
-
 		# --- skim cut-weight
 		if not isFake:
 			def skim_weight(arr):
@@ -947,9 +969,9 @@ class JW_Processor(processor.ProcessorABC):
 		print("cut1: {0},cut2: {1},cut3: {2},cut4: {3},cut5: {4},cut6: {5},cut7: {6}".format(len(cut0), len(cut1), len(cut2), len(cut3), len(cut4), len(cut5),len(cut6)))
 
 
-		# Cut flow loop
-		for cut in [cut0, cut1, cut2, cut3, cut4, cut5,cut6]:
-			out["cutflow"].fill(dataset=dataset, cutflow=cut)
+		## Cut flow loop
+		#for cut in [cut0, cut1, cut2, cut3, cut4, cut5,cut6]:
+		#	out["cutflow"].fill(dataset=dataset, cutflow=cut)
 
 		# Primary vertex
 		out["nPV"].fill(
