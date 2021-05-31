@@ -1,0 +1,720 @@
+HELLO
+ **********
+ **    1 **SET PRINT           0
+ **********
+ **********
+ **    2 **SET NOGRAD
+ **********
+ PARAMETER DEFINITIONS:
+    NO.   NAME         VALUE      STEP SIZE      LIMITS
+     1 frac0        5.00000e-01  1.00000e-02     no limits
+     2 frac1        5.00000e-01  1.00000e-02     no limits
+ **********
+ **    3 **SET ERR         0.5
+ **********
+ **********
+ **    4 **SET PRINT           0
+ **********
+ **********
+ **    5 **SET STR           1
+ **********
+ **********
+ **    6 **MIGRAD        1220        0.01
+ **********
+ MIGRAD MINIMIZATION HAS CONVERGED.
+ MIGRAD WILL VERIFY CONVERGENCE AND ERROR MATRIX.
+ FCN=-98270.9 FROM MIGRAD    STATUS=CONVERGED      48 CALLS          49 TOTAL
+                     EDM=3.32223e-07    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  frac0        3.92364e-01   1.63473e-02   3.09002e-03  -3.35739e-02
+   2  frac1        6.07636e-01   2.64675e-02   4.99784e-03   1.99331e-03
+                               ERR DEF= 0.5
+is Barrel!
+Fit status:  
+****************************************
+Minimizer is Minuit / Migrad
+MinFCN                    =     -98270.9
+NDf                       =            0
+Edm                       =  3.32223e-07
+NCalls                    =           49
+frac0                     =     0.392364   +/-   0.0163473   
+frac1                     =     0.607636   +/-   0.0264675   
+
+SF_fake = 1.04, SF_real = 10.91
+### File name:PT_1_eta_1 Fake fraction: 0.2395681194907672
+HELLO
+ **********
+ **    1 **SET PRINT           0
+ **********
+ **********
+ **    2 **SET NOGRAD
+ **********
+ PARAMETER DEFINITIONS:
+    NO.   NAME         VALUE      STEP SIZE      LIMITS
+     1 frac0        5.00000e-01  1.00000e-02     no limits
+     2 frac1        5.00000e-01  1.00000e-02     no limits
+ **********
+ **    3 **SET ERR         0.5
+ **********
+ **********
+ **    4 **SET PRINT           0
+ **********
+ **********
+ **    5 **SET STR           1
+ **********
+ **********
+ **    6 **MIGRAD        1220        0.01
+ **********
+ MIGRAD MINIMIZATION HAS CONVERGED.
+ MIGRAD WILL VERIFY CONVERGENCE AND ERROR MATRIX.
+ FCN=-28532.8 FROM MIGRAD    STATUS=CONVERGED      46 CALLS          47 TOTAL
+                     EDM=3.65966e-09    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  frac0        4.55094e-01   2.81791e-02   2.81517e-03  -2.31752e-03
+   2  frac1        5.44904e-01   4.16865e-02   4.16490e-03  -1.36007e-03
+                               ERR DEF= 0.5
+is Barrel!
+Fit status:  
+****************************************
+Minimizer is Minuit / Migrad
+MinFCN                    =     -28532.8
+NDf                       =            0
+Edm                       =  3.65966e-09
+NCalls                    =           47
+frac0                     =     0.455094   +/-   0.0281791   
+frac1                     =     0.544904   +/-   0.0416865   
+
+SF_fake = 1.15, SF_real = 10.32
+### File name:PT_1_eta_2 Fake fraction: 0.33412811760065864
+HELLO
+ **********
+ **    1 **SET PRINT           0
+ **********
+ **********
+ **    2 **SET NOGRAD
+ **********
+ PARAMETER DEFINITIONS:
+    NO.   NAME         VALUE      STEP SIZE      LIMITS
+     1 frac0        5.00000e-01  1.00000e-02     no limits
+     2 frac1        5.00000e-01  1.00000e-02     no limits
+ **********
+ **    3 **SET ERR         0.5
+ **********
+ **********
+ **    4 **SET PRINT           0
+ **********
+ **********
+ **    5 **SET STR           1
+ **********
+ **********
+ **    6 **MIGRAD        1220        0.01
+ **********
+ MIGRAD MINIMIZATION HAS CONVERGED.
+ MIGRAD WILL VERIFY CONVERGENCE AND ERROR MATRIX.
+ FCN=-21603.5 FROM MIGRAD    STATUS=CONVERGED      59 CALLS          60 TOTAL
+                     EDM=7.30584e-09    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  frac0        3.83598e-01   3.96722e-02   3.39140e-03  -2.26942e-03
+   2  frac1        6.16398e-01   6.38102e-02   5.45012e-03  -1.38446e-03
+                               ERR DEF= 0.5
+is Endcap!
+Fit status:  
+****************************************
+Minimizer is Minuit / Migrad
+MinFCN                    =     -21603.5
+NDf                       =            0
+Edm                       =  7.30584e-09
+NCalls                    =           60
+frac0                     =     0.383598   +/-   0.0396722   
+frac1                     =     0.616398   +/-   0.0638102   
+
+SF_fake = 0.76, SF_real = 15.15
+### File name:PT_1_eta_3 Fake fraction: 0.2190434510083378
+HELLO
+ **********
+ **    1 **SET PRINT           0
+ **********
+ **********
+ **    2 **SET NOGRAD
+ **********
+ PARAMETER DEFINITIONS:
+    NO.   NAME         VALUE      STEP SIZE      LIMITS
+     1 frac0        5.00000e-01  1.00000e-02     no limits
+     2 frac1        5.00000e-01  1.00000e-02     no limits
+ **********
+ **    3 **SET ERR         0.5
+ **********
+ **********
+ **    4 **SET PRINT           0
+ **********
+ **********
+ **    5 **SET STR           1
+ **********
+ **********
+ **    6 **MIGRAD        1220        0.01
+ **********
+ MIGRAD MINIMIZATION HAS CONVERGED.
+ MIGRAD WILL VERIFY CONVERGENCE AND ERROR MATRIX.
+ FCN=-10624.7 FROM MIGRAD    STATUS=CONVERGED      47 CALLS          48 TOTAL
+                     EDM=2.81368e-09    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  frac0        4.20640e-01   5.22344e-02   3.18930e-03   8.76543e-05
+   2  frac1        5.79363e-01   8.35963e-02   5.10292e-03   6.60927e-04
+                               ERR DEF= 0.5
+is Endcap!
+Fit status:  
+****************************************
+Minimizer is Minuit / Migrad
+MinFCN                    =     -10624.7
+NDf                       =            0
+Edm                       =  2.81368e-09
+NCalls                    =           48
+frac0                     =      0.42064   +/-   0.0522344   
+frac1                     =     0.579363   +/-   0.0835963   
+
+SF_fake = 1.26, SF_real = 15.81
+### File name:PT_1_eta_4 Fake fraction: 0.3327610897438862
+HELLO
+ **********
+ **    1 **SET PRINT           0
+ **********
+ **********
+ **    2 **SET NOGRAD
+ **********
+ PARAMETER DEFINITIONS:
+    NO.   NAME         VALUE      STEP SIZE      LIMITS
+     1 frac0        5.00000e-01  1.00000e-02     no limits
+     2 frac1        5.00000e-01  1.00000e-02     no limits
+ **********
+ **    3 **SET ERR         0.5
+ **********
+ **********
+ **    4 **SET PRINT           0
+ **********
+ **********
+ **    5 **SET STR           1
+ **********
+ **********
+ **    6 **MIGRAD        1220        0.01
+ **********
+ MIGRAD MINIMIZATION HAS CONVERGED.
+ MIGRAD WILL VERIFY CONVERGENCE AND ERROR MATRIX.
+ FCN=-23482.5 FROM MIGRAD    STATUS=CONVERGED      54 CALLS          55 TOTAL
+                     EDM=4.25038e-08    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  frac0        3.22374e-01   2.30895e-02   2.19888e-03   9.75449e-03
+   2  frac1        6.77629e-01   3.97834e-02   3.78816e-03   1.52115e-03
+                               ERR DEF= 0.5
+is Barrel!
+Fit status:  
+****************************************
+Minimizer is Minuit / Migrad
+MinFCN                    =     -23482.5
+NDf                       =            0
+Edm                       =  4.25038e-08
+NCalls                    =           55
+frac0                     =     0.322374   +/-   0.0230895   
+frac1                     =     0.677629   +/-   0.0397834   
+
+SF_fake = 0.68, SF_real = 6.26
+### File name:PT_2_eta_1 Fake fraction: 0.12407395697904466
+HELLO
+ **********
+ **    1 **SET PRINT           0
+ **********
+ **********
+ **    2 **SET NOGRAD
+ **********
+ PARAMETER DEFINITIONS:
+    NO.   NAME         VALUE      STEP SIZE      LIMITS
+     1 frac0        5.00000e-01  1.00000e-02     no limits
+     2 frac1        5.00000e-01  1.00000e-02     no limits
+ **********
+ **    3 **SET ERR         0.5
+ **********
+ **********
+ **    4 **SET PRINT           0
+ **********
+ **********
+ **    5 **SET STR           1
+ **********
+ **********
+ **    6 **MIGRAD        1220        0.01
+ **********
+ MIGRAD MINIMIZATION HAS CONVERGED.
+ MIGRAD WILL VERIFY CONVERGENCE AND ERROR MATRIX.
+ FCN=-7941.16 FROM MIGRAD    STATUS=CONVERGED      51 CALLS          52 TOTAL
+                     EDM=1.08304e-06    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  frac0        2.98272e-01   3.68966e-02   2.09060e-03   2.45758e-02
+   2  frac1        7.01719e-01   7.24976e-02   4.05943e-03  -3.66320e-03
+                               ERR DEF= 0.5
+is Barrel!
+Fit status:  
+****************************************
+Minimizer is Minuit / Migrad
+MinFCN                    =     -7941.16
+NDf                       =            0
+Edm                       =  1.08304e-06
+NCalls                    =           52
+frac0                     =     0.298272   +/-   0.0368966   
+frac1                     =     0.701719   +/-   0.0724976   
+
+SF_fake = 0.58, SF_real = 8.46
+### File name:PT_2_eta_2 Fake fraction: 0.1078591563916597
+HELLO
+ **********
+ **    1 **SET PRINT           0
+ **********
+ **********
+ **    2 **SET NOGRAD
+ **********
+ PARAMETER DEFINITIONS:
+    NO.   NAME         VALUE      STEP SIZE      LIMITS
+     1 frac0        5.00000e-01  1.00000e-02     no limits
+     2 frac1        5.00000e-01  1.00000e-02     no limits
+ **********
+ **    3 **SET ERR         0.5
+ **********
+ **********
+ **    4 **SET PRINT           0
+ **********
+ **********
+ **    5 **SET STR           1
+ **********
+ **********
+ **    6 **MIGRAD        1220        0.01
+ **********
+ MIGRAD MINIMIZATION HAS CONVERGED.
+ MIGRAD WILL VERIFY CONVERGENCE AND ERROR MATRIX.
+ FCN=-6272.45 FROM MIGRAD    STATUS=CONVERGED      47 CALLS          48 TOTAL
+                     EDM=5.68788e-08    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  frac0        4.04273e-01   3.85725e-02   1.99810e-03  -2.36204e-03
+   2  frac1        5.95711e-01   7.03631e-02   3.64176e-03  -3.57446e-03
+                               ERR DEF= 0.5
+is Endcap!
+Fit status:  
+****************************************
+Minimizer is Minuit / Migrad
+MinFCN                    =     -6272.45
+NDf                       =            0
+Edm                       =  5.68788e-08
+NCalls                    =           48
+frac0                     =     0.404273   +/-   0.0385725   
+frac1                     =     0.595711   +/-   0.0703631   
+
+SF_fake = 0.59, SF_real = 6.18
+### File name:PT_2_eta_3 Fake fraction: 0.18660182200622444
+HELLO
+ **********
+ **    1 **SET PRINT           0
+ **********
+ **********
+ **    2 **SET NOGRAD
+ **********
+ PARAMETER DEFINITIONS:
+    NO.   NAME         VALUE      STEP SIZE      LIMITS
+     1 frac0        5.00000e-01  1.00000e-02     no limits
+     2 frac1        5.00000e-01  1.00000e-02     no limits
+ **********
+ **    3 **SET ERR         0.5
+ **********
+ **********
+ **    4 **SET PRINT           0
+ **********
+ **********
+ **    5 **SET STR           1
+ **********
+ **********
+ **    6 **MIGRAD        1220        0.01
+ **********
+ MIGRAD MINIMIZATION HAS CONVERGED.
+ MIGRAD WILL VERIFY CONVERGENCE AND ERROR MATRIX.
+ FCN=-2731.51 FROM MIGRAD    STATUS=CONVERGED      50 CALLS          51 TOTAL
+                     EDM=8.0925e-08    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  frac0        3.27165e-01   5.02582e-02   1.75311e-03   3.64992e-03
+   2  frac1        6.72820e-01   1.17219e-01   4.03472e-03  -1.48139e-03
+                               ERR DEF= 0.5
+is Endcap!
+Fit status:  
+****************************************
+Minimizer is Minuit / Migrad
+MinFCN                    =     -2731.51
+NDf                       =            0
+Edm                       =   8.0925e-08
+NCalls                    =           51
+frac0                     =     0.327165   +/-   0.0502582   
+frac1                     =      0.67282   +/-   0.117219    
+
+SF_fake = 0.71, SF_real = 9.86
+### File name:PT_2_eta_4 Fake fraction: 0.1652063465781484
+HELLO
+ **********
+ **    1 **SET PRINT           0
+ **********
+ **********
+ **    2 **SET NOGRAD
+ **********
+ PARAMETER DEFINITIONS:
+    NO.   NAME         VALUE      STEP SIZE      LIMITS
+     1 frac0        5.00000e-01  1.00000e-02     no limits
+     2 frac1        5.00000e-01  1.00000e-02     no limits
+ **********
+ **    3 **SET ERR         0.5
+ **********
+ **********
+ **    4 **SET PRINT           0
+ **********
+ **********
+ **    5 **SET STR           1
+ **********
+ **********
+ **    6 **MIGRAD        1220        0.01
+ **********
+ MIGRAD MINIMIZATION HAS CONVERGED.
+ MIGRAD WILL VERIFY CONVERGENCE AND ERROR MATRIX.
+ FCN=-9855.55 FROM MIGRAD    STATUS=CONVERGED      55 CALLS          56 TOTAL
+                     EDM=1.22333e-07    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  frac0        1.89284e-01   2.83232e-02   1.80090e-03   1.33269e-02
+   2  frac1        8.10726e-01   6.07019e-02   3.85313e-03   2.34086e-03
+                               ERR DEF= 0.5
+is Barrel!
+Fit status:  
+****************************************
+Minimizer is Minuit / Migrad
+MinFCN                    =     -9855.55
+NDf                       =            0
+Edm                       =  1.22333e-07
+NCalls                    =           56
+frac0                     =     0.189284   +/-   0.0283232   
+frac1                     =     0.810726   +/-   0.0607019   
+
+SF_fake = 0.30, SF_real = 5.05
+### File name:PT_3_eta_1 Fake fraction: 0.03037716545581564
+HELLO
+ **********
+ **    1 **SET PRINT           0
+ **********
+ **********
+ **    2 **SET NOGRAD
+ **********
+ PARAMETER DEFINITIONS:
+    NO.   NAME         VALUE      STEP SIZE      LIMITS
+     1 frac0        5.00000e-01  1.00000e-02     no limits
+     2 frac1        5.00000e-01  1.00000e-02     no limits
+ **********
+ **    3 **SET ERR         0.5
+ **********
+ **********
+ **    4 **SET PRINT           0
+ **********
+ **********
+ **    5 **SET STR           1
+ **********
+ **********
+ **    6 **MIGRAD        1220        0.01
+ **********
+ MIGRAD MINIMIZATION HAS CONVERGED.
+ MIGRAD WILL VERIFY CONVERGENCE AND ERROR MATRIX.
+ FCN=-2613.17 FROM MIGRAD    STATUS=CONVERGED      54 CALLS          55 TOTAL
+                     EDM=1.80206e-08    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  frac0        3.25822e-01   5.42498e-02   1.71736e-03   2.73947e-03
+   2  frac1        6.74183e-01   9.00933e-02   2.85029e-03   5.47769e-04
+                               ERR DEF= 0.5
+is Barrel!
+Fit status:  
+****************************************
+Minimizer is Minuit / Migrad
+MinFCN                    =     -2613.17
+NDf                       =            0
+Edm                       =  1.80206e-08
+NCalls                    =           55
+frac0                     =     0.325822   +/-   0.0542498   
+frac1                     =     0.674183   +/-   0.0900933   
+
+SF_fake = 0.49, SF_real = 4.58
+### File name:PT_3_eta_2 Fake fraction: 0.08784016563206055
+HELLO
+ **********
+ **    1 **SET PRINT           0
+ **********
+ **********
+ **    2 **SET NOGRAD
+ **********
+ PARAMETER DEFINITIONS:
+    NO.   NAME         VALUE      STEP SIZE      LIMITS
+     1 frac0        5.00000e-01  1.00000e-02     no limits
+     2 frac1        5.00000e-01  1.00000e-02     no limits
+ **********
+ **    3 **SET ERR         0.5
+ **********
+ **********
+ **    4 **SET PRINT           0
+ **********
+ **********
+ **    5 **SET STR           1
+ **********
+ **********
+ **    6 **MIGRAD        1220        0.01
+ **********
+ MIGRAD MINIMIZATION HAS CONVERGED.
+ MIGRAD WILL VERIFY CONVERGENCE AND ERROR MATRIX.
+ FCN=-2193.95 FROM MIGRAD    STATUS=CONVERGED      49 CALLS          50 TOTAL
+                     EDM=3.7871e-07    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  frac0        3.19654e-01   4.41048e-02   1.40674e-03  -4.11678e-03
+   2  frac1        6.80281e-01   1.05381e-01   3.29859e-03  -5.91149e-03
+                               ERR DEF= 0.5
+is Endcap!
+Fit status:  
+****************************************
+Minimizer is Minuit / Migrad
+MinFCN                    =     -2193.95
+NDf                       =            0
+Edm                       =   3.7871e-07
+NCalls                    =           50
+frac0                     =     0.319654   +/-   0.0441048   
+frac1                     =     0.680281   +/-   0.105381    
+
+SF_fake = 0.51, SF_real = 5.80
+### File name:PT_3_eta_3 Fake fraction: 0.12673213201689995
+HELLO
+ **********
+ **    1 **SET PRINT           0
+ **********
+ **********
+ **    2 **SET NOGRAD
+ **********
+ PARAMETER DEFINITIONS:
+    NO.   NAME         VALUE      STEP SIZE      LIMITS
+     1 frac0        5.00000e-01  1.00000e-02     no limits
+     2 frac1        5.00000e-01  1.00000e-02     no limits
+ **********
+ **    3 **SET ERR         0.5
+ **********
+ **********
+ **    4 **SET PRINT           0
+ **********
+ **********
+ **    5 **SET STR           1
+ **********
+ **********
+ **    6 **MIGRAD        1220        0.01
+ **********
+ MIGRAD MINIMIZATION HAS CONVERGED.
+ MIGRAD WILL VERIFY CONVERGENCE AND ERROR MATRIX.
+ FCN=-1151.42 FROM MIGRAD    STATUS=CONVERGED      44 CALLS          45 TOTAL
+                     EDM=2.84963e-08    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  frac0        4.16439e-01   7.37974e-02   1.66167e-03  -1.41925e-03
+   2  frac1        5.83540e-01   1.25740e-01   2.83013e-03  -1.30782e-03
+                               ERR DEF= 0.5
+is Endcap!
+Fit status:  
+****************************************
+Minimizer is Minuit / Migrad
+MinFCN                    =     -1151.42
+NDf                       =            0
+Edm                       =  2.84963e-08
+NCalls                    =           45
+frac0                     =     0.416439   +/-   0.0737974   
+frac1                     =      0.58354   +/-   0.12574     
+
+SF_fake = 0.78, SF_real = 4.86
+### File name:PT_3_eta_4 Fake fraction: 0.22721386617102432
+HELLO
+ **********
+ **    1 **SET PRINT           0
+ **********
+ **********
+ **    2 **SET NOGRAD
+ **********
+ PARAMETER DEFINITIONS:
+    NO.   NAME         VALUE      STEP SIZE      LIMITS
+     1 frac0        5.00000e-01  1.00000e-02     no limits
+     2 frac1        5.00000e-01  1.00000e-02     no limits
+ **********
+ **    3 **SET ERR         0.5
+ **********
+ **********
+ **    4 **SET PRINT           0
+ **********
+ **********
+ **    5 **SET STR           1
+ **********
+ **********
+ **    6 **MIGRAD        1220        0.01
+ **********
+ MIGRAD MINIMIZATION HAS CONVERGED.
+ MIGRAD WILL VERIFY CONVERGENCE AND ERROR MATRIX.
+ FCN=-25004.1 FROM MIGRAD    STATUS=CONVERGED      62 CALLS          63 TOTAL
+                     EDM=2.66819e-09    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  frac0        2.17471e-01   1.49133e-02   1.58752e-03   2.29626e-03
+   2  frac1        7.82530e-01   3.62028e-02   3.85476e-03   1.29731e-03
+                               ERR DEF= 0.5
+is Barrel!
+Fit status:  
+****************************************
+Minimizer is Minuit / Migrad
+MinFCN                    =     -25004.1
+NDf                       =            0
+Edm                       =  2.66819e-09
+NCalls                    =           63
+frac0                     =     0.217471   +/-   0.0149133   
+frac1                     =      0.78253   +/-   0.0362028   
+
+SF_fake = 0.37, SF_real = 3.49
+### File name:PT_4_eta_1 Fake fraction: 0.03451207171801139
+HELLO
+ **********
+ **    1 **SET PRINT           0
+ **********
+ **********
+ **    2 **SET NOGRAD
+ **********
+ PARAMETER DEFINITIONS:
+    NO.   NAME         VALUE      STEP SIZE      LIMITS
+     1 frac0        5.00000e-01  1.00000e-02     no limits
+     2 frac1        5.00000e-01  1.00000e-02     no limits
+ **********
+ **    3 **SET ERR         0.5
+ **********
+ **********
+ **    4 **SET PRINT           0
+ **********
+ **********
+ **    5 **SET STR           1
+ **********
+ **********
+ **    6 **MIGRAD        1220        0.01
+ **********
+ MIGRAD MINIMIZATION HAS CONVERGED.
+ MIGRAD WILL VERIFY CONVERGENCE AND ERROR MATRIX.
+ FCN=-5309.57 FROM MIGRAD    STATUS=CONVERGED      54 CALLS          55 TOTAL
+                     EDM=3.22035e-08    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  frac0        2.84040e-01   2.83154e-02   1.38390e-03  -5.60927e-03
+   2  frac1        7.15951e-01   5.92918e-02   2.89748e-03  -2.17819e-03
+                               ERR DEF= 0.5
+is Barrel!
+Fit status:  
+****************************************
+Minimizer is Minuit / Migrad
+MinFCN                    =     -5309.57
+NDf                       =            0
+Edm                       =  3.22035e-08
+NCalls                    =           55
+frac0                     =      0.28404   +/-   0.0283154   
+frac1                     =     0.715951   +/-   0.0592918   
+
+SF_fake = 0.40, SF_real = 3.31
+### File name:PT_4_eta_2 Fake fraction: 0.057434704223169715
+HELLO
+ **********
+ **    1 **SET PRINT           0
+ **********
+ **********
+ **    2 **SET NOGRAD
+ **********
+ PARAMETER DEFINITIONS:
+    NO.   NAME         VALUE      STEP SIZE      LIMITS
+     1 frac0        5.00000e-01  1.00000e-02     no limits
+     2 frac1        5.00000e-01  1.00000e-02     no limits
+ **********
+ **    3 **SET ERR         0.5
+ **********
+ **********
+ **    4 **SET PRINT           0
+ **********
+ **********
+ **    5 **SET STR           1
+ **********
+ **********
+ **    6 **MIGRAD        1220        0.01
+ **********
+ MIGRAD MINIMIZATION HAS CONVERGED.
+ MIGRAD WILL VERIFY CONVERGENCE AND ERROR MATRIX.
+ FCN=-4795.87 FROM MIGRAD    STATUS=CONVERGED      60 CALLS          61 TOTAL
+                     EDM=2.83159e-08    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  frac0        2.66714e-01   3.39887e-02   1.58918e-03   5.05492e-03
+   2  frac1        7.33291e-01   8.38349e-02   3.91830e-03   3.08460e-04
+                               ERR DEF= 0.5
+is Endcap!
+Fit status:  
+****************************************
+Minimizer is Minuit / Migrad
+MinFCN                    =     -4795.87
+NDf                       =            0
+Edm                       =  2.83159e-08
+NCalls                    =           61
+frac0                     =     0.266714   +/-   0.0339887   
+frac1                     =     0.733291   +/-   0.0838349   
+
+SF_fake = 0.37, SF_real = 4.82
+### File name:PT_4_eta_3 Fake fraction: 0.07279613321212826
+HELLO
+ **********
+ **    1 **SET PRINT           0
+ **********
+ **********
+ **    2 **SET NOGRAD
+ **********
+ PARAMETER DEFINITIONS:
+    NO.   NAME         VALUE      STEP SIZE      LIMITS
+     1 frac0        5.00000e-01  1.00000e-02     no limits
+     2 frac1        5.00000e-01  1.00000e-02     no limits
+ **********
+ **    3 **SET ERR         0.5
+ **********
+ **********
+ **    4 **SET PRINT           0
+ **********
+ **********
+ **    5 **SET STR           1
+ **********
+ **********
+ **    6 **MIGRAD        1220        0.01
+ **********
+ MIGRAD MINIMIZATION HAS CONVERGED.
+ MIGRAD WILL VERIFY CONVERGENCE AND ERROR MATRIX.
+ FCN=-1826 FROM MIGRAD    STATUS=CONVERGED      51 CALLS          52 TOTAL
+                     EDM=6.4805e-08    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  frac0        2.83344e-01   5.66772e-02   1.59087e-03  -3.41139e-03
+   2  frac1        7.16632e-01   9.87919e-02   2.75118e-03  -2.42463e-03
+                               ERR DEF= 0.5
+is Endcap!
+Fit status:  
+****************************************
+Minimizer is Minuit / Migrad
+MinFCN                    =        -1826
+NDf                       =            0
+Edm                       =   6.4805e-08
+NCalls                    =           52
+frac0                     =     0.283344   +/-   0.0566772   
+frac1                     =     0.716632   +/-   0.0987919   
+
+SF_fake = 0.67, SF_real = 2.76
+### File name:PT_4_eta_4 Fake fraction: 0.14057992016129742
