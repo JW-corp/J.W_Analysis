@@ -625,7 +625,13 @@ class JW_Processor(processor.ProcessorABC):
 					name,
 				)
 			# Read Fake fraction --> Mapping bin name to int()
-			in_dict = np.load('Fitting_v2/results_210517.npy',allow_pickle="True")[()]
+
+			if self._year == "2018":
+				in_dict = np.load('Fitting_2018/results_210517.npy',allow_pickle="True")[()]
+
+			if self._year == "2017":
+				in_dict = np.load('Fitting_2017/fit_result_log.npy',allow_pickle="True")[()]
+
 			idx=0
 			fake_dict ={}
 			for i,j in in_dict.items():
@@ -824,7 +830,7 @@ class JW_Processor(processor.ProcessorABC):
 
 		# Electron PT cuts
 		Elept_mask = ak.firsts(
-			(leading_ele.pt >= 25) & (subleading_ele.pt >= 10) & (third_ele.pt >= 25)
+			(leading_ele.pt >= 25) & (subleading_ele.pt >= 20) & (third_ele.pt >= 25)
 		)
 
 		# MET cuts
@@ -841,7 +847,7 @@ class JW_Processor(processor.ProcessorABC):
 		leading_pho_sel = leading_pho[Event_sel_mask]
 		MET_sel = MET[Event_sel_mask]
 		events = events[Event_sel_mask]
-		fw = fw[Event_sel_mask]
+		#fw = fw[Event_sel_mask]
 
 		# Photon  EE and EB
 		isEE_mask = leading_pho.isScEtaEE
@@ -854,8 +860,8 @@ class JW_Processor(processor.ProcessorABC):
 		if len(leading_pho_sel) == 0:
 			return out
 
-		cut6 = np.ones(ak.sum(ak.num(leading_pho_sel) > 0)) * 6
-		out["cutflow"].fill(dataset=dataset, cutflow=cut6,weight=fw)
+		cut6 = np.ones(len(events))*6
+		out["cutflow"].fill(dataset=dataset, cutflow=cut6,weight=fw[Event_sel_mask])
 
 		## -------------------- Prepare making hist --------------#
 
@@ -900,7 +906,7 @@ class JW_Processor(processor.ProcessorABC):
 		charge = ak.flatten(Triple_eee.lep1.charge + Triple_eee.lep2.charge)
 
 		# MET
-		met = ak.to_numpy(MET_sel.pt)
+		met = MET_sel.pt
 
 		# M(eea) M(ee)
 		diele = Triple_eee_sel.p4
@@ -916,34 +922,20 @@ class JW_Processor(processor.ProcessorABC):
 		MT = np.array(MT)
 
 		# --- Apply weight and hist
-		
-		if isFake:
-			weights = processor.Weights(len(cut6))
-		else:
-			weights = processor.Weights(len(cut5))
+		weights = processor.Weights(len(cut5))
+
+
+
+		def skim_weight(arr):
+			mask1 = ~ak.is_none(arr)
+			subarr = arr[mask1]
+			mask2 = subarr != 0
+			return ak.to_numpy(subarr[mask2])
 			
+		cuts = Event_sel_mask
+		cuts_pho_EE = ak.flatten(isEE_mask)
+		cuts_pho_EB = ak.flatten(isEB_mask)
 
-		# --- skim cut-weight
-		if not isFake:
-			def skim_weight(arr):
-				mask1 = ~ak.is_none(arr)
-				subarr = arr[mask1]
-				mask2 = subarr != 0
-				return ak.to_numpy(subarr[mask2])
-		else:
-			def skim_weight(arr):
-				return arr
-
-
-		if not isFake:
-			cuts = Event_sel_mask
-			cuts_pho_EE = ak.flatten(isEE_mask)
-			cuts_pho_EB = ak.flatten(isEB_mask)
-
-		if isFake:
-			cuts = np.ones(len(Event_sel_mask))
-			cuts_pho_EE = ak.flatten(isEE_mask & Event_sel_mask)
-			cuts_pho_EB = ak.flatten(isEB_mask & Event_sel_mask)
 
 
 		if isFake:
@@ -966,7 +958,7 @@ class JW_Processor(processor.ProcessorABC):
 		out["sumw"][dataset] += len(Initial_events)
 
 
-		print("cut1: {0},cut2: {1},cut3: {2},cut4: {3},cut5: {4},cut6: {5},cut7: {6}".format(len(cut0), len(cut1), len(cut2), len(cut3), len(cut4), len(cut5),len(cut6)))
+		print("cut0: {0},cut1: {1},cut2: {2},cut3: {3},cut4: {4},cut5: {5},cut6: {6}".format(len(cut0), len(cut1), len(cut2), len(cut3), len(cut4), len(cut5),len(cut6)))
 
 
 		## Cut flow loop
@@ -981,12 +973,13 @@ class JW_Processor(processor.ProcessorABC):
 		out["nPV_nw"].fill(dataset=dataset, nPV_nw=nPV_nw)
 
 		# Fill hist
-
+		
+		print("w: {0}, cuts: {1}, weight: {2}, value: {3} cutindex: {4}".format(weights.weight(),cuts, skim_weight(weights.weight() * cuts),met, cut6))
 		# -- met -- #
 		out["met"].fill(
 			dataset=dataset, met=met, weight=skim_weight(weights.weight() * cuts)
 		)
-
+		
 		# --mass -- #
 		out["MT"].fill(
 			dataset=dataset, MT=MT, weight=skim_weight(weights.weight() * cuts)
@@ -1177,7 +1170,7 @@ if __name__ == "__main__":
 			"WZ": "mcPileupDist_WZ_TuneCP5_13TeV-pythia8.npy",
 			"ZZ": "mcPileupDist_ZZ_TuneCP5_13TeV-pythia8.npy",
 			"tZq": "mcPileupDist_tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8.npy",
-			"WZG": "mcPileupDist_wza_UL18.npy",
+			"WZG": "mcPileupDist_wza_UL18_sum.npy",
 			"ZGToLLG": "mcPileupDist_ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8.npy",
 			"TTGJets": "mcPileupDist_TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8.npy",
 			"WGToLNuG": "mcPileupDist_WGToLNuG_01J_5f_PtG_120_TuneCP5_13TeV-amcatnloFXFX-pythia8.npy",

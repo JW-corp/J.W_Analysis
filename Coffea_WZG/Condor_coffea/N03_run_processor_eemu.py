@@ -627,7 +627,14 @@ class JW_Processor(processor.ProcessorABC):
 					name,
 				)
 			# Read Fake fraction --> Mapping bin name to int()
-			in_dict = np.load('Fitting_v2/results_210517.npy',allow_pickle="True")[()]
+			if self._year == "2018":
+				in_dict = np.load('Fitting_2018/results_210517.npy',allow_pickle="True")[()]
+
+			if self._year == "2017":
+				in_dict = np.load('Fitting_2017/fit_result_log.npy',allow_pickle="True")[()]
+
+
+
 			idx=0
 			fake_dict ={}
 			for i,j in in_dict.items():
@@ -784,7 +791,7 @@ class JW_Processor(processor.ProcessorABC):
 		Mee_cut_mask = Diele.p4.mass > 4
 
 		# Lepton PT cuts
-		Leppt_mask = ak.firsts((Diele.lep1.pt >= 25) & (Diele.lep2.pt >= 10) & (Muon.pt >= 25))
+		Leppt_mask = ak.firsts((Diele.lep1.pt >= 25) & (Diele.lep2.pt >= 20) & (Muon.pt >= 25))
 
 		# MET cuts
 		MET_mask = MET.pt > 20  # Baseline
@@ -873,34 +880,20 @@ class JW_Processor(processor.ProcessorABC):
 		MT = np.array(ak.firsts(MT))
 
 		# --- Apply weight and hist
+		weights = processor.Weights(len(cut5))
 		
-		if isFake:
-			weights = processor.Weights(len(cut6))
-		else:
-			weights = processor.Weights(len(cut5))
 			
 
 		# --- skim cut-weight
-		if not isFake:
-			def skim_weight(arr):
-				mask1 = ~ak.is_none(arr)
-				subarr = arr[mask1]
-				mask2 = subarr != 0
-				return ak.to_numpy(subarr[mask2])
-		else:
-			def skim_weight(arr):
-				return arr
-
-
-		if not isFake:
-			cuts = Event_sel_mask
-			cuts_pho_EE = ak.flatten(isEE_mask)
-			cuts_pho_EB = ak.flatten(isEB_mask)
-
-		if isFake:
-			cuts = np.ones(len(Event_sel_mask))
-			cuts_pho_EE = ak.flatten(isEE_mask & Event_sel_mask)
-			cuts_pho_EB = ak.flatten(isEB_mask & Event_sel_mask)
+		def skim_weight(arr):
+			mask1 = ~ak.is_none(arr)
+			subarr = arr[mask1]
+			mask2 = subarr != 0
+			return ak.to_numpy(subarr[mask2])
+			
+		cuts = Event_sel_mask
+		cuts_pho_EE = ak.flatten(isEE_mask)
+		cuts_pho_EB = ak.flatten(isEB_mask)
 
 
 		if isFake:
@@ -1151,11 +1144,11 @@ if __name__ == "__main__":
 			"DY": "mcPileupDist_DYToEE_M-50_NNPDF31_TuneCP5_13TeV-powheg-pythia8.npy",
 			"TTWJets": "mcPileupDist_TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8.npy",
 			"TTZtoLL": "mcPileupDist_TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8.npy",
-			"WW": "mcPileupDist_WW_TuneCP5_DoubleScattering_13TeV-pythia8.npy",
-			"WZ": "mcPileupDist_WZ_TuneCP5_13TeV-pythia8.npy",
-			"ZZ": "mcPileupDist_ZZ_TuneCP5_13TeV-pythia8.npy",
+			"WW" : "mcPileupDist_WW_TuneCP5_DoubleScattering_13TeV-pythia8.npy",
+			"WZ" : "mcPileupDist_WZ_TuneCP5_13TeV-pythia8.npy",
+			"ZZ" : "mcPileupDist_ZZ_TuneCP5_13TeV-pythia8.npy",
 			"tZq": "mcPileupDist_tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8.npy",
-			"WZG": "mcPileupDist_wza_UL18.npy",
+			"WZG": "mcPileupDist_wza_UL18_sum.npy",
 			"ZGToLLG": "mcPileupDist_ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8.npy",
 			"TTGJets": "mcPileupDist_TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8.npy",
 			"WGToLNuG": "mcPileupDist_WGToLNuG_01J_5f_PtG_120_TuneCP5_13TeV-amcatnloFXFX-pythia8.npy",
