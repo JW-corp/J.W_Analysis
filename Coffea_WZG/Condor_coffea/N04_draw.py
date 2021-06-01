@@ -10,7 +10,7 @@ import sys
 
 sys.path.append("util")
 import Particle_Info_DB
-
+import Hist_standard_dict
 
 
 # -- Muon -- #
@@ -231,21 +231,6 @@ def reduce(folder,sample_list,histname):
 	hists={}
 	
 
-	sumwdict ={
-		"DY":0,
-		"WZ":0,
-		"ZZ":0,
-		"TTWJets":0,
-		"TTZtoLL":0,
-		"tZq":0,
-		"Egamma":0,
-		"WZG":0,
-		'ZGToLLG':0,	
-        'TTGJets':0,
-        'WGToLNuG':0
-	}
-
-	
 	for filename in os.listdir(folder):
 		hin = load(folder + '/' + filename)
 		hists[filename] = hin.copy()
@@ -258,9 +243,33 @@ def reduce(folder,sample_list,histname):
 	return hist_
 
 
+
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("hist_name", type=str, help="PT_1_eta_1")
+parser.add_argument("year", type=str, help="2018")
+parser.add_argument("channel", type=str, help="eee")
+parser.add_argument("filename", type=str, help="210531_eee_2018")
+args = parser.parse_args()
+
+histname = args.hist_name
+
+hist_info = Hist_standard_dict.hist_info
+xmin = hist_info[histname]['xmin']
+xmax = hist_info[histname]['xmax']
+ymin = hist_info[histname]['ymin']
+ymax = hist_info[histname]['ymax']
+
+if not histname == 'cutflow':
+	bins = hist_info[histname]['bins']
+	binxmin = hist_info[histname]['binxmin']
+	binxmax = hist_info[histname]['binxmax']
+	name = hist_info[histname]['name']
+
 # 2018
-year = "2018"
-file_name = "210531_eee_2018"
+#year = "2018"
+#file_name = "210531_eee_2018"
 #file_name = "210531_eemu_2018"
 
 #year = "2017"
@@ -268,14 +277,30 @@ file_name = "210531_eee_2018"
 #file_name = "210531_eemu_2017"
 
 
-
+year = args.year
+file_name = args.filename
+channel = args.channel
 file_path = "results/" + file_name
+
 
 dict_ = Particle_Info_DB.DB
 lumi_factor = dict_[year]["Lumi"]
 GenDict = dict_[year]["Gen"]
 xsecDict = dict_[year]["xsec"]
 
+if (year =='2018') and (channel =='eee'):
+	order = ['TTWJets', 'tZq', 'TTGJets', 'TTZtoLL', 'Fake_Photon', 'WZ', 'ZGToLLG', 'ZZ', 'WZG']
+
+if (year =='2018') and (channel =='eemu'):
+	order = ['tZq', 'TTWJets', 'ZGToLLG', 'TTGJets', 'TTZtoLL', 'ZZ', 'Fake_Photon', 'WZ', 'WZG']
+
+if (year =='2017') and (channel =='eee'):
+	order = ['TTWJets', 'tZq', 'TTGJets', 'TTZtoLL', 'Fake_Photon', 'WZ', 'ZGToLLG', 'ZZ', 'WZG']
+
+if (year =='2017') and (channel =='eemu'):
+	order = ['tZq', 'TTWJets', 'ZGToLLG', 'TTZtoLL', 'TTGJets', 'Fake_Photon', 'ZZ', 'WZ', 'WZG']
+
+#order = ['TTWJets', 'tZq', 'TTGJets', 'TTZtoLL', 'Fake_Photon', 'WZ', 'ZGToLLG', 'ZZ', 'WZG']
 
 
 
@@ -300,8 +325,8 @@ sample_list = ['DoubleEG','DY' ,'WZ' ,'ZZ' ,'TTWJets','TTZtoLL','tZq' ,'Egamma',
 #histname = "ele1eta"; xmin=-3; xmax=3; ymin=0; ymax=12;
 #histname = "ele2eta"; xmin=-3; xmax=3; ymin=0; ymax=12;
 
-histname = "ele1phi"; xmin=-3.15; xmax=3.15; ymin=100; ymax=5e+6;
-#histname = "ele2phi"; xmin=-3.15; xmax=3.15; ymin=100; ymax=5e+6;
+#histname = "ele1phi"; xmin=-3.15; xmax=3.15; ymin=0; ymax=10;
+#histname = "ele2phi"; xmin=-3.15; xmax=3.15; ymin=0; ymax=10;
 
 #histname = "cutflow"; xmin=0; xmax=7; ymin=1; ymax=5e+9
 
@@ -314,21 +339,21 @@ histname = "ele1phi"; xmin=-3.15; xmax=3.15; ymin=100; ymax=5e+6;
 
 		# --- Photon --- #
 
-#histname = "pho_EB_pt"; xmin=0; xmax=200; ymin=0; ymax=30;
-#histname = "pho_EB_eta"; xmin=-3; xmax=3; ymin=1; ymax=5e+6;
-#histname = "pho_EB_phi"; xmin=-3.15; xmax=3.15; ymin=1; ymax=5e+6;
-#histname = "pho_EB_sieie"; xmin=0; xmax=0.012; ymin=0.01; ymax=5e+6;
+#histname = "pho_EB_pt"; xmin=0; xmax=200; ymin=0; ymax=16;
+#histname = "pho_EB_eta"; xmin=-3; xmax=3; ymin=0; ymax=10;
+#histname = "pho_EB_phi"; xmin=-3.15; xmax=3.15; ymin=0; ymax=10;
+#histname = "pho_EB_sieie"; xmin=0.006; xmax=0.012; ymin=0; ymax=16;
 
-#histname = "pho_EE_pt"; xmin=0; xmax=200; ymin=0; ymax=20;
-#histname = "pho_EE_eta"; xmin=-3; xmax=3; ymin=1; ymax=5e+6;
-#histname = "pho_EE_phi"; xmin=-3.15; xmax=3.15; ymin=1; ymax=5e+6;
-#histname = "pho_EE_sieie"; xmin=0; xmax=0.3; ymin=0.01; ymax=5e+6;
+#histname = "pho_EE_pt"; xmin=0; xmax=200; ymin=0; ymax=10;
+#histname = "pho_EE_eta"; xmin=-3; xmax=3; ymin=0; ymax=7;
+#histname = "pho_EE_phi"; xmin=-3.15; xmax=3.15; ymin=0; ymax=6;
+#histname = "pho_EE_sieie"; xmin=0.2; xmax=0.3; ymin=0; ymax=6;
 
 
 
 		# --- Kinematics --- #
-#histname = "mass"; xmin=0; xmax=200; ymin=0; ymax=40;
-#histname = "MT"; xmin=0; xmax=200; ymin=0; ymax=15;
+#histname = "mass"; xmin=0; xmax=200; ymin=0; ymax=20;
+#histname = "MT"; xmin=0; xmax=200; ymin=0; ymax=10;
 
 ################################################################
 ## --All-reduce 
@@ -367,15 +392,27 @@ h1.scale(scales,axis='dataset')
 #h1 = h1.rebin(histname,hist.Bin("ele2pt","Subleading electron from Z  $P_{T}$ [GeV]",30,0,600))
 #h1 = h1.rebin(histname,hist.Bin("ele3pt","electron from W  $P_{T}$ [GeV]",30,0,600))
 
-
+#h1 = h1.rebin(histname,hist.Bin("ele1phi","Leading Electron $\phi$ [GeV]", 10, -3.15, 3.15))
+#h1 = h1.rebin(histname,hist.Bin("ele2phi","Subleading Electron $\phi$ [GeV]", 10, -3.15, 3.15))
 
 
 # Photon
 #h1 = h1.rebin(histname,hist.Bin("pho_EB_pt","Photon EB $P_{T}$ [GeV]", 30, 0, 600))
+#h1 = h1.rebin(histname,hist.Bin("pho_EB_eta","Photon EB $\eta$ ", 25, -5, 5))
+#h1 = h1.rebin(histname,hist.Bin("pho_EB_phi","Photon EB $\phi$ ", 10, -3.15, 3.15))
+#h1 = h1.rebin(histname,hist.Bin("pho_EB_sieie","Photon EB sieie", 25, 0, 0.012))
+
+
 #h1 = h1.rebin(histname,hist.Bin("pho_EE_pt","Photon EE $P_{T}$ [GeV]", 30, 0, 600))
+#h1 = h1.rebin(histname,hist.Bin("pho_EE_eta","Photon EE $\eta$ ", 25, -5, 5))
+#h1 = h1.rebin(histname,hist.Bin("pho_EE_phi","Photon EE $\phi$ ", 10, -3.15, 3.15))
+#h1 = h1.rebin(histname,hist.Bin("pho_EE_sieie","Photon EE sieie", 50, 0, 0.3))
 
 # Muon
 #h1 = h1.rebin(histname,hist.Bin("mupt","Leading Muon  $P_{T}$ [GeV]", 30, 0, 600))
+
+if not histname == 'cutflow':
+	h1 = h1.rebin(histname,hist.Bin(histname,name,bins,binxmin,binxmax))
 
 
 # ----> Plotting 
@@ -461,7 +498,7 @@ if year == "2018":
 
 if year == "2017":
 	notdata = re.compile('(?!DoubleEG)')
-	data =  ''
+	data =  'DoubleEG'
 
 
 
@@ -470,9 +507,7 @@ hist.plot1d(
 	ax=ax,
 	clear=False,
 	stack=True,
-	order=['TTWJets', 'tZq', 'TTGJets', 'TTZtoLL', 'Fake_Photon', 'ZGToLLG', 'WZ', 'ZZ', 'WZG'], # 2018 full
-	#order= ['tZq', 'TTWJets', 'ZGToLLG', 'TTZtoLL', 'TTGJets', 'Fake_Photon', 'ZZ', 'WZ', 'WZG'], # 2017 eemu
-	#order = ['TTWJets', 'tZq', 'TTGJets', 'TTZtoLL', 'Fake_Photon', 'WZ', 'ZGToLLG', 'ZZ', 'WZG'], # 2017 eee
+	order= order,
 	fill_opts=fill_opts,
 	error_opts = error_opts,
 )
@@ -535,5 +570,5 @@ lum = plt.text(
 outname = histname + "_" + file_name + ".png"
 
 plt.savefig(outname)
-plt.show()
+#plt.show()
 
