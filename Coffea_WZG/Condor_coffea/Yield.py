@@ -58,10 +58,10 @@ def rep(dict_):
 	print(list_key)
 
 
-#rep(eee_2018)
-#rep(eemu_2018)
 #rep(eee_2017)
-rep(eemu_2017)
+#rep(eemu_2017)
+#rep(eee_2018)
+rep(eemu_2018)
 
 
 

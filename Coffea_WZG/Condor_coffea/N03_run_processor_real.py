@@ -606,9 +606,7 @@ class JW_Processor(processor.ProcessorABC):
 		dr_pho_ele_mask = ak.all(Photon.metric_table(Electron) >= 0.5, axis=-1) # default metric table: delta_r
 		dr_pho_mu_mask = ak.all(Photon.metric_table(Muon) >= 0.5, axis=-1)
 
-		Photon_template_mask = make_fake_obj_mask(Photon, ak.ArrayBuilder()).snapshot()
-
-		PhoSelmask = PT_mask  & isgap_mask &  Pixel_seed_mask & dr_pho_ele_mask & dr_pho_mu_mask & Photon_template_mask
+		PhoSelmask = PT_mask  & isgap_mask &  Pixel_seed_mask & dr_pho_ele_mask & dr_pho_mu_mask
 		Photon = Photon[PhoSelmask]
 
 		# Apply cut 3
@@ -622,6 +620,21 @@ class JW_Processor(processor.ProcessorABC):
 		events = events[A_photon_mask]
 		gen_photons = gen_photons[A_photon_mask]
 		
+		Photon_template_mask = make_fake_obj_mask(Photon, ak.ArrayBuilder()).snapshot()
+		Photon = Photon[Photon_template_mask]
+		
+		# Apply cut 3
+		A_photon_mask = ak.num(Photon) > 0
+		Electron = Electron[A_photon_mask ]
+		Photon   = Photon[A_photon_mask]
+		Jet = Jet[A_photon_mask]
+		Muon = Muon[A_photon_mask]
+		MET = MET[A_photon_mask]
+		if not isData:pu = pu[A_photon_mask]
+		events = events[A_photon_mask]
+		gen_photons = gen_photons[A_photon_mask]
+
+
 		# Stop processing if there is no event remain
 		if len(Electron) == 0:
 			return out
@@ -765,7 +778,7 @@ class JW_Processor(processor.ProcessorABC):
 		Mee_cut_mask  = ak.firsts(Diele.p4.mass) > 4  
 
 		# Electron PT cuts
-		Elept_mask = ak.firsts((Diele.lep1.pt >= 25) & (Diele.lep2.pt >= 10))
+		Elept_mask = ak.firsts((Diele.lep1.pt >= 25) & (Diele.lep2.pt >= 20))
 
 		# MET cuts
 		MET_mask = MET.pt > 20
@@ -1151,7 +1164,7 @@ if __name__ == '__main__':
 		"WZ":"mcPileupDist_WZ_TuneCP5_13TeV-pythia8.npy",
 		"ZZ":"mcPileupDist_ZZ_TuneCP5_13TeV-pythia8.npy",
 		"tZq":"mcPileupDist_tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8.npy",
-		"WZG":"mcPileupDist_wza_UL18.npy",
+		"WZG":"mcPileupDist_wza_UL18_sum.npy",
 		"ZGToLLG":"mcPileupDist_ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8.npy",
 		"TTGJets":"mcPileupDist_TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8.npy",
 		"WGToLNuG":"mcPileupDist_WGToLNuG_01J_5f_PtG_120_TuneCP5_13TeV-amcatnloFXFX-pythia8.npy"
@@ -1164,7 +1177,6 @@ if __name__ == '__main__':
 			
 		if year == '2017':
 			pu_path = '../Corrections/Pileup/puWeight/npy_Run2017/' + pu_path_dict[sample_name]# 2017
-
 
 		print("Use the PU file: ",pu_path)
 		with open(pu_path,'rb') as f:

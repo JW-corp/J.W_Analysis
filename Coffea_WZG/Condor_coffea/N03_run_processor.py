@@ -107,6 +107,7 @@ class JW_Processor(processor.ProcessorABC):
 						"ele2pt", "Subleading $Electron P_{T}$ [GeV]", 300, 0, 600
 					),
 				),
+
 				"ele3pt": hist.Hist(
 					"Events",
 					hist.Cat("dataset", "Dataset"),
@@ -627,10 +628,10 @@ class JW_Processor(processor.ProcessorABC):
 			# Read Fake fraction --> Mapping bin name to int()
 
 			if self._year == "2018":
-				in_dict = np.load('Fitting_2018/results_210517.npy',allow_pickle="True")[()]
+				in_dict = np.load('Fitting_2018/Fit_results.npy',allow_pickle="True")[()]
 
 			if self._year == "2017":
-				in_dict = np.load('Fitting_2017/fit_result_log.npy',allow_pickle="True")[()]
+				in_dict = np.load('Fitting_2017/Fit_results.npy',allow_pickle="True")[()]
 
 			idx=0
 			fake_dict ={}
@@ -1018,6 +1019,7 @@ class JW_Processor(processor.ProcessorABC):
 			ele2phi=ele2Phi,
 			weight=skim_weight(weights.weight() * cuts),
 		)
+		print('ele3pt: ',ele3PT)
 		out["ele3pt"].fill(
 			dataset=dataset, ele3pt=ele3PT, weight=skim_weight(weights.weight() * cuts)
 		)
@@ -1208,7 +1210,7 @@ if __name__ == "__main__":
 		"Events",  # Tree name
 		JW_Processor_instance,  # Class
 		executor=processor.futures_executor,
-		executor_args={"schema": NanoAODSchema, "workers": 20},
+		executor_args={"schema": NanoAODSchema, "workers": 48},
 		# maxchunks=4,
 	)
 

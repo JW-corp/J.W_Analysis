@@ -136,11 +136,6 @@ class JW_Processor(processor.ProcessorABC):
 						"pho_EE_Iso_chg", "Photon EE pfReoIso03_charge", 200, 0, 1
 					),
 				),
-				"pho_sieie_check": hist.Hist(
-					"Events",
-					hist.Cat("dataset", "Dataset"),
-					hist.Bin("pho_sieie_check", "Photon sieie", 200, 0, 0.1),
-				),
 				# -- Photon EB -- #
 				"pho_EB_pt": hist.Hist(
 					"Events",
@@ -168,11 +163,6 @@ class JW_Processor(processor.ProcessorABC):
 					"Events",
 					hist.Cat("dataset", "Dataset"),
 					hist.Bin("pho_EB_sieie", "Photon EB sieie", 200, 0, 0.1),
-				),
-				"pho_EB_sieie_check": hist.Hist(
-					"Events",
-					hist.Cat("dataset", "Dataset"),
-					hist.Bin("pho_EB_sieie_check", "Photon EB sieie", 100, 0, 0.1),
 				),
 				# -- Kinematic variables -- #
 				"mass": hist.Hist(
@@ -550,11 +540,6 @@ class JW_Processor(processor.ProcessorABC):
 		)  # default metric table: delta_r
 		dr_pho_mu_mask = ak.all(Photon.metric_table(Muon) >= 0.5, axis=-1)
 
-		# ID for fake photon
-		is_photon_sieie = make_fake_obj_mask(Photon, ak.ArrayBuilder()).snapshot()
-		Photon_template_mask = is_photon_sieie 
-
-		Photon_sieie_inv = Photon[is_photon_sieie]
 
 		PhoSelmask = (
 			PT_mask
@@ -562,7 +547,6 @@ class JW_Processor(processor.ProcessorABC):
 			& Pixel_seed_mask
 			& dr_pho_ele_mask
 			& dr_pho_mu_mask
-			& Photon_template_mask
 		)
 		Photon = Photon[PhoSelmask]
 
@@ -574,6 +558,20 @@ class JW_Processor(processor.ProcessorABC):
 		Muon = Muon[A_photon_mask]
 		MET = MET[A_photon_mask]
 		events = events[A_photon_mask]
+
+		# ID for fake photon
+		Photon_template_mask = make_fake_obj_mask(Photon, ak.ArrayBuilder()).snapshot()
+
+		Photon = Photon[Photon_template_mask]
+		# Apply cut -Fake Photon -
+		A_photon_mask = ak.num(Photon) > 0
+		Electron = Electron[A_photon_mask]
+		Photon = Photon[A_photon_mask]
+		Jet = Jet[A_photon_mask]
+		Muon = Muon[A_photon_mask]
+		MET = MET[A_photon_mask]
+		events = events[A_photon_mask]
+
 
 		# Stop processing if there is no event remain
 		if len(Electron) == 0:
@@ -650,7 +648,7 @@ class JW_Processor(processor.ProcessorABC):
 		Mee_cut_mask = ak.firsts(Diele.p4.mass) > 4
 
 		# Electron PT cuts
-		Elept_mask = ak.firsts((Diele.lep1.pt >= 25) & (Diele.lep2.pt >= 10))
+		Elept_mask = ak.firsts((Diele.lep1.pt >= 25) & (Diele.lep2.pt >= 20))
 
 		# MET cuts
 		MET_mask = MET.pt > 20
@@ -687,8 +685,6 @@ class JW_Processor(processor.ProcessorABC):
 		Pho_Eta = ak.flatten(leading_pho_sel.eta)
 		Pho_Phi = ak.flatten(leading_pho_sel.phi)
 
-		# -- Just check -- #
-		pho_check_sieie = ak.flatten(Photon_sieie_inv.sieie)
 
 		# -- Pho EB --#
 		Pho_EB_PT = ak.flatten(Pho_EB.pt)
@@ -838,8 +834,6 @@ class JW_Processor(processor.ProcessorABC):
 		)
 		out["pho_EE_Iso_chg"].fill(dataset=dataset, pho_EE_Iso_chg=Pho_EE_Isochg)
 
-		# -- Just check -- #
-		out["pho_sieie_check"].fill(dataset=dataset, pho_sieie_check=pho_check_sieie)
 
 		# -- Kinematic variables -- #
 		out["mass"].fill(dataset=dataset, Mee=Diele_mass)

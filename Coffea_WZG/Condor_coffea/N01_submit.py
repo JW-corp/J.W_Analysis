@@ -4,19 +4,18 @@ import argparse
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('json', type=str,
-            help="python N01.submit.py PATH/TO/File.json")
+parser.add_argument("json", type=str, help="python N01.submit.py PATH/TO/File.json")
 args = parser.parse_args()
 
 
-metadata=args.json
+metadata = args.json
 
 
 with open(metadata) as fin:
     datadict = json.load(fin)
 
 
-os.system('mkdir -p run_condor_log/out run_condor_log/err run_condor_log/log condorOut')
+os.system("mkdir -p run_condor_log/out run_condor_log/err run_condor_log/log condorOut")
 
 jdl = """universe = vanilla
 Executable = N02_run.sh
@@ -30,16 +29,16 @@ transfer_output_files=condorOut
 Arguments = $ENV(METADATA) $ENV(SAMPLE)
 Queue 1"""
 
-jdl_file = open("run.submit", "w") 
-jdl_file.write(jdl) 
-jdl_file.close() 
+jdl_file = open("run.submit", "w")
+jdl_file.write(jdl)
+jdl_file.close()
 
 
-for info,dataset in datadict.items():
-    #os.system('rm -rf run_condor_log/err/'+info+'*')
-    #os.system('rm -rf run_condor_log/log/'+info+'*')
-    #os.system('rm -rf run_condor_log/out/'+info+'*')
-    os.environ['SAMPLE'] = info
-    os.environ['METADATA']   = metadata
-    os.system('condor_submit run.submit')
-os.system('rm run.submit')
+for info, dataset in datadict.items():
+    # os.system('rm -rf run_condor_log/err/'+info+'*')
+    # os.system('rm -rf run_condor_log/log/'+info+'*')
+    # os.system('rm -rf run_condor_log/out/'+info+'*')
+    os.environ["SAMPLE"] = info
+    os.environ["METADATA"] = metadata
+    os.system("condor_submit run.submit")
+os.system("rm run.submit")

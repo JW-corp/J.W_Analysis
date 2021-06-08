@@ -531,22 +531,15 @@ class JW_Processor(processor.ProcessorABC):
 		)  # default metric table: delta_r
 		dr_pho_mu_mask = ak.all(Photon.metric_table(Muon) >= 0.5, axis=-1)
 
-		# ID for fake photon
-		is_photon_sieie = make_fake_obj_mask(Photon, ak.ArrayBuilder()).snapshot()
-		is_photon_medium = Photon.cutBased > 1
-
-		Photon_template_mask = is_photon_sieie # Apply Medium photon ID without the Sieie
-
+		# Photon basic mask
 		PhoSelmask = (
 			PT_mask
-			& isgap_mask
+			&isgap_mask
 			& Pixel_seed_mask
 			& dr_pho_ele_mask
 			& dr_pho_mu_mask
-			& Photon_template_mask
 		)
 		Photon = Photon[PhoSelmask]
-
 		# Apply cut 3
 		A_photon_mask = ak.num(Photon) > 0
 		Electron = Electron[A_photon_mask]
@@ -555,6 +548,20 @@ class JW_Processor(processor.ProcessorABC):
 		Muon = Muon[A_photon_mask]
 		MET = MET[A_photon_mask]
 		events = events[A_photon_mask]
+
+		# ID for fake photon
+		Photon_template_mask = make_fake_obj_mask(Photon, ak.ArrayBuilder()).snapshot()
+
+		Photon = Photon[Photon_template_mask]
+		# Apply cut -Fake Photon -
+		A_photon_mask = ak.num(Photon) > 0
+		Electron = Electron[A_photon_mask]
+		Photon = Photon[A_photon_mask]
+		Jet = Jet[A_photon_mask]
+		Muon = Muon[A_photon_mask]
+		MET = MET[A_photon_mask]
+		events = events[A_photon_mask]
+
 
 		# Stop processing if there is no event remain
 		if len(Electron) == 0:
@@ -631,7 +638,7 @@ class JW_Processor(processor.ProcessorABC):
 		Mee_cut_mask = ak.firsts(Diele.p4.mass) > 4
 
 		# Electron PT cuts
-		Elept_mask = ak.firsts((Diele.lep1.pt >= 25) & (Diele.lep2.pt >= 10))
+		Elept_mask = ak.firsts((Diele.lep1.pt >= 25) & (Diele.lep2.pt >= 20))
 
 		# MET cuts
 		MET_mask = MET.pt > 20

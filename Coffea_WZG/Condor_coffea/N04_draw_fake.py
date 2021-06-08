@@ -38,15 +38,16 @@ isData = True
 isFake = True
 isReal = True
 
+# 2017
+#year = "2017"
+#file_name = "210531_FakeTemplate_2017"
 
+# 2018
 year = "2018"
+file_name = "210531_FakeTemplate_2018"
 
-#file_name = "210427_FakeTemplate_v2"
 
-file_name = "210514_FakeTemplate"
 file_path = "results/" + file_name
-
-
 sample_list = ["Fake", "Real", "data"]
 
 dict_ = Particle_Info_DB.DB
@@ -302,5 +303,5 @@ for i in range(len(out_dict['data_template']['contents'])):
 	)
 
 
-out_npy_name = "Fitting_v2/" + histname + '.npy'
+out_npy_name = "Fitting_2018/" + histname + '.npy'
 np.save(out_npy_name,out_dict)
