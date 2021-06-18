@@ -50,7 +50,7 @@ The bin-names and cuts are mached like this
 
 
 
-(Fake Photon array generation in my script)[https://github.com/JW-corp/J.W_Analysis/blob/main/Coffea_WZG/Condor_coffea/N03_run_processor.py#L571]  
+[Fake Photon array generation in my script](https://github.com/JW-corp/J.W_Analysis/blob/main/Coffea_WZG/Condor_coffea/N03_run_processor.py#L571)
   
 Fake fraction should be applied on 16 different bins.
 This code-snippet make fake fraction arrays matched with different Photon PT & Eta bins
