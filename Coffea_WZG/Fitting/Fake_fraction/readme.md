@@ -48,10 +48,12 @@ The bin-names and cuts are mached like this
 | PT_4_eta_3 | 50 < pt,& 1.5 < \|eta\| < 2     |
 | PT_4_eta_4 | 50 < pt,& 2 < \|eta\| < 2.5     |
 
+---
 
 
-[Fake Photon array generation in my script](https://github.com/JW-corp/J.W_Analysis/blob/main/Coffea_WZG/Condor_coffea/N03_run_processor.py#L571)
-  
+[Fake Photon array generation in my script](https://github.com/JW-corp/J.W_Analysis/blob/main/Coffea_WZG/Condor_coffea/N03_run_processor.py#L571)  
+This script only acting on Columnar based analysis like Coffea,uproot,numpy,pandas if you use loop-based analysis like ROOT, please just refer it.
+
 Fake fraction should be applied on 16 different bins.
 This code-snippet make fake fraction arrays matched with different Photon PT & Eta bins
 After that you can make Fake Photon sample using this simple equation  
