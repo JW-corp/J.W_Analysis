@@ -12,6 +12,7 @@ Before the start, we need make this "npy" file from "coffea-processor" output
  - [Fit_root.py](https://github.com/JW-corp/J.W_Analysis/blob/main/Coffea_WZG/Fitting/Fit_root.py): Fit using TFractionFitter in ROOT (stable)
  - [Fit_pyhf.py](https://github.com/JW-corp/J.W_Analysis/blob/main/Coffea_WZG/Fitting/Fit_pyhf.py): Fit using Fully python eco-system tool: pyhf (need improve)  
  - [root_set](https://github.com/JW-corp/J.W_Analysis/blob/main/Coffea_WZG/Fitting/root_set): Setup root ( python3.8 + ROOT6 ) in KNU-CCP cluster.  
+ - [FakeFraction](https://github.com/JW-corp/J.W_Analysis/tree/main/Coffea_WZG/Fitting/Fake_fraction): Fake fraction results and methods how to calculate them
  - images
    - images_2017 : Fit results with 2017 data
    - images_2018 : Fit results with 2018 data
