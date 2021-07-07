@@ -99,8 +99,6 @@ def TestPileupWeight(filenameData, filenameMC):
 
 
 
-
-
 if __name__ == '__main__':
 	
 #	# -- For making MC hist
@@ -113,8 +111,8 @@ if __name__ == '__main__':
 #	datadir = args.infile
 #	outname = args.outfile
 #
-#	inFiles = FindFiles(datadir, "*.root")  # from DAS file structure
-#	#inFiles = [datadir] # Ntuple 
+#	#inFiles = FindFiles(datadir, "*.root")  # from DAS file structure
+#	inFiles = [datadir] # Ntuple and WZG
 #
 #	
 #	MakeMCPileupDist(inFiles, outname)
@@ -126,9 +124,18 @@ if __name__ == '__main__':
 	infile = sys.argv[1]
 	startTime = time.time()
 
-	infile_path = "mc_pure/2017/" + infile
+	#infile_path = "mc_pure/2018/" + infile # 2018
+	infile_path = "mc_pure/2017/" + infile # 2017
 	outfile_name = infile.split('.')[0] + '.npy'
-	puWeight_arr = TestPileupWeight("../2017/data_2018_pileup_out.root",infile_path)	
+
+
+	# --Legacy
+	#puWeight_arr = TestPileupWeight("../2017/data_2018_pileup_out.root",infile_path)	
+	#puWeight_arr = TestPileupWeight("../2018/data_2018_pileup_out_runABD.root",infile_path)	
+
+	# --Ultra Legacay
+	#puWeight_arr = TestPileupWeight("../UL/2018/PileupHistogram-goldenJSON-13tev-2018-69200ub-99bins.root",infile_path)	 # 2018
+	puWeight_arr = TestPileupWeight("../UL/2017/PileupHistogram-goldenJSON-13tev-2017-69200ub-99bins.root",infile_path) # 2017
 	print(puWeight_arr)
 	print(len(puWeight_arr))
 	

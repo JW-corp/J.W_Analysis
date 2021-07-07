@@ -11,13 +11,14 @@ from coffea.lookup_tools import extractor, dense_lookup
 ###
 
 ele_trig_hists_leg1 = {
-    '2018': uproot3.open("Trigger/leg1/egammaEffi.txt_EGM2D.root")
+    '2018': uproot3.open("Trigger/leg1/2018/egammaEffi.txt_EGM2D.root"),
+    '2017': uproot3.open("Trigger/leg1/2017/egammaEffi.txt_EGM2D.root")
 }
 
 get_ele_trig_leg1_SF = {}
 get_ele_trig_leg1_data_Eff = {}
 get_ele_trig_leg1_mc_Eff = {}
-for year in ['2018']:
+for year in ['2017','2018']:
     ele_trig_SF_leg1 = ele_trig_hists_leg1[year]['EGamma_SF2D']
     ele_trig_Eff_data_leg1 = ele_trig_hists_leg1[year]['EGamma_EffData2D']
     ele_trig_Eff_mc_leg1 = ele_trig_hists_leg1[year]['EGamma_EffMC2D']
@@ -28,12 +29,13 @@ for year in ['2018']:
 
 
 ele_trig_hists_leg2 = {
-    '2018': uproot3.open("Trigger/leg2/egammaEffi.txt_EGM2D.root")
+    '2018': uproot3.open("Trigger/leg2/2018/egammaEffi.txt_EGM2D.root"),
+    '2017': uproot3.open("Trigger/leg2/2017/egammaEffi.txt_EGM2D.root")
 }
 get_ele_trig_leg2_SF = {}
 get_ele_trig_leg2_data_Eff = {}
 get_ele_trig_leg2_mc_Eff = {}
-for year in ['2018']:
+for year in ['2017','2018']:
     ele_trig_SF_leg2 = ele_trig_hists_leg2[year]['EGamma_SF2D']
     ele_trig_Eff_data_leg2 = ele_trig_hists_leg2[year]['EGamma_EffData2D']
     ele_trig_Eff_mc_leg2 = ele_trig_hists_leg2[year]['EGamma_EffMC2D']
@@ -114,21 +116,20 @@ for year in ['2018','2017','2016_preVFP','2016_postVFP']:
 # Muon ID  SFs. Depends on supercluster eta and pt.    
 ###
 mu_files = {
-  #  '2016': uproot3.open("data/ScaleFactor/2016LegacyReReco_Muon_SF_ID.root"),
-  #  '2017': uproot3.open("data/ScaleFactor/2017_Muon_RunBCDEF_SF_ID.root"),
+    '2017': uproot3.open("Muon/2017/Efficiencies_muon_generalTracks_Z_Run2017_UL_ID.root"),
     '2018': uproot3.open("Muon/2018/Efficiencies_muon_generalTracks_Z_Run2018_UL_ID.root")
 }
 
+
 mu_tight_hist = {
- #   '2016': mu_files['2016']["NUM_TightID_DEN_genTracks_eta_pt"],
- #   '2017': mu_files['2017']["NUM_TightID_DEN_genTracks_pt_abseta"],
+    '2017': mu_files['2017']["NUM_TightID_DEN_TrackerMuons_abseta_pt"],
     '2018': mu_files['2018']["NUM_TightID_DEN_TrackerMuons_abseta_pt"]
 }
 
 
 
 get_mu_tight_id_sf = {}
-for year in ['2018']:
+for year in ['2017','2018']:
     get_mu_tight_id_sf[year] = lookup_tools.dense_lookup.dense_lookup(mu_tight_hist[year].values, mu_tight_hist[year].edges)
 
 
@@ -138,18 +139,18 @@ for year in ['2018']:
 
 mu_iso_files = {
 #    '2016': uproot3.open("data/ScaleFactor/Merged_SF_ISO.root"),
-#    '2017': uproot3.open("data/ScaleFactor/RunBCDEF_SF_ISO_syst.root"),
+    '2017': uproot3.open("Muon/2017/Efficiencies_muon_generalTracks_Z_Run2017_UL_ISO.root"),
     '2018': uproot3.open("Muon/2018/Efficiencies_muon_generalTracks_Z_Run2018_UL_ISO.root")
 }
 mu_iso_tight_hist = {
 #    '2016': mu_iso_files['2016']["NUM_TightRelIso_DEN_TightIDandIPCut_eta_pt"],
-#    '2017': mu_iso_files['2017']["NUM_TightRelIso_DEN_TightIDandIPCut_pt_abseta"],
+    '2017': mu_iso_files['2017']["NUM_TightRelIso_DEN_TightIDandIPCut_abseta_pt"],
     '2018': mu_iso_files['2018']["NUM_TightRelIso_DEN_TightIDandIPCut_abseta_pt"]
 }
 
 
 get_mu_tight_iso_sf = {}
-for year in ['2018']:
+for year in ['2017','2018']:
     get_mu_tight_iso_sf[year] = lookup_tools.dense_lookup.dense_lookup(mu_iso_tight_hist[year].values, mu_iso_tight_hist[year].edges)
 
 
