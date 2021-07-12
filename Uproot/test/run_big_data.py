@@ -1,7 +1,7 @@
 import glob
 import subprocess
 
-file_list  = glob.glob("/x4/cms/dylee/Delphes/data/root/signal/*/*.root")
+file_list  = glob.glob("/x4/cms/dylee/Delphes/data/Storage/Second_data/root/signal/condorDelPyOut/*.root")
 
 
 def calc_Nout(maxfile,nfile):
@@ -9,7 +9,7 @@ def calc_Nout(maxfile,nfile):
 	nout = int(nfile / maxfile)
 	return(nout)
 
-maxfile=20 # Max number of input files for each run ( argumnet )
+maxfile=50 # Max number of input files for each run ( argumnet )
 nfile=len(file_list) #  Number of total input files
 nout  = calc_Nout(maxfile,nfile) # Number of output files
 
@@ -20,7 +20,7 @@ for i in range(nout):
 	
 	infiles = (' '.join(file_list[start:end]))
 
-
+	print("############################## SET: ",i)
 	print(infiles)
 	
 	# Run specific excutable codes
