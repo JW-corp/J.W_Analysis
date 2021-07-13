@@ -154,14 +154,14 @@ if __name__ == "__main__":
 	start_time = time.time()
 
 	# read data list
-	#flist, branches = read_data()
+	flist, branches = read_data()
 
 	# start process
-	#histo = Loop(flist)
+	histo = Loop(flist)
 	
 	# output ntuple
-	#out_name = 'out.npy' # --> Please automate it using str.split() method
-	#np.save(out_name,histo,allow_pickle=True)
+	out_name = 'out.npy' # --> Please automate it using str.split() method
+	np.save(out_name,histo,allow_pickle=True)
 	
 	# read ntuple and draw hist
 	ntuple = np.load('out.npy',allow_pickle=True)[()]
