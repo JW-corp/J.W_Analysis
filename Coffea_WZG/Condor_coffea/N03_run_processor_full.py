@@ -260,26 +260,24 @@ class JW_Processor(processor.ProcessorABC):
 			get_ele_medium_id_sf = self._corrections["get_ele_medium_id_sf"][self._year]
 			get_pho_medium_id_sf = self._corrections["get_pho_medium_id_sf"][self._year]
 
-			# DoubleEG trigger # 2016, 2017 are not applied yet
-			if self._year == "2018":
-				get_ele_trig_leg1_SF = self._corrections["get_ele_trig_leg1_SF"][
-					self._year
-				]
-				get_ele_trig_leg1_data_Eff = self._corrections[
-					"get_ele_trig_leg1_data_Eff"
-				][self._year]
-				get_ele_trig_leg1_mc_Eff = self._corrections[
-					"get_ele_trig_leg1_mc_Eff"
-				][self._year]
-				get_ele_trig_leg2_SF = self._corrections["get_ele_trig_leg2_SF"][
-					self._year
-				]
-				get_ele_trig_leg2_data_Eff = self._corrections[
-					"get_ele_trig_leg2_data_Eff"
-				][self._year]
-				get_ele_trig_leg2_mc_Eff = self._corrections[
-					"get_ele_trig_leg2_mc_Eff"
-				][self._year]
+			get_ele_trig_leg1_SF = self._corrections["get_ele_trig_leg1_SF"][
+				self._year
+			]
+			get_ele_trig_leg1_data_Eff = self._corrections[
+				"get_ele_trig_leg1_data_Eff"
+			][self._year]
+			get_ele_trig_leg1_mc_Eff = self._corrections[
+				"get_ele_trig_leg1_mc_Eff"
+			][self._year]
+			get_ele_trig_leg2_SF = self._corrections["get_ele_trig_leg2_SF"][
+				self._year
+			]
+			get_ele_trig_leg2_data_Eff = self._corrections[
+				"get_ele_trig_leg2_data_Eff"
+			][self._year]
+			get_ele_trig_leg2_mc_Eff = self._corrections[
+				"get_ele_trig_leg2_mc_Eff"
+			][self._year]
 
 			# PU weight with custom made npy and multi-indexing
 			pu_weight_idx = ak.values_astype(events.Pileup.nTrueInt, "int64")
@@ -421,35 +419,68 @@ class JW_Processor(processor.ProcessorABC):
 		'''
 
 		#  --Muon
-		MuSelmask = (
-			(Muon.pt >= 10)
-			& (abs(Muon.eta) <= 2.5)
-			& (Muon.tightId)
-			& (Muon.pfRelIso04_all < 0.15)
-		)
+
+		if dataset == "FakeLepton":
+
+			MuSelmask = (
+				(Muon.pt >= 10)
+				& (abs(Muon.eta) <= 2.5)
+				& (Muon.pfRelIso04_all < 0.15)
+			)
+
+		else:
+
+			MuSelmask = (
+				(Muon.pt >= 10)
+				& (abs(Muon.eta) <= 2.5)
+				& (Muon.tightId)
+				& (Muon.pfRelIso04_all < 0.15)
+			)
+
+
+
 		Muon = Muon[MuSelmask]
 
 		##----------- Cut flow2: Electron Selection
 
-		EleSelmask = (
-			(Electron.pt >= 10)
-			& (np.abs(Electron.eta + Electron.deltaEtaSC) < 1.479)
-			& (Electron.cutBased > 2)
-			& (abs(Electron.dxy) < 0.05)
-			& (abs(Electron.dz) < 0.1)
-		) | (
-			(Electron.pt >= 10)
-			& (np.abs(Electron.eta + Electron.deltaEtaSC) > 1.479)
-			& (np.abs(Electron.eta + Electron.deltaEtaSC) <= 2.5)
-			& (Electron.cutBased > 2)
-			& (abs(Electron.dxy) < 0.1)
-			& (abs(Electron.dz) < 0.2)
-		)
+		if dataset == "FakeLepton":
+			
+			EleSelmask = (
+				(Electron.pt >= 10)
+				& (np.abs(Electron.eta + Electron.deltaEtaSC) < 1.479)
+				& (abs(Electron.dxy) < 0.05)
+				& (abs(Electron.dz) < 0.1)
+			) | (
+				(Electron.pt >= 10)
+				& (np.abs(Electron.eta + Electron.deltaEtaSC) > 1.479)
+				& (np.abs(Electron.eta + Electron.deltaEtaSC) <= 2.5)
+				& (abs(Electron.dxy) < 0.1)
+				& (abs(Electron.dz) < 0.2)
+			)
+
+		else:
+
+			EleSelmask = (
+				(Electron.pt >= 10)
+				& (np.abs(Electron.eta + Electron.deltaEtaSC) < 1.479)
+				& (Electron.cutBased > 2)
+				& (abs(Electron.dxy) < 0.05)
+				& (abs(Electron.dz) < 0.1)
+				#& (Electron.genPartFlav == 1)
+			) | (
+				(Electron.pt >= 10)
+				& (np.abs(Electron.eta + Electron.deltaEtaSC) > 1.479)
+				& (np.abs(Electron.eta + Electron.deltaEtaSC) <= 2.5)
+				& (Electron.cutBased > 2)
+				& (abs(Electron.dxy) < 0.1)
+				& (abs(Electron.dz) < 0.2)
+			)
 
 		Electron = Electron[EleSelmask]
 
 		# Apply flow2
-		Tri_electron_mask = ak.num(Electron) >= 3
+		Tri_electron_mask = ak.num(Electron) == 3
+
 		Electron = Electron[Tri_electron_mask]
 		Photon = Photon[Tri_electron_mask]
 		if (not isData) and (not isFake):
@@ -691,6 +722,13 @@ class JW_Processor(processor.ProcessorABC):
 
 		cut4 = np.ones(ak.sum(ak.num(Electron) > 0)) * 4
 
+
+		# Fake Lepton weight
+		if dataset == "FakeLepton":
+			fake_lep_w = events.fake.lepton_weight
+
+
+
 		# Define Electron Triplet
 
 		Triple_electron = [Electron[eee_triplet_idx[idx]] for idx in "012"]
@@ -784,9 +822,7 @@ class JW_Processor(processor.ProcessorABC):
 			pt1 = ak.flatten(leading_ele.pt)
 			pt2 = ak.flatten(subleading_ele.pt)
 
-			# -- 2017,2016 are not applied yet
-			if self._year == "2018":
-				ele_trig_weight = Trigger_Weight(eta1, pt1, eta2, pt2)
+			ele_trig_weight = Trigger_Weight(eta1, pt1, eta2, pt2)
 
 		##----------- Cut flow5: Basline selection
 
@@ -800,7 +836,10 @@ class JW_Processor(processor.ProcessorABC):
 		)
 
 		# MET cuts
-		MET_mask = MET.pt > 20  # Baseline
+		if dataset == "FakeLepton":
+			MET_mask = MET > 20
+		else:
+			MET_mask = MET.pt > 20
 
 		# Mask
 		Baseline_mask = Elept_mask & MET_mask & Mee_cut_mask  # SR,CR
@@ -840,7 +879,12 @@ class JW_Processor(processor.ProcessorABC):
 
 		##-----------  << SR >>
 		Zmass_window_mask = ak.firsts(abs(Triple_eee.p4.mass - 91.1876)) < 15
-		MET_mask = MET.pt > 30
+
+		if dataset == "FakeLepton":
+			MET_mask = MET > 30
+		else:
+			MET_mask = MET.pt > 30
+
 		bjet_veto = ak.firsts(Jet.btagDeepB > 0.7665) == 0
 		Mlll_mask = ak.firsts((Triple_eee.p4 + Triple_eee.lep3).mass) > 100
 		
@@ -878,7 +922,13 @@ class JW_Processor(processor.ProcessorABC):
 		
 		is4lep = (N_muon +ak.num(Electron)) == 4
 		Zmass_window_mask = ak.firsts(abs(Triple_eee.p4.mass - 91.1876)) < 15
-		MET_mask = MET.pt > 30
+
+
+		if dataset == "FakeLepton":
+			MET_mask = MET > 30
+		else:
+			MET_mask = MET.pt > 30
+
 		bjet_veto = ak.firsts(Jet.btagDeepB > 0.7665) == 0
 		Mlll_mask = ak.firsts((Triple_eee.p4 + Triple_eee.lep3).mass) > 100
 		CR_ZZA_mask = (is4lep & Zmass_window_mask & MET_mask & bjet_veto & Mlll_mask)
@@ -904,7 +954,12 @@ class JW_Processor(processor.ProcessorABC):
 
  		##-----------  << CR-Z+Jets >>
 		Zmass_window_mask = ak.firsts(abs(Triple_eee.p4.mass - 91.1876)) < 15
-		MET_mask = MET.pt <= 30
+
+		if dataset == "FakeLepton":
+			MET_mask = MET <= 30
+		else:
+			MET_mask = MET.pt <= 30
+
 		bjet_veto = ak.firsts(Jet.btagDeepB > 0.7665) == 0
 		Mlll_mask = ak.firsts((Triple_eee.p4 + Triple_eee.lep3).mass) > 100
 		
@@ -936,7 +991,12 @@ class JW_Processor(processor.ProcessorABC):
 		
 		##-----------  << CR-T-enriched >>
 		Zmass_window_mask = ak.firsts(abs(Triple_eee.p4.mass - 91.1876)) > 5
-		MET_mask = MET.pt > 30
+
+		if dataset == "FakeLepton":
+			MET_mask = MET > 30
+		else:
+			MET_mask = MET.pt > 30
+
 		bjet_veto = ak.firsts(Jet.btagDeepB > 0.7665) > 0
 		Mlll_mask = ak.firsts((Triple_eee.p4 + Triple_eee.lep3).mass) > 100
 		
@@ -969,7 +1029,14 @@ class JW_Processor(processor.ProcessorABC):
 
 		##-----------  << CR-Conversion >>
 		Zmass_window_mask = ak.firsts(abs(Triple_eee.p4.mass - 91.1876)) > 15
-		MET_mask = MET.pt <= 30
+
+
+		if dataset == "FakeLepton":
+			MET_mask = MET <= 30
+		else:
+			MET_mask = MET.pt <= 30
+
+
 		bjet_veto = ak.firsts(Jet.btagDeepB > 0.7665) == 0
 		Mlll_mask = ak.firsts((Triple_eee.p4 + Triple_eee.lep3).mass) <= 100
 
@@ -1062,7 +1129,10 @@ class JW_Processor(processor.ProcessorABC):
 			ele3Phi = ak.flatten(arr_dict["Triple_eee_sel"].lep3.phi)
 
 			# MET
-			met = arr_dict["MET_sel"].pt
+			if dataset == "FakeLepton":
+				met = arr_dict["MET_sel"]
+			else:
+				met = arr_dict["MET_sel"].pt
 
 			# M(eea) M(ee)
 			diele = arr_dict["Triple_eee_sel"].p4
@@ -1070,12 +1140,12 @@ class JW_Processor(processor.ProcessorABC):
 			Mlll = ak.flatten(lll_vec.mass)
 			Mee = ak.flatten(arr_dict["Triple_eee_sel"].p4.mass)
 
-			# W MT (--> beta )
-			Ele3 = ak.flatten(arr_dict["Triple_eee_sel"].lep3)
-			MT = np.sqrt(
-				2 * Ele3.pt * arr_dict["MET_sel"].pt * (1 - np.cos(abs(arr_dict["MET_sel"].delta_phi(Ele3))))
-			)
-			MT = np.array(MT)
+			## W MT (--> beta )
+			#Ele3 = ak.flatten(arr_dict["Triple_eee_sel"].lep3)
+			#MT = np.sqrt(
+			#	2 * Ele3.pt * arr_dict["MET_sel"].pt * (1 - np.cos(abs(arr_dict["MET_sel"].delta_phi(Ele3))))
+			#)
+			#MT = np.array(MT)
 
 			# --- Apply weight and hist
 			weights = processor.Weights(len(cut4))
@@ -1093,16 +1163,17 @@ class JW_Processor(processor.ProcessorABC):
 			if isFake:
 				weights.add("fake_fraction", fw)
 
+
+			if dataset == "FakeLepton":
+				weights.add("fake_lepton_weight",fake_lep_w)
+
 			# Weight and SF here
 			if not (isData | isFake):
 				weights.add("pileup", pu)
 				weights.add("ele_id", ele_medium_id_sf)
 				weights.add("pho_id", get_pho_medium_id_sf)
 				weights.add("ele_reco", ele_reco_sf)
-
-				# 2016,2017 are not applied yet
-				if self._year == "2018":
-					weights.add("ele_trigger", ele_trig_weight)
+				weights.add("ele_trigger", ele_trig_weight)
 
 			# ---------------------------- Fill hist --------------------------------------#
 
@@ -1130,9 +1201,9 @@ class JW_Processor(processor.ProcessorABC):
 			)
 
 			# --mass -- #
-			out["MT"].fill(
-				dataset=dataset, region = region,MT=MT, weight=skim_weight(weights.weight() * cuts)
-			)
+			#out["MT"].fill(
+			#	dataset=dataset, region = region,MT=MT, weight=skim_weight(weights.weight() * cuts)
+			#)
 			out["mass"].fill(
 				dataset=dataset, region = region,mass=Mee, weight=skim_weight(weights.weight() * cuts)
 			)
@@ -1293,7 +1364,7 @@ if __name__ == "__main__":
 	filelist = glob.glob(datadict[data_sample])
 
 	if isFake:
-		sample_name = "Fake_Photon"
+		sample_name = "FakePhoton"
 	else:
 		sample_name = data_sample.split("_")[0]
 
