@@ -10,14 +10,17 @@ import sys
 
 sys.path.append("util")
 import Particle_Info_DB
-import Hist_standard_dict
+import Hist_Base_dict
+import Hist_CR_ZZA_dict
+import Hist_SR_dict
+
 
 
 # -- Muon -- #
-
 hsum_mupt = hist.Hist(
     "Events",
     hist.Cat("dataset", "Dataset"),
+	hist.Cat("region", "region"),
     hist.Bin("mupt","Leading Muon  $P_{T}$ [GeV]", 300, 0, 600),
 )
 
@@ -25,6 +28,7 @@ hsum_mupt = hist.Hist(
 hsum_mueta =  hist.Hist(
     "Events",
     hist.Cat("dataset", "Dataset"),
+	hist.Cat("region", "region"),
     hist.Bin("mueta", "Leading Muon $\eta$ [GeV]", 20, -5, 5),
 )
 
@@ -32,15 +36,16 @@ hsum_mueta =  hist.Hist(
 hsum_muphi =  hist.Hist(
     "Events",
     hist.Cat("dataset", "Dataset"),
+	hist.Cat("region", "region"),
     hist.Bin("muphi", "Leading Muon $\phi$ [GeV]", 20, -3.15, 3.15),
 )
-
 
 
 
 hsum_mass_eee =  hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("mass_eee","$m_{eee}$ [GeV]", 300, 0, 600),
 )
 
@@ -48,6 +53,7 @@ hsum_mass_eee =  hist.Hist(
 hsum_MT = hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("MT","W MT [GeV]", 100, 0, 200)
 )
 
@@ -55,113 +61,134 @@ hsum_MT = hist.Hist(
 hsum_dR_aj = hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("dR_aj","$\delta R_{\gammaj}$", 100, 0, 4),
 )
 hsum_cutflow = hist.Hist(
 	'Events',
 	hist.Cat('dataset', 'Dataset'),
+	hist.Cat("region", "region"),
 	hist.Bin('cutflow', 'Cut index', [0, 1, 2, 3,4,5,6,7,8])
 )
 
 hsum_charge= hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("charge","charge sum of electrons", 6, -3, 3),
 )
 hsum_nPV = hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("nPV","Number of Primary vertex",100,0,100)	
 )
 hsum_nPV_nw = hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("nPV_nw","Number of Primary vertex",100,0,100)	
 )
 hsum_Mee = hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("mass","Z mass",100,0,200)	
 )
 
 hsum_ele1pt = hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("ele1pt","Leading Electron $P_{T}$ [GeV]",300,0,600)	
 )
 hsum_ele2pt =  hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("ele2pt","Subleading $Electron P_{T}$ [GeV]", 300, 0, 600),
 )
 hsum_ele3pt =  hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("ele3pt","Third $Electron P_{T}$ [GeV]", 300, 0, 600),
 )
 
 hsum_ele1eta= hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("ele1eta","Leading Electron $\eta$ [GeV]", 20, -5, 5),
 )
 
 hsum_ele2eta =  hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("ele2eta","Subleading Electron $\eta$ [GeV]", 20, -5, 5),
 )
 hsum_ele1phi =  hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("ele1phi","Leading Electron $\phi$ [GeV]", 20, -3.15, 3.15),
 )
 
 hsum_ele2phi =  hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("ele2phi","Subleading Electron $\phi$ [GeV]", 20, -3.15, 3.15),
 )
 hsum_nElectrons = hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("nElectrons","# of Electrons",10,0,10)
 )
 
 hsum_pho_EE_pt =  hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("pho_EE_pt","Photon EE $P_{T}$ [GeV]", 300, 0, 600),
 )
 
 hsum_pho_EE_eta =  hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("pho_EE_eta","Photon EE $\eta$ ", 50, -5, 5),
 )
 hsum_pho_EE_phi =  hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("pho_EE_phi","Photon EE $\phi$ ", 50, -3.15, 3.15),
 )
 hsum_pho_EE_hoe = hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("pho_EE_hoe","Photon EE HoverE", 100, 0, 0.6),
 )
 hsum_pho_EE_sieie =  hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("pho_EE_sieie","Photon EE sieie", 100, 0, 0.3),
 )
 hsum_pho_EE_Iso_all =  hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("pho_EE_Iso_all","Photon EE pfReoIso03_all", 100, 0, 0.3),
 )
 hsum_pho_EE_Iso_chg =  hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("pho_EE_Iso_chg","Photon EE pfReoIso03_charge", 100, 0, 0.03),
 )
 
@@ -172,36 +199,43 @@ hsum_pho_EE_Iso_chg =  hist.Hist(
 hsum_pho_EB_pt =  hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("pho_EB_pt","Photon EB $P_{T}$ [GeV]", 300, 0, 600),
 )
 hsum_pho_EB_eta =  hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("pho_EB_eta","Photon EB $\eta$ ", 50, -5, 5),
 )
 hsum_pho_EB_phi =  hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("pho_EB_phi","Photon EB $\phi$ ", 50, -3.15, 3.15),
 )
 hsum_pho_EB_hoe = hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("pho_EB_hoe","Photon EB HoverE", 100, 0, 0.6),
 )
 hsum_pho_EB_sieie =  hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("pho_EB_sieie","Photon EB sieie", 100, 0, 0.012),
 )
 hsum_pho_EB_Iso_all =  hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("pho_EB_Iso_all","Photon EB pfReoIso03_all", 100, 0, 0.15),
 )
 hsum_pho_EB_Iso_chg =  hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("pho_EB_Iso_chg","Photon EB pfReoIso03_charge", 100, 0, 0.03),
 )
 
@@ -209,6 +243,7 @@ hsum_pho_EB_Iso_chg =  hist.Hist(
 hsum_met = hist.Hist(
 	"Events",
 	hist.Cat("dataset","Dataset"),
+	hist.Cat("region", "region"),
 	hist.Bin("met","met [GeV]", 300, 0, 600),
 )
 
@@ -250,12 +285,25 @@ parser = argparse.ArgumentParser()
 parser.add_argument("hist_name", type=str, help="PT_1_eta_1")
 parser.add_argument("year", type=str, help="2018")
 parser.add_argument("channel", type=str, help="eee")
+parser.add_argument("region", type=str, help="Signal")
 parser.add_argument("filename", type=str, help="210531_eee_2018")
 args = parser.parse_args()
 
-histname = args.hist_name
 
-hist_info = Hist_standard_dict.hist_info
+
+if args.region == "Baseline":
+	Hist_dict = Hist_Base_dict
+elif args.region == "Signal":
+	Hist_dict = Hist_SR_dict
+else:
+	Hist_dict = Hist_CR_ZZA_dict
+
+
+histname = args.hist_name
+hist_info = Hist_dict.hist_info
+
+
+
 xmin = hist_info[histname]['xmin']
 xmax = hist_info[histname]['xmax']
 ymin = hist_info[histname]['ymin']
@@ -305,7 +353,7 @@ if (year =='2017') and (channel =='eemu'):
 
 
 ## --Sample Lists
-sample_list = ['DoubleEG','DY' ,'WZ' ,'ZZ' ,'TTWJets','TTZtoLL','tZq' ,'Egamma','WZG','ZGToLLG','TTGJets','WGToLNuG','FakePhoton']
+sample_list = ['DoubleEG','DY' ,'WZ' ,'ZZ' ,'TTWJets','TTZtoLL','tZq' ,'Egamma','WZG','ZGToLLG','TTGJets','WGToLNuG','FakePhoton','FakeLepton']
 
 
 
@@ -415,6 +463,8 @@ if not histname == 'cutflow':
 	h1 = h1.rebin(histname,hist.Bin(histname,name,bins,binxmin,binxmax))
 
 
+
+
 # ----> Plotting 
 print("End processing.. make plot")
 print(" ")
@@ -434,6 +484,8 @@ plt.rcParams.update({
 	'ytick.labelsize': 12
 })
 fig, (ax, rax) = plt.subplots(
+#fig, ax = plt.subplots(
+	#nrows=1,
 	nrows=2,
 	ncols=1,
 	figsize=(10,10),
@@ -476,14 +528,27 @@ data_err_opts = {
 
 
 # -- Make order of stak
-print("##" * 20)
+#print("##" * 20)
+#order_dict = {}
+#for i, j in h1.values().items():
+#	order_dict[i[0]] = j[-3]
+#	#order_dict[i[0]] = j[-2]
+#
+#orderd_dict = dict(sorted(order_dict.items(),key=(lambda x: x[1])))
+#for i,j in orderd_dict.items():
+#	order_dict[i[0]] = j[-3]
+#	print("{0} : {1}".format(i,j))
+
+
+region = args.region
 order_dict = {}
-for i, j in h1.values().items():
-	order_dict[i[0]] = j[-2]
+for i, j in h1.integrate('region',region).values().items():
+	order_dict[i[0]] = sum(j)
 
 orderd_dict = dict(sorted(order_dict.items(),key=(lambda x: x[1])))
 for i,j in orderd_dict.items():
 	print("{0} : {1}".format(i,j))
+	
 
 
 
@@ -502,8 +567,14 @@ if year == "2017":
 
 
 
+# 2018 eee fake lepton baseline
+order=['TTWJets','tZq','TTGJets','TTZtoLL','ZZ','WZ','Fake_Photon','ZGToLLG','FakeLepton','WZG']
+
+
+
+
 hist.plot1d(
-	h1[notdata],
+	h1[notdata].integrate('region',region),
 	ax=ax,
 	clear=False,
 	stack=True,
@@ -514,11 +585,9 @@ hist.plot1d(
 
 
 
-
-
 # DATA plotting
 hist.plot1d(
-	h1[data],
+	h1[data].integrate('region',region),
 	ax=ax,
 	clear=False,
 	error_opts=data_err_opts
@@ -527,8 +596,8 @@ hist.plot1d(
 
 # -- Ratio Plot
 hist.plotratio(
-    num=h1[data].sum("dataset"),
-    denom=h1[notdata].sum("dataset"),
+    num=h1[data].integrate('region',region).sum("dataset"),
+    denom=h1[notdata].integrate('region',region).sum("dataset"),
     ax=rax,
     error_opts=data_err_opts,
     denom_fill_opts={},
