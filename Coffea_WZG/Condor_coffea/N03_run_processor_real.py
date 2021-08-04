@@ -354,7 +354,7 @@ class JW_Processor(processor.ProcessorABC):
 
 		# Golden Json file 
 		if (self._year == "2018") and isData:
-			injson = "/x5/cms/jwkim/gitdir/JWCorp/JW_analysis/Coffea_WZG/Corrections/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt.RunABD"
+			injson = "/x5/cms/jwkim/gitdir/JWCorp/JW_analysis/Coffea_WZG/Corrections/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt.RunABCD"
 		
 		if (self._year == "2017") and isData:
 			injson="/x5/cms/jwkim/gitdir/JWCorp/JW_analysis/Coffea_WZG/Corrections/Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt"
@@ -469,7 +469,7 @@ class JW_Processor(processor.ProcessorABC):
 						
 					#if (vid_cuts2 & 0b1111111 == 0b1111111): # Cut applied
 					#if (vid_cuts2 & 0b1111111 == 0b1110111): # Inverse Sieie
-					if (vid_cuts2 & 0b1100111 == 0b1100111): # Without Sieie
+					if (vid_cuts2 & 0b1110111 == 0b1110111): # Without Sieie
 					
 						builder.boolean(True)
 						
@@ -571,8 +571,8 @@ class JW_Processor(processor.ProcessorABC):
 
 		##----------- Cut flow2: Electron Selection
 
-		EleSelmask = ((Electron.pt >= 10) & (np.abs(Electron.eta + Electron.deltaEtaSC) < 1.479)  &  (Electron.cutBased > 2) & (abs(Electron.dxy) < 0.05) & (abs(Electron.dz) < 0.1)) | \
-					((Electron.pt >= 10) & (np.abs(Electron.eta + Electron.deltaEtaSC) > 1.479) & (np.abs(Electron.eta + Electron.deltaEtaSC) <= 2.5) & (Electron.cutBased > 2) & (abs(Electron.dxy) < 0.1) & (abs(Electron.dz) < 0.2))
+		EleSelmask = ((Electron.pt >= 20) & (np.abs(Electron.eta + Electron.deltaEtaSC) < 1.479)  &  (Electron.cutBased > 2) & (abs(Electron.dxy) < 0.05) & (abs(Electron.dz) < 0.1)) | \
+					((Electron.pt >= 20) & (np.abs(Electron.eta + Electron.deltaEtaSC) > 1.479) & (np.abs(Electron.eta + Electron.deltaEtaSC) <= 2.5) & (Electron.cutBased > 2) & (abs(Electron.dxy) < 0.1) & (abs(Electron.dz) < 0.2))
 		
 		Electron = Electron[EleSelmask]
 		
@@ -1171,9 +1171,9 @@ if __name__ == '__main__':
 		}
 
 
+
 		if year == '2018':
-			pu_path = '../Corrections/Pileup/puWeight/npy_Run2018ABD_pure/'+ pu_path_dict[sample_name] # Local pure 2018
-			#pu_path = '../Corrections/Pileup/puWeight/npy_Run2018ABD/'+ pu_path_dict[sample_name] # Local skim 2018
+			pu_path = '../Corrections/Pileup/puWeight/npy_UL_Run2018/'+ pu_path_dict[sample_name] # Local pure 2018
 			
 		if year == '2017':
 			pu_path = '../Corrections/Pileup/puWeight/npy_Run2017/' + pu_path_dict[sample_name]# 2017
@@ -1204,7 +1204,7 @@ if __name__ == '__main__':
 		"Events", # Tree name
 		JW_Processor_instance, # Class
 		executor=processor.futures_executor,
-		executor_args={"schema": NanoAODSchema, "workers": 1},
+		executor_args={"schema": NanoAODSchema, "workers": 48},
 	)
 	
 	#outname = data_sample + '.futures'

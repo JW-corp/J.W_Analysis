@@ -18,26 +18,26 @@ import Hist_SR_dict
 
 # -- Muon -- #
 hsum_mupt = hist.Hist(
-    "Events",
-    hist.Cat("dataset", "Dataset"),
+	"Events",
+	hist.Cat("dataset", "Dataset"),
 	hist.Cat("region", "region"),
-    hist.Bin("mupt","Leading Muon  $P_{T}$ [GeV]", 300, 0, 600),
+	hist.Bin("mupt","Leading Muon  $P_{T}$ [GeV]", 300, 0, 600),
 )
 
 
 hsum_mueta =  hist.Hist(
-    "Events",
-    hist.Cat("dataset", "Dataset"),
+	"Events",
+	hist.Cat("dataset", "Dataset"),
 	hist.Cat("region", "region"),
-    hist.Bin("mueta", "Leading Muon $\eta$ [GeV]", 20, -5, 5),
+	hist.Bin("mueta", "Leading Muon $\eta$ [GeV]", 20, -5, 5),
 )
 
 
 hsum_muphi =  hist.Hist(
-    "Events",
-    hist.Cat("dataset", "Dataset"),
+	"Events",
+	hist.Cat("dataset", "Dataset"),
 	hist.Cat("region", "region"),
-    hist.Bin("muphi", "Leading Muon $\phi$ [GeV]", 20, -3.15, 3.15),
+	hist.Bin("muphi", "Leading Muon $\phi$ [GeV]", 20, -3.15, 3.15),
 )
 
 
@@ -418,7 +418,7 @@ scales={
 	'TTZtoLL' : lumi_factor * 1000  * xsecDict['TTZtoLL'] / GenDict['TTZtoLL'],
 	'tZq'	  : lumi_factor * 1000  * xsecDict['tZq'] / GenDict['tZq'],
 	'ZGToLLG' : lumi_factor * 1000  * xsecDict['ZGToLLG'] / GenDict['ZGToLLG'],
-    'TTGJets' : lumi_factor * 1000  * xsecDict['TTGJets'] / GenDict['TTGJets'],
+	'TTGJets' : lumi_factor * 1000  * xsecDict['TTGJets'] / GenDict['TTGJets'],
  #   'WGToLNuG': lumi_factor * 1000  * xsecDict['WGToLNuG'] / GenDict['WGToLNuG'],
 }
 
@@ -568,8 +568,14 @@ if year == "2017":
 
 
 # 2018 eee fake lepton baseline
-order=['TTWJets','tZq','TTGJets','TTZtoLL','ZZ','WZ','Fake_Photon','ZGToLLG','FakeLepton','WZG']
+#order=['TTWJets','tZq','TTGJets','TTZtoLL','ZZ','WZ','Fake_Photon','ZGToLLG','FakeLepton','WZG']
 
+# 2018 eee fake lepton CR Z+jets
+#order=['TTWJets', 'tZq', 'TTZtoLL', 'TTGJets', 'ZGToLLG', 'Fake_Photon', 'WZ', 'ZZ', 'FakeLepton', 'WZG']
+#order = ['TTWJets', 'ZGToLLG', 'tZq', 'TTZtoLL', 'FakePhoton', 'WZ', 'ZZ', 'FakeLepton', 'WZG']
+
+# 2018 eee fake lepton SR
+order=['TTWJets', 'ZGToLLG', 'tZq', 'TTZtoLL', 'WZ', 'ZZ', 'FakeLepton', 'WZG']
 
 
 
@@ -596,13 +602,13 @@ hist.plot1d(
 
 # -- Ratio Plot
 hist.plotratio(
-    num=h1[data].integrate('region',region).sum("dataset"),
-    denom=h1[notdata].integrate('region',region).sum("dataset"),
-    ax=rax,
-    error_opts=data_err_opts,
-    denom_fill_opts={},
-    guide_opts={},
-    unc="num",
+	num=h1[data].integrate('region',region).sum("dataset"),
+	denom=h1[notdata].integrate('region',region).sum("dataset"),
+	ax=rax,
+	error_opts=data_err_opts,
+	denom_fill_opts={},
+	guide_opts={},
+	unc="num",
 )
 
 np.set_printoptions(suppress=True)
@@ -625,13 +631,13 @@ if histname == 'cutflow':
 
 
 lum = plt.text(
-    1.0,
-    1.0,
+	1.0,
+	1.0,
 	r"%.2f fb$^{-1}$ (13 TeV)" % (lumi_factor),
-    fontsize=16,
-    horizontalalignment="right",
-    verticalalignment="bottom",
-    transform=ax.transAxes,
+	fontsize=16,
+	horizontalalignment="right",
+	verticalalignment="bottom",
+	transform=ax.transAxes,
 )
 
 

@@ -108,6 +108,12 @@ class JW_Processor(processor.ProcessorABC):
 					hist.Cat("dataset", "Dataset"),
 					hist.Bin("phophi", "Photon $\phi$ ", 50, -3.15, 3.15),
 				),
+				"phoIsoChg": hist.Hist(
+					"Events",
+					hist.Cat("dataset", "Dataset"),
+					hist.Bin("phoIsoChg", "Photon IsoChg*$p_{T}$", 50, 3, 11),
+
+				),
 				# -- Photon EE -- #
 				"pho_EE_pt": hist.Hist(
 					"Events",
@@ -395,7 +401,9 @@ class JW_Processor(processor.ProcessorABC):
 							Pho[eventIdx][phoIdx].pfRelIso03_chg
 							* Pho[eventIdx][phoIdx].pt
 						)
-						if (isochg >= 4) & (isochg <= 10):
+						if (isochg >= 4) & (isochg <= 10):  #Full range
+						#if (isochg >= 4) & (isochg <= 6.84): # Sample1 2018Egamma RunABC x= 6.84
+						#if (isochg >= 6.84) & (isochg <= 10): # Sample2 2018Egamma RunABC x= 6.84
 							builder.boolean(True)
 						else:
 							builder.boolean(False)
@@ -412,7 +420,7 @@ class JW_Processor(processor.ProcessorABC):
 
 		# Golden Json file
 		if self._year == "2018":
-			injson = "/x5/cms/jwkim/gitdir/JWCorp/JW_analysis/Coffea_WZG/Corrections/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt.RunABD"
+			injson = "/x5/cms/jwkim/gitdir/JWCorp/JW_analysis/Coffea_WZG/Corrections/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt.RunABCD"
 
 		if self._year == "2017":
 			injson = "/x5/cms/jwkim/gitdir/JWCorp/JW_analysis/Coffea_WZG/Corrections/Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt"
@@ -493,13 +501,13 @@ class JW_Processor(processor.ProcessorABC):
 		##----------- Cut flow2: Electron Selection
 
 		EleSelmask = (
-			(Electron.pt >= 10)
+			(Electron.pt >= 20)
 			& (np.abs(Electron.eta + Electron.deltaEtaSC) < 1.479)
 			& (Electron.cutBased > 2)
 			& (abs(Electron.dxy) < 0.05)
 			& (abs(Electron.dz) < 0.1)
 		) | (
-			(Electron.pt >= 10)
+			(Electron.pt >= 20)
 			& (np.abs(Electron.eta + Electron.deltaEtaSC) > 1.479)
 			& (np.abs(Electron.eta + Electron.deltaEtaSC) <= 2.5)
 			& (Electron.cutBased > 2)
@@ -681,11 +689,12 @@ class JW_Processor(processor.ProcessorABC):
 		Ele2_Phi = ak.flatten(Diele_sel.lep2.phi)
 
 		# -- Pho -- #
-		Pho_PT = ak.flatten(leading_pho_sel.pt)
-		Pho_Eta = ak.flatten(leading_pho_sel.eta)
-		Pho_Phi = ak.flatten(leading_pho_sel.phi)
+		Pho_PT	   = ak.flatten(leading_pho_sel.pt)
+		Pho_Eta    = ak.flatten(leading_pho_sel.eta)
+		Pho_Phi    = ak.flatten(leading_pho_sel.phi)
+		Pho_IsoChg = ak.flatten(leading_pho_sel.pt * leading_pho_sel.pfRelIso03_chg)
 
-
+		
 		# -- Pho EB --#
 		Pho_EB_PT = ak.flatten(Pho_EB.pt)
 		Pho_EB_Eta = ak.flatten(Pho_EB.eta)
@@ -792,9 +801,9 @@ class JW_Processor(processor.ProcessorABC):
 		# --Photon-- #
 
 		out["phopt"].fill(dataset=dataset, phopt=Pho_PT)
-
 		out["phoeta"].fill(dataset=dataset, phoeta=Pho_Eta)
 		out["phophi"].fill(dataset=dataset, phophi=Pho_Phi)
+		out["phoIsoChg"].fill(dataset=dataset,phoIsoChg=Pho_IsoChg)
 
 		# --Photon EB --#
 		out["pho_EB_pt"].fill(
@@ -966,7 +975,7 @@ if __name__ == "__main__":
 		"Events",  # Tree name
 		JW_Processor_instance,  # Class
 		executor=processor.futures_executor,
-		executor_args={"schema": NanoAODSchema, "workers": 20},
+		executor_args={"schema": NanoAODSchema, "workers": 48},
 		# maxchunks=4,
 	)
 

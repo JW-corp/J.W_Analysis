@@ -403,7 +403,7 @@ class JW_Processor(processor.ProcessorABC):
 
 		# Golden Json file
 		if self._year == "2018":
-			injson = "/x5/cms/jwkim/gitdir/JWCorp/JW_analysis/Coffea_WZG/Corrections/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt.RunABD"
+			injson = "/x5/cms/jwkim/gitdir/JWCorp/JW_analysis/Coffea_WZG/Corrections/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt.RunABCD"
 
 		if self._year == "2017":
 			injson = "/x5/cms/jwkim/gitdir/JWCorp/JW_analysis/Coffea_WZG/Corrections/Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt"
@@ -484,13 +484,13 @@ class JW_Processor(processor.ProcessorABC):
 		##----------- Cut flow2: Electron Selection
 
 		EleSelmask = (
-			(Electron.pt >= 10)
+			(Electron.pt >= 20)
 			& (np.abs(Electron.eta + Electron.deltaEtaSC) < 1.479)
 			& (Electron.cutBased > 2)
 			& (abs(Electron.dxy) < 0.05)
 			& (abs(Electron.dz) < 0.1)
 		) | (
-			(Electron.pt >= 10)
+			(Electron.pt >= 20)
 			& (np.abs(Electron.eta + Electron.deltaEtaSC) > 1.479)
 			& (np.abs(Electron.eta + Electron.deltaEtaSC) <= 2.5)
 			& (Electron.cutBased > 2)
@@ -953,7 +953,7 @@ if __name__ == "__main__":
 		"Events",  # Tree name
 		JW_Processor_instance,  # Class
 		executor=processor.futures_executor,
-		executor_args={"schema": NanoAODSchema, "workers": 20},
+		executor_args={"schema": NanoAODSchema, "workers": 48},
 		# maxchunks=4,
 	)
 

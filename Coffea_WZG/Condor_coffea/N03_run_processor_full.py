@@ -244,7 +244,7 @@ class JW_Processor(processor.ProcessorABC):
 
 		# Golden Json file
 		if (self._year == "2018") and isData:
-			injson = "/x5/cms/jwkim/gitdir/JWCorp/JW_analysis/Coffea_WZG/Corrections/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt.RunABD"
+			injson = "/x5/cms/jwkim/gitdir/JWCorp/JW_analysis/Coffea_WZG/Corrections/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt.RunABCD"
 
 		if (self._year == "2017") and isData:
 			injson = "/x5/cms/jwkim/gitdir/JWCorp/JW_analysis/Coffea_WZG/Corrections/Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt"
@@ -283,9 +283,9 @@ class JW_Processor(processor.ProcessorABC):
 			pu_weight_idx = ak.values_astype(events.Pileup.nTrueInt, "int64")
 			pu = self._puweight_arr[pu_weight_idx]
 
-			print("## pu_idx: ", len(pu_weight_idx), pu_weight_idx)
-			print("## pu_arr: ", len(self._puweight_arr), self._puweight_arr)
-			print("## pu:", len(pu), pu)
+			#print("## pu_idx: ", len(pu_weight_idx), pu_weight_idx)
+			#print("## pu_arr: ", len(self._puweight_arr), self._puweight_arr)
+			#print("## pu:", len(pu), pu)
 
 		# <----- Helper functions ------>#
 
@@ -399,25 +399,6 @@ class JW_Processor(processor.ProcessorABC):
 		Jet = events.Jet
 
 
-		'''
-		if (not isData) and (not isFake):
-			# --Gen Photon for dR
-			genparts = events.GenPart
-			pdgID_mask = genparts.pdgId == 22
-			# mask2: isPrompt | fromHardProcess | isLastCopy
-			mask2 = (1 << 0) | (1 << 8) | (1 << 13)
-			# https://github.com/PKUHEPEWK/WGamma/blob/master/2018/wgRealPhotonTemplateModule.py
-
-			status_mask = (genparts.statusFlags & mask2) == mask2
-			gen_photons = genparts[pdgID_mask & status_mask]
-
-
-			print("#####: Debug Gen-Photon: ",ak.sum(ak.num(gen_photons)))
-			assert ak.all(
-				ak.num(gen_photons) == 1
-			)  # Raise error if len(gen_photon) != 1
-		'''
-
 		#  --Muon
 
 		if dataset == "FakeLepton":
@@ -425,11 +406,10 @@ class JW_Processor(processor.ProcessorABC):
 			MuSelmask = (
 				(Muon.pt >= 10)
 				& (abs(Muon.eta) <= 2.5)
-				& (Muon.pfRelIso04_all < 0.15)
+				& (Muon.tightId)
 			)
 
 		else:
-
 			MuSelmask = (
 				(Muon.pt >= 10)
 				& (abs(Muon.eta) <= 2.5)
@@ -442,16 +422,15 @@ class JW_Processor(processor.ProcessorABC):
 		Muon = Muon[MuSelmask]
 
 		##----------- Cut flow2: Electron Selection
-
 		if dataset == "FakeLepton":
 			
 			EleSelmask = (
-				(Electron.pt >= 10)
+				(Electron.pt >= 20)
 				& (np.abs(Electron.eta + Electron.deltaEtaSC) < 1.479)
 				& (abs(Electron.dxy) < 0.05)
 				& (abs(Electron.dz) < 0.1)
 			) | (
-				(Electron.pt >= 10)
+				(Electron.pt >= 20)
 				& (np.abs(Electron.eta + Electron.deltaEtaSC) > 1.479)
 				& (np.abs(Electron.eta + Electron.deltaEtaSC) <= 2.5)
 				& (abs(Electron.dxy) < 0.1)
@@ -459,22 +438,39 @@ class JW_Processor(processor.ProcessorABC):
 			)
 
 		else:
-
-			EleSelmask = (
-				(Electron.pt >= 10)
-				& (np.abs(Electron.eta + Electron.deltaEtaSC) < 1.479)
-				& (Electron.cutBased > 2)
-				& (abs(Electron.dxy) < 0.05)
-				& (abs(Electron.dz) < 0.1)
-				#& (Electron.genPartFlav == 1)
-			) | (
-				(Electron.pt >= 10)
-				& (np.abs(Electron.eta + Electron.deltaEtaSC) > 1.479)
-				& (np.abs(Electron.eta + Electron.deltaEtaSC) <= 2.5)
-				& (Electron.cutBased > 2)
-				& (abs(Electron.dxy) < 0.1)
-				& (abs(Electron.dz) < 0.2)
-			)
+			if not isData:
+				EleSelmask = (
+					(Electron.pt >= 20)
+					& (np.abs(Electron.eta + Electron.deltaEtaSC) < 1.479)
+					& (Electron.cutBased > 2)
+					& (abs(Electron.dxy) < 0.05)
+					& (abs(Electron.dz) < 0.1)
+					& (Electron.genPartFlav == 1)
+				) | (
+					(Electron.pt >= 20)
+					& (np.abs(Electron.eta + Electron.deltaEtaSC) > 1.479)
+					& (np.abs(Electron.eta + Electron.deltaEtaSC) <= 2.5)
+					& (Electron.cutBased > 2)
+					& (abs(Electron.dxy) < 0.1)
+					& (abs(Electron.dz) < 0.2)
+					& (Electron.genPartFlav == 1)
+				)
+			else:
+				EleSelmask = (
+					(Electron.pt >= 20)
+					& (np.abs(Electron.eta + Electron.deltaEtaSC) < 1.479)
+					& (Electron.cutBased > 2)
+					& (abs(Electron.dxy) < 0.05)
+					& (abs(Electron.dz) < 0.1)
+				) | (
+					(Electron.pt >= 20)
+					& (np.abs(Electron.eta + Electron.deltaEtaSC) > 1.479)
+					& (np.abs(Electron.eta + Electron.deltaEtaSC) <= 2.5)
+					& (Electron.cutBased > 2)
+					& (abs(Electron.dxy) < 0.1)
+					& (abs(Electron.dz) < 0.2)
+				)
+				
 
 		Electron = Electron[EleSelmask]
 
@@ -491,6 +487,7 @@ class JW_Processor(processor.ProcessorABC):
 		Muon = Muon[Tri_electron_mask]
 		events = events[Tri_electron_mask]
 
+		print("N muon: ",ak.sum(ak.num(Muon)))
 		# Stop processing if there is no event remain
 		if len(Electron) == 0:
 			return out
@@ -518,19 +515,6 @@ class JW_Processor(processor.ProcessorABC):
 		)  # default metric table: delta_r
 		dr_pho_mu_mask = ak.all(Photon.metric_table(Muon) >= 0.5, axis=-1)
 
-		# genPartFlav cut
-		"""
-		if dataset == "WZG":
-			isPrompt = (Photon.genPartFlav == 1) | (Photon.genPartFlav == 11)
-			PhoSelmask = PT_ID_mask & isgap_mask &  Pixel_seed_mask & isPrompt & dr_pho_ele_mask & dr_pho_mu_mask
-
-		elif dataset == "WZ":
-			isPrompt = (Photon.genPartFlav == 1) 
-			PhoSelmask = PT_ID_mask & isgap_mask &  Pixel_seed_mask & ~isPrompt & dr_pho_ele_mask & dr_pho_mu_mask
-				
-		else:
-			PhoSelmask = PT_ID_mask  & isgap_mask &  Pixel_seed_mask & dr_pho_ele_mask & dr_pho_mu_mask
-		"""
 
 		# Add genPartFlav to remove Fake Photon in MC samples ( They are already considered by data driven method )
 		if not isData:
@@ -622,7 +606,7 @@ class JW_Processor(processor.ProcessorABC):
 			# Read Fake fraction --> Mapping bin name to int()
 
 			if self._year == "2018":
-				in_dict = np.load("Fitting_2018/Fit_results.npy", allow_pickle="True")[
+				in_dict = np.load("FakePhoton_16bin_IsoChg4to10", allow_pickle="True")[
 					()
 				]
 
@@ -851,6 +835,7 @@ class JW_Processor(processor.ProcessorABC):
 		Jet_base = Jet[Baseline_mask]
 		MET_base = MET[Baseline_mask] 
 		events_base = events[Baseline_mask]
+
 		if ak.sum(ak.num(Muon)) != 0:
 			Muon_base = Muon[Baseline_mask]
 
@@ -964,6 +949,7 @@ class JW_Processor(processor.ProcessorABC):
 		Mlll_mask = ak.firsts((Triple_eee.p4 + Triple_eee.lep3).mass) > 100
 		
 		if ak.sum(ak.num(Muon)) != 0:
+			print("What?!!!!!! another lepton! Muon!")
 			Muon_veto = ak.num(Muon) == 0
 			CR_ZJets_mask = (Muon_veto & Zmass_window_mask & MET_mask & bjet_veto & Mlll_mask)
 		else:
@@ -1167,13 +1153,14 @@ class JW_Processor(processor.ProcessorABC):
 			if dataset == "FakeLepton":
 				weights.add("fake_lepton_weight",fake_lep_w)
 
-			# Weight and SF here
-			if not (isData | isFake):
-				weights.add("pileup", pu)
-				weights.add("ele_id", ele_medium_id_sf)
-				weights.add("pho_id", get_pho_medium_id_sf)
-				weights.add("ele_reco", ele_reco_sf)
-				weights.add("ele_trigger", ele_trig_weight)
+			else:
+				# Weight and SF here
+				if not (isData | isFake):
+					weights.add("pileup", pu)
+					weights.add("ele_id", ele_medium_id_sf)
+					weights.add("pho_id", get_pho_medium_id_sf)
+					weights.add("ele_reco", ele_reco_sf)
+					weights.add("ele_trigger", ele_trig_weight)
 
 			# ---------------------------- Fill hist --------------------------------------#
 
@@ -1391,11 +1378,9 @@ if __name__ == "__main__":
 		}
 
 		if year == "2018":
-			pu_path = (
-				"../Corrections/Pileup/puWeight/npy_Run2018ABD_pure/"
-				+ pu_path_dict[sample_name]
-			)  # Local pure 2018
-			# pu_path = '../Corrections/Pileup/puWeight/npy_Run2018ABD/'+ pu_path_dict[sample_name] # Local skim 2018
+			pu_path = "../Corrections/Pileup/puWeight/npy_UL_Run2018/"+ pu_path_dict[sample_name]
+			
+
 
 		if year == "2017":
 			pu_path = (
